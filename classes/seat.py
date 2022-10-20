@@ -1,11 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
+
+# ˄
 
 
 class Seat(object):
+    # ˅
+    
+    # ˄
 
     def __init__(self):
 
-        self.__seat_row = None
+        self.__type = None
 
-        self.__sear_column = None
-
+        # ˅
         pass
+        # ˄
+
+    def get_type(self):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄
