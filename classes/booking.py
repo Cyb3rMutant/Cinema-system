@@ -1,20 +1,22 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
+
+# ˄
 
 
 class Booking(object):
+    # ˅
+    
+    # ˄
 
-    def __init__(self):
+    def __init__(self, booking_reference, showing, seats, number_of_tickets, date_of_booking, price, name, phone, email):
 
         self.__booking_reference = None
-
-        self.__date = None
-
-        self.__film = None
 
         self.__showing = None
 
         self.__seats = None
-
-        self.__ticket_type = None
 
         self.__number_of_tickets = None
 
@@ -28,10 +30,70 @@ class Booking(object):
 
         self.__email = None
 
+        # ˅
         pass
+        # ˄
 
     def get_reciept(self):
+        # ˅
         pass
+        # ˄
 
     def get_ticket(self):
+        # ˅
         pass
+        # ˄
+
+    def get_booking_reference(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_showing(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_seats(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_number_of_tickets(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_date_of_booking(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_price(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_name(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_phone(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_email(self):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄

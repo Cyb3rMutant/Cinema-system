@@ -1,11 +1,19 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
 from seat import Seat
 from show import Show
 
 
-class Screen(object):
+# ˄
 
-    def __init__(self):
+
+class Screen(object):
+    # ˅
+    
+    # ˄
+
+    def __init__(self, screen_number, seats, shows):
 
         self.__screen_number = None
 
@@ -19,4 +27,30 @@ class Screen(object):
 
         self.__show = []
 
+        # ˅
         pass
+        # ˄
+
+    def get_screen_number(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_seats(self):
+        # ˅
+        pass
+        # ˄
+
+    def get_shows(self):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄
