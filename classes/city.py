@@ -12,7 +12,7 @@ class City(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, city_name, morning_price, afternoon_price, evening_price, cinemas):
 
         self.__city_name = None
 

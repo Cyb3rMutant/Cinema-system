@@ -13,7 +13,7 @@ class Screen(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, screen_number, seats, shows):
 
         self.__screen_number = None
 

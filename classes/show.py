@@ -12,7 +12,7 @@ class Show(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, show_number, time, seats_available, film):
 
         self.__show_number = None
 

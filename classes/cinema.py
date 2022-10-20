@@ -12,7 +12,7 @@ class Cinema(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, cinema_id, address, screens):
 
         self.__cinema_id = None
 

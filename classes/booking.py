@@ -10,19 +10,13 @@ class Booking(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, booking_reference, showing, seats, number_of_tickets, date_of_booking, price, name, phone, email):
 
         self.__booking_reference = None
-
-        self.__date = None
-
-        self.__film = None
 
         self.__showing = None
 
         self.__seats = None
-
-        self.__ticket_type = None
 
         self.__number_of_tickets = None
 
@@ -55,11 +49,6 @@ class Booking(object):
         pass
         # ˄
 
-    def get_date(self):
-        # ˅
-        pass
-        # ˄
-
     def get_showing(self):
         # ˅
         pass
@@ -70,12 +59,12 @@ class Booking(object):
         pass
         # ˄
 
-    def get_ticket_type(self):
+    def get_number_of_tickets(self):
         # ˅
         pass
         # ˄
 
-    def get_number_of_tickets(self):
+    def get_date_of_booking(self):
         # ˅
         pass
         # ˄

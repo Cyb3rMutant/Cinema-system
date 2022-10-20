@@ -10,7 +10,7 @@ class Film(object):
     
     # ˄
 
-    def __init__(self):
+    def __init__(self, title, rating, genre, year, age_rating, duration, description, cast):
 
         self.__title = None
 
