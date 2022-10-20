@@ -1,99 +1,58 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
+from datetime import datetime
+from seat import Seat
+from show import Show
 
 
 class Booking(object):
-    # ˅
-    
-    # ˄
+    def __init__(self, booking_reference: str, showing: Show, seats: Seat, number_of_tickets: int, date_of_booking: datetime, price: int, name: str, phone: str, email: str):
 
-    def __init__(self, booking_reference, showing, seats, number_of_tickets, date_of_booking, price, name, phone, email):
+        self.__booking_reference = booking_reference
 
-        self.__booking_reference = None
+        self.__showing = showing
 
-        self.__showing = None
+        self.__seats = seats
 
-        self.__seats = None
+        self.__number_of_tickets = number_of_tickets
 
-        self.__number_of_tickets = None
+        self.__date_of_booking = date_of_booking
 
-        self.__date_of_booking = None
+        self.__price = price
 
-        self.__price = None
+        self.__name = name
 
-        self.__name = None
+        self.__phone = phone
 
-        self.__phone = None
-
-        self.__email = None
-
-        # ˅
-        pass
-        # ˄
+        self.__email = email
 
     def get_reciept(self):
-        # ˅
-        pass
-        # ˄
+        return self.__reciept
 
     def get_ticket(self):
-        # ˅
-        pass
-        # ˄
+        return self.__ticket
 
     def get_booking_reference(self):
-        # ˅
-        pass
-        # ˄
+        return self.__booking_reference
 
     def get_showing(self):
-        # ˅
-        pass
-        # ˄
+        return self.__showing
 
     def get_seats(self):
-        # ˅
-        pass
-        # ˄
+        return self.__seats
 
     def get_number_of_tickets(self):
-        # ˅
-        pass
-        # ˄
+        return self.__number_of_tickets
 
     def get_date_of_booking(self):
-        # ˅
-        pass
-        # ˄
+        return self.__date_of_booking
 
     def get_price(self):
-        # ˅
-        pass
-        # ˄
+        return self.__price
 
     def get_name(self):
-        # ˅
-        pass
-        # ˄
+        return self.__name
 
     def get_phone(self):
-        # ˅
-        pass
-        # ˄
+        return self.__phone
 
     def get_email(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__email

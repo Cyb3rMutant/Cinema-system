@@ -1,47 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
+from cinema import Cinema
 
 
-class User(object):
-    # ˅
-    
-    # ˄
+class User():
+    def __init__(self, name: str, id: int, branch: Cinema):
 
-    def __init__(self, name, id):
+        self.__name = name
 
-        self.__name = None
+        self.__id = id
 
-        self.__id = None
-
-        self.__branch = None
-
-        # ˅
-        pass
-        # ˄
+        self.__branch = branch
 
     def get_name(self):
-        # ˅
-        pass
-        # ˄
+        return self.__name
 
     def get_id(self):
-        # ˅
-        pass
-        # ˄
+        return self.__id
 
     def get_branch(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__branch

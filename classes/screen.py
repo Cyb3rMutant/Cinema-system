@@ -1,56 +1,21 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 from seat import Seat
 from show import Show
 
 
-# ˄
+class Screen():
+    def __init__(self, screen_number: int, seats: dict, shows: list):
 
+        self.__screen_number = screen_number
 
-class Screen(object):
-    # ˅
-    
-    # ˄
+        self.__seats = seats
 
-    def __init__(self, screen_number, seats, shows):
-
-        self.__screen_number = None
-
-        self.__seats = None
-
-        self.__shows = None
-
-        self.__show = []
-
-        self.__seat = []
-
-        self.__show = []
-
-        # ˅
-        pass
-        # ˄
+        self.__shows = shows
 
     def get_screen_number(self):
-        # ˅
-        pass
-        # ˄
+        return self.__screen_number
 
     def get_seats(self):
-        # ˅
-        pass
-        # ˄
+        return self.__seats
 
     def get_shows(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__shows

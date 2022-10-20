@@ -1,40 +1,12 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
+class Seat():
+    def __init__(self, seat_number: int, seat_type: str):
 
-# ˄
+        self.__seat_number = seat_number
 
-
-class Seat(object):
-    # ˅
-    
-    # ˄
-
-    def __init__(self, type, seat_number):
-
-        self.__seat_number = None
-
-        self.__type = None
-
-        # ˅
-        pass
-        # ˄
+        self.__seat_type = seat_type
 
     def get_seat_number(self):
-        # ˅
-        pass
-        # ˄
+        return self.__seat_number
 
-    def get_type(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+    def get_seat_type(self):
+        return self.__seat_type
