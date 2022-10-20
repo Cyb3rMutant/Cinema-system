@@ -1,0 +1,17 @@
+========================================================================
+drop database if exists tkinter;
+create database tkinter;
+use tkinter;
+CREATE TABLE `users` (
+  `userID` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `email` varchar(120) NOT NULL,
+  `password_hash` varchar(128) NOT NULL,
+  `usertype` varchar(8) NOT NULL DEFAULT 'standard',
+  PRIMARY KEY (`userID`)
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8;
+
+INSERT INTO `users` VALUES (1,'roh','roh@gmail.com','$5$rounds=535000$yifUHYNoA5Vojx6r$4l3zf9llXdB3L7bl.qfMe8WSShB5JoG4ewVQa5cVCp0','standard');
+========================================================================
+username=roh
+password=roh
