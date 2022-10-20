@@ -3,7 +3,7 @@ from seat import Seat
 from show import Show
 
 
-class Booking(object):
+class Booking():
     def __init__(self, booking_reference: str, showing: Show, seats: Seat, number_of_tickets: int, date_of_booking: datetime, price: int, name: str, phone: str, email: str):
 
         self.__booking_reference = booking_reference
@@ -25,10 +25,10 @@ class Booking(object):
         self.__email = email
 
     def get_reciept(self):
-        return self.__reciept
+        pass
 
     def get_ticket(self):
-        return self.__ticket
+        pass
 
     def get_booking_reference(self):
         return self.__booking_reference
