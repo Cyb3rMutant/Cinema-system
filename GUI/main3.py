@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 from turtle import right
+from urllib.request import DataHandler
 import mysql.connector
 from passlib.hash import sha256_crypt
 
@@ -11,13 +12,13 @@ def get_connection():
     conn = mysql.connector.connect(host='localhost',
                                    port='3306',
                                    user='root',
-                                   password='',
+                                   password='avatar',
                                    database='tkinter')
     return conn
 
 def main():
     root = tk.Tk()
-    app = Login(root)
+    app = DashboardTest(root)
 
 
 class Login:
@@ -92,56 +93,30 @@ class DashboardTest:
         self.root.geometry("1350x800+0+0")
         self.root.configure(background="gainsboro")
 
-        MainFrame = Frame(self.root, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
-        MainFrame.grid()
-        HeaderFrame = Frame(MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
-        HeaderFrame.grid()    
-        BodyFrame= Frame(MainFrame, bd=10, width=1320, height=670)
-        BodyFrame.grid()
+        self.MainFrame = Frame(self.root, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
+        self.MainFrame.grid()
+        self.HeaderFrame = Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
+        self.HeaderFrame.grid()    
+        self.BodyFrame= Frame(self.MainFrame, bd=10, width=1320, height=670, bg="gainsboro",relief=RIDGE)
+        self.BodyFrame.grid()
+
+
+        self.name_label = tk.Label(self.HeaderFrame, text="roh", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.name_label.place(x=0,y=0,width=443,height=100)
+
+        self.name_label2 = tk.Label(self.HeaderFrame, text="roh2", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.name_label2.place(x=443,y=0,width=443,height=100)
+
+        self.name_label3 = tk.Label(self.HeaderFrame, text="roh3", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.name_label3.place(x=886,y=0,width=443,height=100)
+
+        self.root.mainloop()
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# class Dashboard:
-#     def __init__(self, window,name,usertype):
-#         self.window = window
-#         self.window.title("Dashboard")
-#         self.window.geometry("1200x700")
-#         self.window.config(bg='#333333')
-#         # self.frame = tk.Frame(self.window)
-#         # self.frame.config(bg='#333333')
-
-#         self.window.columnconfigure(0,weight=1)
-#         self.window.columnconfigure(1,weight=3)
-#         self.window.columnconfigure(2,weight=1)
-
-#         self.usertype = str(usertype)
-#         self.name = str(name)
-
-#         self.name_and_type = tk.Label(self.window, text=self.name + "[" + self.usertype + "]", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16),pady=20)
-#         self.name_and_type.pack(side=RIGHT,anchor=NE)
-
- 
-#         self.name_label = tk.Label(self.window, text=self.name, borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-#         self.name_label.place(relx=0.1,rely=0.2,relwidth=0.4,relheight=0.7)    
-
-
-
-#         self.window.pack()
-#         self.window.mainloop()        
 
 
 
