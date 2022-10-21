@@ -38,8 +38,7 @@ class Login:
         self.password_label = tk.Label(self.frame, text='Password', bg='#333333', fg='#FFFFFF',font=("Arial",18))
         self.password_entry = tk.Entry(self.frame, show='*', font=("Arial", 18))
         self.login_button = tk.Button(self.frame, text='Login', bg='#DD2424', fg='#000000',font=("Arial",18),command=self.login_verify)
-
-
+        
         #Placing widgets
         self.login_label.grid(row=0, column=1, columnspan=2,pady=45)
         self.username_label.grid(row=1, column=1)
@@ -87,34 +86,66 @@ class Login:
 
 
 class DashboardTest:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Dashboard")
-        self.root.geometry("1350x800+0+0")
-        self.root.configure(background="gainsboro")
+    def __init__(self, window):
+        self.window = window
+        self.window.title("Dashboard")
+        self.window.geometry("1350x800+0+0")
+        self.window.configure(background="gainsboro")
 
-        self.MainFrame = Frame(self.root, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
+        self.MainFrame = Frame(self.window, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
         self.MainFrame.grid()
         self.HeaderFrame = Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
-        self.HeaderFrame.grid()    
-        self.BodyFrame= Frame(self.MainFrame, bd=10, width=1320, height=670, bg="gainsboro",relief=RIDGE)
+        self.HeaderFrame.config(bg='#333333')
+        self.HeaderFrame.grid()
+            
+        self.BodyFrame= Frame(self.MainFrame, bd=10, width=1330, height=670, bg="gainsboro",relief=RIDGE)
         self.BodyFrame.grid()
+        #Could have a boolean of isAdmin isManager. Then place widgets dependant on it
+        #Dependent on the user type!
+
+        #Header
+        self.page_label = tk.Label(self.HeaderFrame, text="Dashboard", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.page_label.place(x=0,y=5,width=443,height=70) #443 = width/3
+        self.title_label = tk.Label(self.HeaderFrame, text="Horizon Cinemas", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.title_label.place(x=443,y=5,width=443,height=70) 
+        self.branch_label = tk.Label(self.HeaderFrame, text="Bristol City Centre", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.branch_label.place(x=890,y=5,width=400) #Higher width overlaps border. Had to make it smaller and adjust with X     
+        self.name_label3 = tk.Label(self.HeaderFrame, text="James Jenkins [Booking Staff]", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.name_label3.place(x=890,y=40,width=400)
 
 
-        self.name_label = tk.Label(self.HeaderFrame, text="roh", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-        self.name_label.place(x=0,y=0,width=443,height=100)
+        #Body
+        self.create_booking_btn = tk.Button(self.BodyFrame, text="Create Booking", borderwidth=1)
+        self.view_bookings_btn = tk.Button(self.BodyFrame, text="View Bookings", borderwidth=1)
+        self.view_film_listings_btn = tk.Button(self.BodyFrame, text="View Film Listings", borderwidth=1)
+        self.cancel_booking_btn = tk.Button(self.BodyFrame, text="Cancel Booking", borderwidth=1)
+        
+        self.add_listing_btn = tk.Button(self.BodyFrame, text="Add Listing", borderwidth=1)
+        self.remove_listing_btn = tk.Button(self.BodyFrame, text="Remove Listing", borderwidth=1)
+        self.update_listing_btn = tk.Button(self.BodyFrame, text="Update Listing", borderwidth=1)
+        self.generate_report_btn = tk.Button(self.BodyFrame, text="Generate Report", borderwidth=1) 
+        
+        self.add_new_cinema_btn = tk.Button(self.BodyFrame, text="Add New Cinema", borderwidth=1)
+        self.add_listing_master_btn = tk.Button(self.BodyFrame, text="Add Listing to Cinema", borderwidth=1)        
 
-        self.name_label2 = tk.Label(self.HeaderFrame, text="roh2", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-        self.name_label2.place(x=443,y=0,width=443,height=100)
 
-        self.name_label3 = tk.Label(self.HeaderFrame, text="roh3", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-        self.name_label3.place(x=886,y=0,width=443,height=100)
+        #Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
+        self.create_booking_btn.place(x=170,y=150,width=240,height=100)
+        self.view_bookings_btn.place(x=420,y=150,width=240,height=100)
+        self.view_film_listings_btn.place(x=670,y=150,width=240,height=100)
+        self.cancel_booking_btn.place(x=920,y=150,width=240,height=100)
 
-        self.root.mainloop()
+        self.add_listing_btn.place(x=170,y=250,width=240,height=100)
+        self.remove_listing_btn.place(x=420,y=250,width=240,height=100)
+        self.update_listing_btn.place(x=670,y=250,width=240,height=100)
+        self.generate_report_btn.place(x=920,y=250,width=240,height=100)
+
+        self.add_new_cinema_btn.place(x=170,y=350,width=240,height=100)
+        self.add_listing_master_btn.place(x=420,y=350,width=240,height=100)
 
 
 
-
+        self.window.mainloop()
 
 
 
