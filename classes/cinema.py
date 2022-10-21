@@ -1,51 +1,20 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 from screen import Screen
 
 
-# ˄
+class Cinema():
+    def __init__(self, cinema_id: int, address: str, screens: list):
 
+        self.__cinema_id = cinema_id
 
-class Cinema(object):
-    # ˅
-    
-    # ˄
+        self.__address = address
 
-    def __init__(self, cinema_id, address, screens):
-
-        self.__cinema_id = None
-
-        self.__address = None
-
-        self.__screens = None
-
-        self.__screen = []
-
-        # ˅
-        pass
-        # ˄
+        self.__screens = screens
 
     def get_cinema_id(self):
-        # ˅
-        pass
-        # ˄
+        return self.__cinema_id
 
     def get_address(self):
-        # ˅
-        pass
-        # ˄
+        return self.__address
 
     def get_screens(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__screens

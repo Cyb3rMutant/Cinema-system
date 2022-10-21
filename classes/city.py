@@ -1,65 +1,30 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 from cinema import Cinema
 
 
-# ˄
+class City():
+    def __init__(self, city_name: str, morning_price: int, afternoon_price: int, evening_price: int, cinemas: list):
 
+        self.__city_name = city_name
 
-class City(object):
-    # ˅
-    
-    # ˄
+        self.__morning_price = morning_price
 
-    def __init__(self, city_name, morning_price, afternoon_price, evening_price, cinemas):
+        self.__afternoon_price = afternoon_price
 
-        self.__city_name = None
+        self.__evening_price = evening_price
 
-        self.__morning_price = None
-
-        self.__afternoon_price = None
-
-        self.__evening_price = None
-
-        self.__cinemas = None
-
-        self.__cinema = []
-
-        # ˅
-        pass
-        # ˄
+        self.__cinemas = list()
 
     def get_city_name(self):
-        # ˅
-        pass
-        # ˄
+        return self.__city_name
 
     def get_morning_price(self):
-        # ˅
-        pass
-        # ˄
+        return self.__morning_price
 
     def get_afternoon_price(self):
-        # ˅
-        pass
-        # ˄
+        return self.__afternoon_price
 
     def get_evening_price(self):
-        # ˅
-        pass
-        # ˄
+        return self.__evening_price
 
     def get_cinemas(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__cinemas

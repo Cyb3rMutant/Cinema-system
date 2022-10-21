@@ -1,58 +1,35 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
+from datetime import datetime
 from film import Film
 
 
-# ˄
+class Show():
+    def __init__(self, show_number: int, time: datetime, seats_available_vip: int, seats_available_upper: int, seats_available_lower: int, film: Film):
+        self.__show_number = show_number
 
+        self.__time = time
 
-class Show(object):
-    # ˅
-    
-    # ˄
+        self.__seats_available_vip = seats_available_vip
 
-    def __init__(self, show_number, time, seats_available, film):
+        self.__seats_available_upper = seats_available_upper
 
-        self.__show_number = None
+        self.__seats_available_lower = seats_available_lower
 
-        self.__time = None
+        self.__film = film
 
-        self.__seats_available = None
-
-        self.__film = None
-
-        self.__film = None
-
-        # ˅
-        pass
-        # ˄
-
-    def get_show_mumber(self):
-        # ˅
-        pass
-        # ˄
+    def get_show_number(self):
+        return self.__show_number
 
     def get_time(self):
-        # ˅
-        pass
-        # ˄
+        return self.__time
 
-    def get_seats_available(self):
-        # ˅
-        pass
-        # ˄
+    def get_seats_available_vip(self):
+        return self.__seats_available_vip
+
+    def get_seats_available_lower(self):
+        return self.__seats_available_upper
+
+    def get_seats_available_lower(self):
+        return self.__seats_available_lower
 
     def get_film(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__film
