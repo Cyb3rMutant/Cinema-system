@@ -3,11 +3,11 @@ from show import Show
 
 
 class Screen():
-    def __init__(self, screen_number: int, seats: dict, shows: list):
+    def __init__(self, screen_number: int, shows: list):
 
         self.__screen_number = screen_number
 
-        self.__seats = seats
+        self.__seats = dict()
 
         self.__shows = shows
 

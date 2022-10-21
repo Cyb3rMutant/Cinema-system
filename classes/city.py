@@ -2,7 +2,7 @@ from cinema import Cinema
 
 
 class City():
-    def __init__(self, city_name: str, morning_price: int, afternoon_price: int, evening_price: int, cinemas: list):
+    def __init__(self, city_name: str, morning_price: int, afternoon_price: int, evening_price: int):
 
         self.__city_name = city_name
 
