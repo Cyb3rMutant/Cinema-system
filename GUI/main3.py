@@ -4,6 +4,7 @@ from tkinter import *
 from turtle import right
 from urllib.request import DataHandler
 import mysql.connector
+from numpy import logical_and
 from passlib.hash import sha256_crypt
 
 #This one is a work in progress. Im trying to place stuff around the window
@@ -18,8 +19,9 @@ def get_connection():
 
 def main():
     root = tk.Tk()
-    app = DashboardTest(root)
+    app = Login(root)
 
+# global usertype #Potentially used for future sessions
 
 class Login:
     def __init__(self,window):
@@ -70,6 +72,8 @@ class Login:
             if sha256_crypt.verify(self.password, str(data[1])):
                 messagebox.showinfo(title="Login Successful",message="You have successfully logged in.")
                 self.window.destroy()
+                # global usertype
+                # usertype = str(data[2])
                 self.create_dashboard(str(data[0]),str(data[2]))
 
             else:
@@ -91,7 +95,7 @@ class DashboardTest:
         self.window.title("Dashboard")
         self.window.geometry("1350x800+0+0")
         self.window.configure(background="gainsboro")
-
+        print(str(usertype))
         self.MainFrame = Frame(self.window, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
         self.MainFrame.grid()
         self.HeaderFrame = Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
