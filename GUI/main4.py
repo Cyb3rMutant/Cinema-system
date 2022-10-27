@@ -1,14 +1,11 @@
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import *
-from turtle import right
-from urllib.request import DataHandler
+from click import command
 import mysql.connector
-from numpy import logical_and
 from passlib.hash import sha256_crypt
-
+from tkcalendar import Calendar, DateEntry
+from datetime import datetime
 #Started using inheritence for windows. In the testing stage atm of it
-
+#Started create booking GUI, working on validation
 def get_connection():
     conn = mysql.connector.connect(host='localhost',
                                    port='3306',
@@ -19,7 +16,7 @@ def get_connection():
 
 def main():
     root = tk.Tk()
-    app = Dashboard(root)
+    app = BookingGUI(root)
 
 
 class Login:
@@ -65,17 +62,17 @@ class Login:
         
         data = dbcursor.fetchone()
         if dbcursor.rowcount < 1:
-            messagebox.showerror(title="Error",message="User doesnt exist.")
+            tk.messagebox.showerror(title="Error",message="User doesnt exist.")
 
         else:
             if sha256_crypt.verify(self.password, str(data[1])):
-                messagebox.showinfo(title="Login Successful",message="You have successfully logged in.")
+                tk.messagebox.showinfo(title="Login Successful",message="You have successfully logged in.")
                 self.window.destroy()
 
                 self.create_dashboard(str(data[0]),str(data[2]))
 
             else:
-                messagebox.showerror(title="Error",message="Incorrect username or password.")
+                tk.messagebox.showerror(title="Error",message="Incorrect username or password.")
 
     
     def create_dashboard(self,name,usertype):
@@ -91,12 +88,12 @@ class BaseWindow():
         self.window.title("Dashboard")
         self.window.geometry("1350x800+0+0")
         self.window.configure(background="gainsboro")
-        self.MainFrame = Frame(self.window, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
+        self.MainFrame = tk.Frame(self.window, bd=10, width=1350, height=800, bg='gainsboro',relief=tk.RIDGE)
         self.MainFrame.grid()
-        self.HeaderFrame = Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
+        self.HeaderFrame = tk.Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=tk.RIDGE)
         self.HeaderFrame.config(bg='#333333')
         self.HeaderFrame.grid()          
-        self.BodyFrame= Frame(self.MainFrame, bd=10, width=1330, height=670, bg="gainsboro",relief=RIDGE)
+        self.BodyFrame= tk.Frame(self.MainFrame, bd=10, width=1330, height=670, bg="gainsboro",relief=tk.RIDGE)
         self.BodyFrame.grid()
   
 
@@ -164,6 +161,43 @@ class BookingGUI(BaseWindow):
         #Page Name
         self.page_label = tk.Label(self.HeaderFrame, text="Create Booking", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
         self.page_label.place(x=0,y=5,width=443,height=70) #443 = width/3
+
+        #Body
+        #Creating Widgets
+        self.date_today = datetime.now()
+        self.date_label = tk.Label(self.BodyFrame, text="Select Date",fg='#DD2424', font=("Arial",16))
+        self.date_entry = DateEntry(self.BodyFrame,width=10,font=("Arial",15),mindate=self.date_today)
+        
+        self.select_film_label = tk.Label(self.BodyFrame, text="Select Film",fg='#DD2424', font=("Arial",16))
+
+
+        self.film_list = self.get_film_listings()
+        self.options = tk.StringVar(self.BodyFrame)
+        self.options.set(self.film_list[0]) # default value
+        self.select_film_entry =tk.OptionMenu(self.BodyFrame, self.options, *self.film_list)
+        
+
+        #Placing Widgets
+        self.date_label.place(x=150,y=0) 
+        self.date_entry.place(x=350,y=0)
+
+        self.select_film_label.place(x=150,y=100)
+        self.select_film_entry.place(x=350, y=100)
+
+        self.window.mainloop()
+
+        
+    def get_film_listings(self):
+        self.conn = get_connection()
+        if self.conn != None:
+            self.dbcursor = self.conn.cursor()
+            self.dbcursor.execute("SELECT film_name FROM films")
+            self.film_list = self.dbcursor.fetchall()
+        
+        self.dbcursor.close()
+        self.conn.close()
+        return self.film_list
+    
 
 
 if (__name__ == "__main__"):
