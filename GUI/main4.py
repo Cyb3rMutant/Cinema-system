@@ -7,7 +7,7 @@ import mysql.connector
 from numpy import logical_and
 from passlib.hash import sha256_crypt
 
-#This one is a work in progress. Im trying to place stuff around the window
+#Started using inheritence for windows. In the testing stage atm of it
 
 def get_connection():
     conn = mysql.connector.connect(host='localhost',
@@ -19,9 +19,8 @@ def get_connection():
 
 def main():
     root = tk.Tk()
-    app = Login(root)
+    app = Dashboard(root)
 
-# global usertype #Potentially used for future sessions
 
 class Login:
     def __init__(self,window):
@@ -72,8 +71,7 @@ class Login:
             if sha256_crypt.verify(self.password, str(data[1])):
                 messagebox.showinfo(title="Login Successful",message="You have successfully logged in.")
                 self.window.destroy()
-                # global usertype
-                # usertype = str(data[2])
+
                 self.create_dashboard(str(data[0]),str(data[2]))
 
             else:
@@ -84,42 +82,44 @@ class Login:
         self.root = tk.Tk()
         self.name = name
         self.usertype = usertype
-        self.app = DashboardTest(self.root)
-        #We can have here if usertype is... then direct it to that class dashboard. We can use inheritence for the classes or hardcode it
+        self.app = Dashboard(self.root)
 
 
-
-class DashboardTest:
+class BaseWindow():
     def __init__(self, window):
         self.window = window
         self.window.title("Dashboard")
         self.window.geometry("1350x800+0+0")
         self.window.configure(background="gainsboro")
-        
         self.MainFrame = Frame(self.window, bd=10, width=1350, height=800, bg='gainsboro',relief=RIDGE)
         self.MainFrame.grid()
         self.HeaderFrame = Frame(self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro',relief=RIDGE)
         self.HeaderFrame.config(bg='#333333')
-        self.HeaderFrame.grid()
-            
+        self.HeaderFrame.grid()          
         self.BodyFrame= Frame(self.MainFrame, bd=10, width=1330, height=670, bg="gainsboro",relief=RIDGE)
         self.BodyFrame.grid()
-        #Could have a boolean of isAdmin isManager. Then place widgets dependant on it
-        #Dependent on the user type!
+  
 
         #Header
-        self.page_label = tk.Label(self.HeaderFrame, text="Dashboard", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-        self.page_label.place(x=0,y=5,width=443,height=70) #443 = width/3
+        #Page Name is different for each class. We place them on the class itself. (Top Left Title)
         self.title_label = tk.Label(self.HeaderFrame, text="Horizon Cinemas", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
         self.title_label.place(x=443,y=5,width=443,height=70) 
         self.branch_label = tk.Label(self.HeaderFrame, text="Bristol City Centre", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
         self.branch_label.place(x=890,y=5,width=400) #Higher width overlaps border. Had to make it smaller and adjust with X     
-        self.name_label3 = tk.Label(self.HeaderFrame, text="James Jenkins [Booking Staff]", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
-        self.name_label3.place(x=890,y=40,width=400)
+        self.name_label = tk.Label(self.HeaderFrame, text="James Jenkins [Booking Staff]", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.name_label.place(x=890,y=40,width=400)
+        
 
+class Dashboard(BaseWindow):
+    def __init__(self, window):
+        super().__init__(window)
+        
+        #Page Title
+        self.page_label = tk.Label(self.HeaderFrame, text="Dashboard", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.page_label.place(x=0,y=5,width=443,height=70) #443 = width/3
 
         #Body
-        self.create_booking_btn = tk.Button(self.BodyFrame, text="Create Booking", borderwidth=1)
+        self.create_booking_btn = tk.Button(self.BodyFrame, text="Create Booking", borderwidth=1, command=self.create_booking_gui)
         self.view_bookings_btn = tk.Button(self.BodyFrame, text="View Bookings", borderwidth=1)
         self.view_film_listings_btn = tk.Button(self.BodyFrame, text="View Film Listings", borderwidth=1)
         self.cancel_booking_btn = tk.Button(self.BodyFrame, text="Cancel Booking", borderwidth=1)
@@ -151,8 +151,19 @@ class DashboardTest:
 
         self.window.mainloop()
 
+    def create_booking_gui(self):
+        self.root = tk.Tk()
+        self.window.destroy()
+        self.app = BookingGUI(self.root)
 
 
+class BookingGUI(BaseWindow):
+    def __init__(self, window):
+        super().__init__(window)
+        
+        #Page Name
+        self.page_label = tk.Label(self.HeaderFrame, text="Create Booking", borderwidth=1, bg='#333333',fg='#DD2424',font=("Arial",16))
+        self.page_label.place(x=0,y=5,width=443,height=70) #443 = width/3
 
 
 if (__name__ == "__main__"):
