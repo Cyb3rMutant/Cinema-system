@@ -1,10 +1,11 @@
+from customer import Customer
 from datetime import datetime
 from seat import Seat
 from show import Show
 
 
 class Booking():
-    def __init__(self, booking_reference: str, showing: Show, seats: Seat, number_of_tickets: int, date_of_booking: datetime, price: int, name: str, phone: str, email: str):
+    def __init__(self, booking_reference: str, showing: Show, seats: Seat, number_of_tickets: int, date_of_booking: datetime, price: int, customer: Customer):
 
         self.__booking_reference = booking_reference
 
@@ -18,11 +19,7 @@ class Booking():
 
         self.__price = price
 
-        self.__name = name
-
-        self.__phone = phone
-
-        self.__email = email
+        self.__customer = customer
 
     def get_reciept(self):
         pass
@@ -48,11 +45,5 @@ class Booking():
     def get_price(self):
         return self.__price
 
-    def get_name(self):
-        return self.__name
-
-    def get_phone(self):
-        return self.__phone
-
-    def get_email(self):
-        return self.__email
+    def get_customer(self):
+        return self.__customer
