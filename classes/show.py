@@ -3,16 +3,16 @@ from film import Film
 
 
 class Show():
-    def __init__(self, show_number: int, time: datetime, seats_available_vip: int, seats_available_upper: int, seats_available_lower: int, film: Film):
+    def __init__(self, show_number: int, time: datetime, available_vip_seats: int, available_upper_seats: int, available_lower_seats: int, film: Film):
         self.__show_number = show_number
 
         self.__time = time
 
-        self.__seats_available_vip = seats_available_vip
+        self.__available_vip_seats = available_vip_seats
 
-        self.__seats_available_upper = seats_available_upper
+        self.__available_upper_seats = available_upper_seats
 
-        self.__seats_available_lower = seats_available_lower
+        self.__available_lower_seats = available_lower_seats
 
         self.__film = film
 
@@ -22,14 +22,14 @@ class Show():
     def get_time(self):
         return self.__time
 
-    def get_seats_available_vip(self):
-        return self.__seats_available_vip
+    def get_available_vip_seats(self):
+        return self.__available_vip_seats
 
-    def get_seats_available_lower(self):
-        return self.__seats_available_upper
+    def get_available_lower_seats(self):
+        return self.__available_upper_seats
 
-    def get_seats_available_lower(self):
-        return self.__seats_available_lower
+    def get_available_lower_seats(self):
+        return self.__available_lower_seats
 
     def get_film(self):
         return self.__film
