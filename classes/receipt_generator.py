@@ -1,10 +1,33 @@
-from classes.booking import Booking
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
+
+# ˄
 
 
 class Receipt_generator(object):
-    def __init__(self, booking: Booking):
+    # ˅
+    
+    # ˄
 
-        self.__booking = booking
+    def __init__(self, booking):
 
-    def gen_ticket(self):
+        self.__booking = None
+
+        # ˅
         pass
+        # ˄
+
+    def gen_receipt(self):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄

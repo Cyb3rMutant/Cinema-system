@@ -1,17 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
+from payment import Payment
+
+
+# ˄
+
+
 class Customer(object):
-    def __init__(self, name: str, phone: str, email: str):
+    # ˅
+    
+    # ˄
 
-        self.__name = name
+    def __init__(self, name, phone, email):
 
-        self.__phone = phone
+        self.__name = None
 
-        self.__email = email
+        self.__phone = None
+
+        self.__email = None
+
+        self.__payment = None
+
+        self.__payment = None
+
+        # ˅
+        pass
+        # ˄
 
     def get_name(self):
-        return self.__name
+        # ˅
+        pass
+        # ˄
 
     def get_phone(self):
-        return self.__phone
+        # ˅
+        pass
+        # ˄
 
     def get_email(self):
-        return self.__email
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄

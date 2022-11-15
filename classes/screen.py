@@ -1,12 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
 from show import Show
+from dbfunc import conn
+
+# ˄
 
 
-class Screen():
-    def __init__(self, screen_number: int, shows: list, num_vip_seats: int, num_upper_seats: int, num_lower_seats: int):
+class Screen(object):
+    # ˅
 
-        self.__screen_number = screen_number
+    # ˄
 
-        self.__shows = shows
+    def __init__(self, screen_id, num_vip_seats, num_upper_seats, num_lower_seats):
+
+        self.__screen_id = screen_id
 
         self.__num_vip_seats = num_vip_seats
 
@@ -14,14 +22,17 @@ class Screen():
 
         self.__num_lower_seats = num_lower_seats
 
-    def get_screen_number(self):
-        return self.__screen_number
+        self.__shows = list()
 
-    def get_seats(self):
-        return self.__seats
+        shows = conn.select("SELECT * FROM SHOWS WHERE SCREEN_ID=%d",
+                            (self.__screen_id,))
 
-    def get_shows(self):
-        return self.__shows
+        for show in shows:
+            self.__shows.append(
+                Show(show[0], show[1], show[2], show[3], show[4], show[5], show[6],))
+
+    def get_screen_id(self):
+        return self.__screen_id
 
     def get_num_vip_seats(self):
         return self.__num_vip_seats
@@ -31,3 +42,27 @@ class Screen():
 
     def get_num_lower_seats(self):
         return self.__num_lower_seats
+
+    def get_shows(self):
+        return self.__shows
+
+    def add_show(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, film):
+        conn.insert("INSERT INTO SHOWS VALUES(%d, %s, %d, %d, %d, %s)", (show_id, time,
+                    available_vip_seats, available_upper_seats, available_lower_seats, film,))
+
+        self.__shows.append(
+            Show(show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, self, film))
+
+    def remove_show(self, show_id):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+
+    # ˄
+
+
+# ˅
+
+# ˄

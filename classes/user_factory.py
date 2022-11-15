@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
+from user import User
+
+
+# ˄
+
+
+class User_factory(object):
+    # ˅
+    
+    # ˄
+
+    def get_user_type(self, type):
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄

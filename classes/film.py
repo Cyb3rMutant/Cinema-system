@@ -1,42 +1,82 @@
-class Film():
-    def __init__(self, title: str, rating: float, genre: list, year: str, age_rating: str, duration: int, description: str, cast: list):
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# ˅
 
-        self.__title = title
+# ˄
 
-        self.__rating = rating
 
-        self.__genre = genre
+class Film(object):
+    # ˅
+    
+    # ˄
 
-        self.__year = year
+    def __init__(self, title, rating, genre, year, age_rating, duration, description, cast):
 
-        self.__age_rating = age_rating
+        self.__title = None
 
-        self.__duration = duration
+        self.__rating = None
 
-        self.__description = description
+        self.__genere = None
 
-        self.__cast = cast
+        self.__year = None
+
+        self.__age_rating = None
+
+        self.__duration = None
+
+        self.__description = None
+
+        self.__cast = None
+
+        # ˅
+        pass
+        # ˄
 
     def get_title(self):
-        return self.__title
+        # ˅
+        pass
+        # ˄
 
     def get_rating(self):
-        return self.__rating
+        # ˅
+        pass
+        # ˄
 
     def get_genre(self):
-        return self.__genre
+        # ˅
+        pass
+        # ˄
 
     def get_year(self):
-        return self.__year
+        # ˅
+        pass
+        # ˄
 
     def get_age_rating(self):
-        return self.__age_rating
+        # ˅
+        pass
+        # ˄
 
     def get_duration(self):
-        return self.__duration
+        # ˅
+        pass
+        # ˄
 
     def get_decription(self):
-        return self.__description
+        # ˅
+        pass
+        # ˄
 
     def get_cast(self):
-        return self.__cast
+        # ˅
+        pass
+        # ˄
+
+    # ˅
+    
+    # ˄
+
+
+# ˅
+
+# ˄

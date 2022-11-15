@@ -1,26 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from abc import *
-from customer import Customer
-from receipt_generator import Receipt_generator
-from show import Show
-from ticket_generator import Ticket_generator
+from booking import Booking
 
 
 # ˄
 
 
-class Booking(object, metaclass=ABCMeta):
+class Booking_upper_hall(Booking):
     # ˅
     
     # ˄
 
-    def __init__(self, show, number_of_seats, date_of_booking, price, customer):
+    def __init__(self, showing, number_of_seats, date_of_booking, price, customer):
 
         self.__booking_reference = None
 
-        self.__show = None
+        self.__showing = None
 
         self.__number_of_seats = None
 
@@ -29,10 +25,6 @@ class Booking(object, metaclass=ABCMeta):
         self.__price = None
 
         self.__customer = None
-
-        self.__ticket_generator = None
-
-        self.__receipt_generator = None
 
         # ˅
         pass
@@ -64,18 +56,6 @@ class Booking(object, metaclass=ABCMeta):
         # ˄
 
     def get_customer(self):
-        # ˅
-        pass
-        # ˄
-
-    @abstractmethod
-    def get_ticket(self):
-        # ˅
-        pass
-        # ˄
-
-    @abstractmethod
-    def get_receipt(self):
         # ˅
         pass
         # ˄
