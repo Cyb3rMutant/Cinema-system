@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from book_ticket import Book_ticket
+import book_ticket
 
 
 # ˄
 
 
-class Book_ticket_booking_staff(Book_ticket):
+class Book_ticket_booking_staff(book_ticket.Book_ticket):
     # ˅
-    
+
     # ˄
 
     def __choose_cinema(self, branch):
@@ -18,7 +18,7 @@ class Book_ticket_booking_staff(Book_ticket):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

@@ -1,33 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
-
-
-class Receipt_generator(object):
-    # ˅
-    
-    # ˄
-
+class Receipt_generator():
     def __init__(self, booking):
 
-        self.__booking = None
-
-        # ˅
-        pass
-        # ˄
+        self.__booking = booking
 
     def gen_receipt(self):
-        # ˅
         pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄

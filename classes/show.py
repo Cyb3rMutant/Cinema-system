@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from booking import Booking
-from booking_factory import Booking_factory
-from film import Film
-from film_container import Film_container
+import booking
+import booking_factory
+import film
+import film_container
 
 
 # ˄

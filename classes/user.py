@@ -1,8 +1,8 @@
-from cinema import Cinema
+import cinema
 
 
 class User():
-    def __init__(self, name: str, id: int, branch: Cinema):
+    def __init__(self, name: str, id: int, branch: cinema.Cinema):
 
         self.__name = name
 

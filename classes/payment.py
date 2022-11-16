@@ -1,54 +1,26 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-
-# ˄
-
-
 class Payment(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, name_on_card, card_number, expiry, cvv):
 
-        self.__name_on_card = None
+        self.__name_on_card = name_on_card
 
-        self.__card_number = None
+        self.__card_number = card_number
 
-        self.__expiry = None
+        self.__expiry = expiry
 
-        self.__cvv = None
-
-        # ˅
-        pass
-        # ˄
+        self.__cvv = cvv
 
     def get_name_on_card(self):
-        # ˅
-        pass
-        # ˄
+        return self._name_on_card
 
     def get_card_number(self):
-        # ˅
-        pass
-        # ˄
+        return self._card_number
 
     def get_expiry_date(self):
-        # ˅
-        pass
-        # ˄
+        return self._expiry_date
 
     def get_cvv(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self._cvv

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from screen import Screen
+import screen
 from dbfunc import conn
 
 # ˄
@@ -25,7 +25,7 @@ class Cinema(object):
         for screen in screens:
 
             self.__screens.append(
-                Screen(screen[0], screen[1], screen[2], screen[3]))
+                screen.Screen(screen[0], screen[1], screen[2], screen[3]))
 
         self.__listings = list()
         ...

@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from booking import Booking
+import booking
 
 
 # ˄
 
 
-class Booking_upper_hall(Booking):
+class Booking_upper_hall(booking.Booking):
     # ˅
-    
+
     # ˄
 
     def __init__(self, showing, number_of_seats, date_of_booking, price, customer):
@@ -61,7 +61,7 @@ class Booking_upper_hall(Booking):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

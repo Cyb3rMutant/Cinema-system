@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # ˅
 from abc import *
-from customer import Customer
-from receipt_generator import Receipt_generator
-from show import Show
-from ticket_generator import Ticket_generator
+import customer
+import receipt_generator
+import show
+import ticket_generator
 
 
 # ˄
@@ -13,7 +13,7 @@ from ticket_generator import Ticket_generator
 
 class Booking(object, metaclass=ABCMeta):
     # ˅
-    
+
     # ˄
 
     def __init__(self, show, number_of_seats, date_of_booking, price, customer):
@@ -81,7 +81,7 @@ class Booking(object, metaclass=ABCMeta):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

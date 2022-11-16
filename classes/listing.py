@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from film import Film
-from show import Show
+import film
+import show
 
 
 # ˄
@@ -10,7 +10,7 @@ from show import Show
 
 class Listing(object):
     # ˅
-    
+
     # ˄
 
     def __init__(self, listing_id, date, film, cinema):
@@ -74,7 +74,7 @@ class Listing(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

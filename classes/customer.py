@@ -1,53 +1,27 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-from payment import Payment
-
-
-# ˄
+import payment
+from dbfunc import conn
 
 
 class Customer(object):
-    # ˅
-    
-    # ˄
-
     def __init__(self, name, phone, email):
 
-        self.__name = None
+        self.__name = name
 
-        self.__phone = None
+        self.__phone = phone
 
-        self.__email = None
+        self.__email = email
 
-        self.__payment = None
+        payment = conn.select(
+            "SELECT * FROM PAYMENTS WHERE CUSTOMER_EMAIL=%s", (self.__email,))
 
-        self.__payment = None
-
-        # ˅
-        pass
-        # ˄
+        self.__payment = payment.Payment(
+            payment[0], payment[1], payment[2], payment[3])
 
     def get_name(self):
-        # ˅
-        pass
-        # ˄
+        return self.__name
 
     def get_phone(self):
-        # ˅
-        pass
-        # ˄
+        return self.__phone
 
     def get_email(self):
-        # ˅
-        pass
-        # ˄
-
-    # ˅
-    
-    # ˄
-
-
-# ˅
-
-# ˄
+        return self.__email

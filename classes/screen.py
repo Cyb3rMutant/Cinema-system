@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from show import Show
+import show
 from dbfunc import conn
 
 # ˄
@@ -29,7 +29,7 @@ class Screen(object):
 
         for show in shows:
             self.__shows.append(
-                Show(show[0], show[1], show[2], show[3], show[4], show[5], show[6],))
+                show.Show(show[0], show[1], show[2], show[3], show[4], show[5], show[6],))
 
     def get_screen_id(self):
         return self.__screen_id
@@ -51,7 +51,7 @@ class Screen(object):
                     available_vip_seats, available_upper_seats, available_lower_seats, film,))
 
         self.__shows.append(
-            Show(show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, self, film))
+            show.Show(show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, self, film))
 
     def remove_show(self, show_id):
         # ˅

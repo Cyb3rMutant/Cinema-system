@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from cinema import Cinema
+import cinema
 from dbfunc import conn
 
 # ˄
@@ -21,7 +21,7 @@ class City(object):
         cinemas = conn.select(
             "SELECT * FROM CINEMAS WHERE CITY_NAME=%s;", (self.__city_name,))
         for cinema in cinemas:
-            self.__cinemas.append(Cinema(cinema[0], cinema[1]))
+            self.__cinemas.append(cinema.Cinema(cinema[0], cinema[1]))
 
     def get_city_name(self):
         return self._city_name
@@ -58,4 +58,4 @@ class City(object):
         conn.insert("INSERT INTO CINEMAS VALUES (%d, %s);",
                     (cinema_id, cinema_address,))
 
-        self.__cinemas.append(Cinema(cinema_id, cinema_address))
+        self.__cinemas.append(cinema.Cinema(cinema_id, cinema_address))

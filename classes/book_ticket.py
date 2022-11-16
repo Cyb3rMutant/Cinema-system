@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # ˅
-from show import Show
+import show
 
 
 # ˄
@@ -9,7 +9,7 @@ from show import Show
 
 class Book_ticket(object):
     # ˅
-    
+
     # ˄
 
     def make_booking(self):
@@ -33,7 +33,7 @@ class Book_ticket(object):
         # ˄
 
     # ˅
-    
+
     # ˄
 
 

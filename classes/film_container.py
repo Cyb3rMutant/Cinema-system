@@ -1,22 +1,33 @@
-from film import Film
+import film
 from dbfunc import conn
-from container import Container
 
 
-class Film_container(Container):
+class Films():
+    __instance = None
 
     def __init__(self):
-        super(Container, self).__init__()
-        self.__elements = dict()
+        if Films.__instance:
+            raise Exception("there can only be one Conn instance!")
 
-        films = conn.select("SELECT * FROM FILMS;")
+        Films.__instance = self
+
+        self.__films = dict()
+
+        films = conn.select("SELECT * FROM films;")
 
         for film in films:
-            self.__elements[film[0]](film(film[0], film[1], film[2], film[3]))
+            self.__films[film[0]] = (
+                film.Film(film[0], film[1], film[2], film[3]))
 
-    def add_element(self, film_title: str, film_rating: float, film_genre: list, film_year: str, film_age_rating: str, film_duration: int, film_description: str, film_cast: list):
-        conn.insert("INSERT INTO FILMS VALUES (%s, %f, %s, %s, %s, %d, %s, %s);",
-                    (film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast,))
+    def __getitem__(self, idx):
+        return self.__films[idx]
 
-        self.__elements[film_title](
-            Film(film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast))
+    def add_film(self, film_name: str, morning_price: int, afternoon_price: int, evening_price: int):
+        conn.insert("INSERT INTO films VALUES (%s, %s, %s, %s);",
+                    (film_name, morning_price, afternoon_price, evening_price,))
+
+        self.__films[film_name] = (
+            film.Film(film_name, morning_price, afternoon_price, evening_price))
+
+    def remove_film(self):
+        pass
