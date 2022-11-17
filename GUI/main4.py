@@ -164,29 +164,36 @@ class BookingGUI(BaseWindow):
 
         #Body
         #Creating Widgets
+
         self.date_today = datetime.now()
         self.date_label = tk.Label(self.BodyFrame, text="Select Date",fg='#DD2424', font=("Arial",16))
         self.date_entry = DateEntry(self.BodyFrame,width=10,font=("Arial",15),mindate=self.date_today)
-        
+
+
         self.select_film_label = tk.Label(self.BodyFrame, text="Select Film",fg='#DD2424', font=("Arial",16))
-
-
-        self.film_list = self.get_film_listings()
-        self.options = tk.StringVar(self.BodyFrame)
-        self.options.set(self.film_list[0]) # default value
+        self.film_list = self.get_film_listings() #List
+        print(self.film_list)
+        self.options = tk.StringVar(self.BodyFrame) 
+        self.options.set(self.film_list[0]) # default value option
         self.select_film_entry =tk.OptionMenu(self.BodyFrame, self.options, *self.film_list)
-        
+
+        #Call check availability function, currently is create showing
+        self.check_showings_btn = tk.Button(self.BodyFrame, text='Check Showings', bg='#DD2424', fg='#000000',font=("Arial",18),command=self.check_film_date_availability)
 
         #Placing Widgets
         self.date_label.place(x=150,y=0) 
         self.date_entry.place(x=350,y=0)
-
         self.select_film_label.place(x=150,y=100)
         self.select_film_entry.place(x=350, y=100)
+        self.check_showings_btn.place(x=250, y=150)
 
         self.window.mainloop()
 
-        
+
+
+
+
+
     def get_film_listings(self):
         self.conn = get_connection()
         if self.conn != None:
@@ -197,8 +204,66 @@ class BookingGUI(BaseWindow):
         self.dbcursor.close()
         self.conn.close()
         return self.film_list
+
+
+    def check_film_date_availability(self):
+
+        self.date = self.date_entry.get() #Type = string
+        self.film = self.options.get()  #Still need to strip this. Gets the value of optionsmenu entered when button is pressed. Type = string
+        
+
+    #If valid then  delete labels and create_showing_options()
+
+        #Destroy the labels so we can replace the screen with showing information
+        self.date_label.destroy()
+        self.date_entry.destroy()
+        self.select_film_label.destroy()
+        self.select_film_entry.destroy()
+        self.check_showings_btn.destroy()
+        
+        self.create_showing_options(self.date,self.film)
+
+        #Else chuck an error
+
+
+    def create_showing_options(self,date,film):
+
+
+        self.date = date #Type = string
+        self.film = film  #Type = string
+
+
+        self.date_label = tk.Label(self.BodyFrame, text=self.date, fg='#000000',font=("Arial",18)).place(x=150,y=100)
+        self.film_title_label = tk.Label(self.BodyFrame, text=self.film, fg='#000000',font=("Arial",18)).place(x=350,y=100)
+        
+        self.select_showings_label = tk.Label(self.BodyFrame, text="Select Showing",fg='#DD2424', font=("Arial",16)).place(x=150,y=200)
+        self.showings_list = self.get_film_listings() #List
+        self.options = tk.StringVar(self.BodyFrame) 
+        self.options.set(self.showings_list[0]) # default value option
+        self.select_showing_entry =tk.OptionMenu(self.BodyFrame, self.options, *self.showings_list).place(x=350, y=200)
+
+
+
+
+        print(self.film)
+        print(self.date)
+
+
+    def get_showings_list(self): #Need to get mock data for this, currently getting film names
+        self.conn = get_connection()
+        if self.conn != None:
+            self.dbcursor = self.conn.cursor()
+            self.dbcursor.execute("SELECT film_name FROM films")
+            self.film_list = self.dbcursor.fetchall()
+        
+        self.dbcursor.close()
+        self.conn.close()
+        return self.film_list
+
     
 
+ 
+        
 
 if (__name__ == "__main__"):
     main()
