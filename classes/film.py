@@ -1,5 +1,5 @@
-class Film():
-    def __init__(self, title: str, rating: float, genre: list, year: str, age_rating: str, duration: int, description: str, cast: list):
+class Film(object):
+    def __init__(self, title, rating, genre, year, age_rating, duration, description, cast):
 
         self.__title = title
 
@@ -35,7 +35,7 @@ class Film():
     def get_duration(self):
         return self.__duration
 
-    def get_decription(self):
+    def get_description(self):
         return self.__description
 
     def get_cast(self):

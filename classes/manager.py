@@ -1,10 +1,7 @@
-from admin import Admin
-from cinema import Cinema
+import admin
+import cinema
 
 
-class Manager(Admin):
-    def __init__(self, name: str, id: int, branch: Cinema):
+class Manager(admin.Admin):
+    def __init__(self, name: str, id: int, branch: cinema.Cinema):
         super(Manager, self).__init__(name, id, branch)
-
-    def add_cinema(self):
-        pass

@@ -1,10 +1,7 @@
-from classes.booking import Booking
-
-
-class Receipt_generator(object):
-    def __init__(self, booking: Booking):
+class Receipt_generator():
+    def __init__(self, booking):
 
         self.__booking = booking
 
-    def gen_ticket(self):
+    def gen_receipt(self):
         pass
