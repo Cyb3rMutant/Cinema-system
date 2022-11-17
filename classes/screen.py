@@ -47,16 +47,22 @@ class Screen(object):
         return self.__shows
 
     def add_show(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, film):
-        conn.insert("INSERT INTO SHOWS VALUES(%d, %s, %d, %d, %d, %s)", (show_id, time,
+        conn.insert("INSERT INTO SHOWS VALUES(%d, %s, %d, %d, %d, %s);", (show_id, time,
                     available_vip_seats, available_upper_seats, available_lower_seats, film,))
 
         self.__shows.append(
             show.Show(show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, self, film))
 
     def remove_show(self, show_id):
-        # ˅
-        pass
-        # ˄
+        #remove show from 
+        show = None
+        for s in self.__shows:
+            if s.get_show_id() == show_id:
+                show = s
+                conn.delete("DELETE FROM SHOWS WHERE SHOW_ID = %s;" (s.get_show_id())) #delete from db
+                self.__shows.remove(s)   #should remove from the list of shows
+                break
+
 
     # ˅
 

@@ -60,7 +60,7 @@ class Cinema(object):
         conn.insert("INSERT INTO LISTINGS VALUES (%s, %s, %d);",
                     (date, film_title, self.__cinema_id))
         #now get the listing id from database
-        listingID = conn.select("SELECT MAX(LISTING_ID) FROM LISTINGS")
+        listingID = conn.select("SELECT MAX(LISTING_ID) FROM LISTINGS;")
         self.__listings.append(listing.Listing(listingID, date, film, self))   #end paramter is cinema
 
 
