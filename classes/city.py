@@ -39,19 +39,13 @@ class City(object):
         return self._cinemas
 
     def set_morning_price(self, morning_prince):
-        # ˅
-        pass
-        # ˄
+        self.__morning_price = morning_prince
 
     def set_afternoon_price(self, afternoon_price):
-        # ˅
-        pass
-        # ˄
+        self.__afternoon_price = afternoon_price
 
     def set_evening_price(self, evening_price):
-        # ˅
-        pass
-        # ˄
+        self.__evening_price = evening_price
 
     def add_cinema(self, cinema_id, cinema_address):
 

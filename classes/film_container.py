@@ -2,14 +2,14 @@ import film
 from dbfunc import conn
 
 
-class Films():
+class Films_container():
     __instance = None
 
     def __init__(self):
-        if Films.__instance:
+        if Films_container.__instance:
             raise Exception("there can only be one Conn instance!")
 
-        Films.__instance = self
+        Films_container.__instance = self
 
         self.__films = dict()
 
@@ -19,8 +19,8 @@ class Films():
             self.__films[film[0]] = (
                 film.Film(film[0], film[1], film[2], film[3]))
 
-    def __getitem__(self, idx):
-        return self.__films[idx]
+    def get_films(self):
+        return self.__films
 
     def add_film(self, film_name: str, morning_price: int, afternoon_price: int, evening_price: int):
         conn.insert("INSERT INTO films VALUES (%s, %s, %s, %s);",
