@@ -4,7 +4,6 @@
 import listing
 import screen
 import listing
-from film_container import Film_container
 from dbfunc import conn
 import film
 # ˄
@@ -44,20 +43,33 @@ class Cinema(object):
         return self.__listings
 
     def update_listing(self, listing_id, date, film):
-        # ˅
-        pass
-        # ˄
+        listing = None
+        for l in self.__listings:
+            if l.get_listing_id() == listing_id:
+                listing = l
+                break
+        listing.set_date(date)
+        listing.set_film = film
+
+        conn.update("UPDATE LISTINGS SET LISTING_DATE=%s, FILM_TITLE=%s WHERE LISTING_ID=%d;",
+                    (date, film.get_title(), listing.get_listing_id(),))
 
     def remove_listing(self, listing_id):
-        # ˅
-        pass
-        # ˄
+        listing = None
+        for l in self.__listings:
+            if l.get_listing_id() == listing_id:
+                listing = l
+                break
 
-    def add_listing(self, date, film:film.Film):
-        #add listing to database (ben)
+        conn.delete("DELETE FROM LISTINGS WHERE LISTING_ID=%d;",
+                    (listing.get_listing_id(),))
+
+    def add_listing(self, date, film: film.Film):
+        # add listing to database (ben)
         film_title = film.get_title()
         conn.insert("INSERT INTO LISTINGS VALUES (%s, %s, %d);",
                     (date, film_title, self.__cinema_id))
+<<<<<<< HEAD
         #now get the listing id from database
         listingID = conn.select("SELECT MAX(LISTING_ID) FROM LISTINGS;")
         self.__listings.append(listing.Listing(listingID, date, film, self))   #end paramter is cinema
@@ -71,3 +83,9 @@ class Cinema(object):
 # ˅
 
 # ˄
+=======
+        # now get the listing id from database
+        listingID = conn.select("SELECT MAX(LISTING_ID) FROM LISTINGS")
+        self.__listings.append(listing.Listing(
+            listingID, date, film, self))  # end paramter is cinema
+>>>>>>> 23e954c (cinema dbfunc and listing)

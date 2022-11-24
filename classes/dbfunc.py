@@ -53,17 +53,29 @@ class Conn():
         dbcursor.close()
         conn.close()  # Connection must be closed
 
-#want to create update method (ben)
+# want to create update method (ben)
     def update(self, query: str, *args):
 
-        conn = self.__getConnection()   #connect to db
-        dbcursor = conn.cursor()  #cursor object
+        conn = self.__getConnection()  # connect to db
+        dbcursor = conn.cursor()  # cursor object
 
-        dbcursor.execute(query, args)   #update query
+        dbcursor.execute(query, args)  # update query
         conn.commit()
 
-        dbcursor.close()   
-        conn.close()     #close connection 
+        dbcursor.close()
+        conn.close()  # close connection
+
+    def delete(self, query: str, *args):
+
+        conn = self.__getConnection()  # connect to db
+        dbcursor = conn.cursor()  # cursor object
+
+        dbcursor.execute(query, args)  # update query
+        conn.commit()
+
+        dbcursor.close()
+        conn.close()  # close connection
+
 
 
     def delete(self, query: str, *args):

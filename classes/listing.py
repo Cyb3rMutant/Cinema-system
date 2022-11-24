@@ -45,11 +45,17 @@ class Listing(object):
     def set_date(self, date):
         conn.update("UPDATE LISTINGS SET LISTING_DATE=%s WHERE LISTING_ID=%d",
                     (date, self.__listing_id,))
+        self.__date = date
 
     def set_film(self, film):
         conn.update("UPDATE LISTINGS SET FILM_TITLE=%s WHERE LISTING_ID=%d",
                     (film.get_title(), self.__listing_id,))
+        self.__film = film
+
+        for show in self.__shows:
+            show.set_film(film)
 
     def update_show_time(self, show_id, time):
         conn.update("UPDATE SHOWS SET SHOW_TIME=%s WHERE SHOW_ID=%d",
                     (time, show_id,))
+        self.__time
