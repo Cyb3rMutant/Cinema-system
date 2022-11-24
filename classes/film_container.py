@@ -29,5 +29,10 @@ class Films_container():
         self.__films[film_name] = (
             film.Film(film_name, morning_price, afternoon_price, evening_price))
 
-    def remove_film(self):
-        pass
+    def remove_film(self, film_name:str):
+        
+        if film_name in self.__films:
+            conn.delete("DELETE FROM FILMS WHERE FILM_TITLE = %s;", (film_name,))
+            del self.__films(film_name)
+        else:
+            print("Film doesn't exist")
