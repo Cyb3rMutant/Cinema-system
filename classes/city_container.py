@@ -29,5 +29,12 @@ class Cities():
         self.__cities[city_name] = (
             city.City(city_name, morning_price, afternoon_price, evening_price))
 
-    def remove_city(self):
-        pass
+    def remove_city(self, city_name: str):
+        #removing city (ben)
+        if city_name in self.__cities:
+            #delete from database
+            conn.delete("DELETE FROM CITIES WHERE CITY_NAME = %s;", (city_name))
+            #delete from cities dictionary
+            del self.__cities[city_name]
+        else:
+            print("City doesnt exist")  #print to terminal

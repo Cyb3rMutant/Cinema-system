@@ -59,7 +59,7 @@ class Screen(object):
         for s in self.__shows:
             if s.get_show_id() == show_id:
                 show = s
-                conn.delete("DELETE FROM SHOWS WHERE SHOW_ID = %s;" (s.get_show_id())) #delete from db
+                conn.delete("DELETE FROM SHOWS WHERE SHOW_ID = %s;", (s.get_show_id())) #delete from db
                 self.__shows.remove(s)   #should remove from the list of shows
                 break
 
