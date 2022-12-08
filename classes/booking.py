@@ -18,17 +18,17 @@ class Booking(object, metaclass=ABCMeta):
 
     def __init__(self, show, number_of_seats, date_of_booking, price, customer):
 
-        self.__booking_reference = None
+        self.__booking_reference = None   #is this meant to be a parameter in constructor or does it get pulled from db?
 
-        self.__show = None
+        self.__show = show
 
-        self.__number_of_seats = None
+        self.__number_of_seats = number_of_seats
 
-        self.__date_of_booking = None
+        self.__date_of_booking = date_of_booking
 
-        self.__price = None
+        self.__price = price
 
-        self.__customer = None
+        self.__customer = customer
 
         self.__ticket_generator = None
 
@@ -39,34 +39,22 @@ class Booking(object, metaclass=ABCMeta):
         # ˄
 
     def get_booking_reference(self):
-        # ˅
-        pass
-        # ˄
+        return self.__booking_reference
 
     def get_show(self):
-        # ˅
-        pass
-        # ˄
+        return self.__show
 
     def get_number_of_seats(self):
-        # ˅
-        pass
-        # ˄
+        return self.__number_of_seats
 
     def get_date_of_booking(self):
-        # ˅
-        pass
-        # ˄
+        return self.__date_of_booking
 
     def get_price(self):
-        # ˅
-        pass
-        # ˄
+        return self.__price
 
     def get_customer(self):
-        # ˅
-        pass
-        # ˄
+        return self.__customer
 
     @abstractmethod
     def get_ticket(self):
