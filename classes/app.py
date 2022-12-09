@@ -10,45 +10,45 @@ class App(tk.Tk):
         self.title("")
         self.geometry("1350x800+0+0")
         self.configure(background="gainsboro")
-        self.MainFrame = tk.Frame(
+        self.main_frame = tk.Frame(
             self, bd=10, width=1350, height=800, bg='gainsboro', relief=tk.RIDGE)
-        self.MainFrame.grid()
+        self.main_frame.grid()
 
-        self.HeaderFrame = tk.Frame(
-            self.MainFrame, bd=10, width=1330, height=100, bg='gainsboro', relief=tk.RIDGE)
-        self.HeaderFrame.config(bg='#333333')
-        self.HeaderFrame.grid()
+        self.header_frame = tk.Frame(
+            self.main_frame, bd=10, width=1330, height=100, bg='gainsboro', relief=tk.RIDGE)
+        self.header_frame.config(bg='#333333')
+        self.header_frame.grid()
         # Header
         # Page Name is different for each class. We place them on the class itself. (Top Left Title)
-        self.title_label = tk.Label(self.HeaderFrame, text="Horizon Cinemas",
+        self.title_label = tk.Label(self.header_frame, text="Horizon Cinemas",
                                     borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
         self.title_label.place(x=443, y=5, width=443, height=70)
-        self.branch_label = tk.Label(self.HeaderFrame, text="",
+        self.branch_label = tk.Label(self.header_frame, text="",
                                      borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
         # Higher width overlaps border. Had to make it smaller and adjust with X
         self.branch_label.place(x=890, y=5, width=400)
         self.name_label = tk.Label(
-            self.HeaderFrame, text="", borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
+            self.header_frame, text="", borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
         self.name_label.place(x=890, y=40, width=400)
 
-        self.page_label = tk.Label(self.HeaderFrame, text="",
+        self.page_label = tk.Label(self.header_frame, text="",
                                    borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
         self.page_label.place(x=0, y=5, width=443, height=70)  # 443 = width/3
 
-        self.BodyFrame = tk.Frame(
-            self.MainFrame, bd=10, width=1330, height=680, bg="gainsboro", relief=tk.RIDGE)
-        self.BodyFrame.grid()
+        self.body_frame = tk.Frame(
+            self.main_frame, bd=10, width=1330, height=680, bg="gainsboro", relief=tk.RIDGE)
+        self.body_frame.grid()
 
-        self.title('Login')
+        self.title('Horizon Cinemas system')
         self.resizable(0, 0)
         self.config(bg="#333333")
 
+        controller = controllers.Controller()
         model = models.Model()
-        view = guis.Main_frame(self)
+        view = guis.Main_frame(self, controller)
 
-        controller = controllers.Controller(model, view)
-
-        view.set_controller(controller)
+        controller.set_model(model)
+        controller.set_view(view)
 
 
 App().mainloop()

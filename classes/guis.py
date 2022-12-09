@@ -9,50 +9,40 @@ from dbfunc import conn
 
 
 class Main_frame(tk.Frame):
-    def __init__(self, container):
-        self.__app = container
-        super().__init__(self.__app)
-        self.__controller = None
-
+    def __init__(self, parent, controller):
+        self.__app = parent
+        self.__controller = controller
         self.login()
 
+    def clear_frame(self):
+        for widgets in self.__app.body_frame.winfo_children():
+            widgets.destroy()
+
     def login(self):
-        self.__app.title("Login")
+        super().__init__(self.__app)
         # Create widgets
-        self.__app.page_label["text"] = "Dashboard"
-        # self.__login_label = tk.Label(
-        #     self, text='Login', borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 32))
+        self.__app.page_label["text"] = "Login"
         self.__username_label = tk.Label(
-            self.__app.BodyFrame, text='Username', font=("Arial", 32))
+            self.__app.body_frame, text='Username', font=("Arial", 32))
         self.__username_label.place(x=562, y=60)
         self.__username_entry = tk.Entry(
-            self.__app.BodyFrame, font=("Arial", 32))
+            self.__app.body_frame, font=("Arial", 32))
         self.__username_entry.place(x=412, y=130)
         self.__password_label = tk.Label(
-            self.__app.BodyFrame, text='Password', font=("Arial", 32))
+            self.__app.body_frame, text='Password', font=("Arial", 32))
         self.__password_label.place(x=562, y=260)
         self.__password_entry = tk.Entry(
-            self.__app.BodyFrame, show='*', font=("Arial", 32))
+            self.__app.body_frame, show='*', font=("Arial", 32))
         self.__password_entry.place(x=412, y=330)
         self.__login_button = tk.Button(
-            self.__app.BodyFrame, text='Login', bg='#DD2424', fg='#000000', font=("Arial", 18), command=self.login)
+            self.__app.body_frame, text='Login', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.login(
+                self.__username_entry.get(), self.__password_entry.get()))
         self.__login_button.place(x=612, y=460)
-        self.__app.page_label["text"] = "login"
-
-        self.__controller = None
-
-    def set_controller(self, controller):
-        self.__controller = controller
-
-    def login(self):
-        if self.__controller:
-            self.__controller.login(
-                self.__username_entry.get(), self.__password_entry.get())
 
     def loggedin(self, data):
         tk.messagebox.showinfo(
             title="Login Successful", message="You have successfully logged in.")
-        self.destroy()
+        self.clear_frame()
 
         self.create_dashboard(
             data["USER_NAME"], data["USER_TYPE"], data["CINEMA_ID"])
@@ -66,31 +56,31 @@ class Main_frame(tk.Frame):
     def dashboard(self, name, usertype, branch):
         # Page Title
         self.__app.page_label["text"] = "Dashboard"
-        self.__app.name_label = f"{name} [{usertype}]"
+        self.__app.name_label["text"] = f"{name} [{usertype}]"
         self.__app.branch_label["text"] = branch
         # Body
         self.create_booking_btn = tk.Button(
-            self.__app.BodyFrame, text="Create Booking", borderwidth=1, command=self.create_booking_gui)
+            self.__app.body_frame, text="Create Booking", borderwidth=1, command=self.create_booking_gui)
         self.view_bookings_btn = tk.Button(
-            self.__app.BodyFrame, text="View Bookings", borderwidth=1)
+            self.__app.body_frame, text="View Bookings", borderwidth=1)
         self.view_film_listings_btn = tk.Button(
-            self.__app.BodyFrame, text="View Film Listings", borderwidth=1)
+            self.__app.body_frame, text="View Film Listings", borderwidth=1)
         self.cancel_booking_btn = tk.Button(
-            self.__app.BodyFrame, text="Cancel Booking", borderwidth=1)
+            self.__app.body_frame, text="Cancel Booking", borderwidth=1)
 
         self.add_listing_btn = tk.Button(
-            self.__app.BodyFrame, text="Add Listing", borderwidth=1)
+            self.__app.body_frame, text="Add Listing", borderwidth=1)
         self.remove_listing_btn = tk.Button(
-            self.__app.BodyFrame, text="Remove Listing", borderwidth=1)
+            self.__app.body_frame, text="Remove Listing", borderwidth=1)
         self.update_listing_btn = tk.Button(
-            self.__app.BodyFrame, text="Update Listing", borderwidth=1)
+            self.__app.body_frame, text="Update Listing", borderwidth=1)
         self.generate_report_btn = tk.Button(
-            self.__app.BodyFrame, text="Generate Report", borderwidth=1)
+            self.__app.body_frame, text="Generate Report", borderwidth=1)
 
         self.add_new_cinema_btn = tk.Button(
-            self.__app.BodyFrame, text="Add New Cinema", borderwidth=1)
+            self.__app.body_frame, text="Add New Cinema", borderwidth=1)
         self.add_listing_master_btn = tk.Button(
-            self.__app.BodyFrame, text="Add Listing to Cinema", borderwidth=1)
+            self.__app.body_frame, text="Add Listing to Cinema", borderwidth=1)
 
         # Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
         self.create_booking_btn.place(x=170, y=150, width=240, height=100)
@@ -119,21 +109,21 @@ class Main_frame(tk.Frame):
 
         self.date_today = datetime.now()
         self.date_label = tk.Label(
-            self.__app.BodyFrame, text="Select Date", fg='#DD2424', font=("Arial", 16))
-        self.date_entry = DateEntry(self.__app.BodyFrame, width=10, font=(
+            self.__app.body_frame, text="Select Date", fg='#DD2424', font=("Arial", 16))
+        self.date_entry = DateEntry(self.__app.body_frame, width=10, font=(
             "Arial", 15), mindate=self.date_today)
 
         self.select_film_label = tk.Label(
-            self.__app.BodyFrame, text="Select Film", fg='#DD2424', font=("Arial", 16))
+            self.__app.body_frame, text="Select Film", fg='#DD2424', font=("Arial", 16))
         self.film_list = self.get_film_listings()  # List
         print(self.film_list)
-        self.options = tk.StringVar(self.__app.BodyFrame)
+        self.options = tk.StringVar(self.__app.body_frame)
         self.options.set(self.film_list[0])  # default value option
         self.select_film_entry = tk.OptionMenu(
-            self.__app.BodyFrame, self.options, *self.film_list)
+            self.__app.body_frame, self.options, *self.film_list)
 
         # Call check availability function, currently is create showing
-        self.check_showings_btn = tk.Button(self.__app.BodyFrame, text='Check Showings', bg='#DD2424', fg='#000000', font=(
+        self.check_showings_btn = tk.Button(self.__app.body_frame, text='Check Showings', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=self.check_film_date_availability)
 
         # Placing Widgets
@@ -142,8 +132,6 @@ class Main_frame(tk.Frame):
         self.select_film_label.place(x=150, y=100)
         self.select_film_entry.place(x=350, y=100)
         self.check_showings_btn.place(x=250, y=150)
-
-        self.__window.mainloop()
 
     def get_film_listings(self):
         self.film_list = conn.select("SELECT film_name FROM films")
@@ -166,30 +154,27 @@ class Main_frame(tk.Frame):
 
         self.create_showing_options(self.date, self.film)
 
-        # Else chuck an error
-
     def create_showing_options(self, date, film):
 
         self.date = date  # Type = string
         self.film = film  # Type = string
 
-        self.date_label = tk.Label(self.__app.BodyFrame, text=self.date, fg='#000000', font=(
+        self.date_label = tk.Label(self.__app.body_frame, text=self.date, fg='#000000', font=(
             "Arial", 18)).place(x=150, y=100)
         self.film_title_label = tk.Label(
-            self.__app.BodyFrame, text=self.film, fg='#000000').place(x=350, y=100)
+            self.__app.body_frame, text=self.film, fg='#000000').place(x=350, y=100)
 
         self.select_showings_label = tk.Label(
-            self.__app.BodyFrame, text="Select Showing", fg='#DD2424', font=("Arial", 16)).place(x=150, y=200)
+            self.__app.body_frame, text="Select Showing", fg='#DD2424', font=("Arial", 16)).place(x=150, y=200)
         self.showings_list = self.get_film_listings()  # List
-        self.options = tk.StringVar(self.__app.BodyFrame)
+        self.options = tk.StringVar(self.__app.body_frame)
         self.options.set(self.showings_list[0])  # default value option
         self.select_showing_entry = tk.OptionMenu(
-            self.__app.BodyFrame, self.options, *self.showings_list).place(x=350, y=200)
+            self.__app.body_frame, self.options, *self.showings_list).place(x=350, y=200)
 
         print(self.film)
         print(self.date)
 
-    # Need to get mock data for this, currently getting film names
     def get_showings_list(self):
         self.film_list = conn.select("SELECT FILM_TITLE FROM FILMS")
 
