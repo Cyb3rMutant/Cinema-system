@@ -10,10 +10,14 @@ class Controller():
         self.__view = view
 
     def login(self, username, password):
-        data = self.__model.validate_login(username, password)
-        if (data == -1):
+        user = self.__model.validate_login(username, password)
+        if (user == -1):
             self.__view.show_error("User doesnt exist.")
-        elif (data == 0):
+
+        elif (user == 0):
             self.__view.show_error("Incorrect username or password.")
+
         else:
-            self.__view.loggedin(data)
+            self.__view.show_info("You have successfully logged in.")
+
+            self.__view.logged_in(user)

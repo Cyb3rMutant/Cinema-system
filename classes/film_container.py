@@ -2,22 +2,25 @@ import film
 from dbfunc import conn
 
 
-class Films_container():
+class Films():
     __instance = None
 
     def __init__(self):
-        if Films_container.__instance:
+        if Films.__instance:
             raise Exception("there can only be one Conn instance!")
 
-        Films_container.__instance = self
+        Films.__instance = self
 
         self.__films = dict()
 
         films = conn.select("SELECT * FROM films;")
 
-        for film in films:
-            self.__films[film[0]] = (
-                film.Film(film[0], film[1], film[2], film[3]))
+        for f in films:
+            self.__films[f["FILM_TITLE"]] = (
+                film.Film(f["FILM_TITLE"], f["FILM_RATING"], f["FILM_GENRE"], f["FILM_YEAR"], f["FILM_AGE_RATING"], f["FILM_DURATION"], f["FILM_DESCRIPTION"], f["FILM_CAST"]))
+
+    def __getitem__(self, film_name):
+        return self.__cities[film_name]
 
     def get_films(self):
         return self.__films
@@ -29,10 +32,14 @@ class Films_container():
         self.__films[film_name] = (
             film.Film(film_name, morning_price, afternoon_price, evening_price))
 
-    def remove_film(self, film_name:str):
-        
+    def remove_film(self, film_name: str):
+
         if film_name in self.__films:
-            conn.delete("DELETE FROM FILMS WHERE FILM_TITLE = %s;", (film_name,))
-            del self.__films(film_name)
+            conn.delete(
+                "DELETE FROM films WHERE FILM_TITLE = %s;", (film_name,))
+            self.__films.pop(film_name)
         else:
             print("Film doesn't exist")
+
+
+films = Films()

@@ -24,12 +24,12 @@ class Screen(object):
 
         self.__shows = list()
 
-        shows = conn.select("SELECT * FROM SHOWS WHERE SCREEN_ID=%d",
-                            (self.__screen_id,))
+        shows = conn.select("SELECT * FROM shows WHERE SCREEN_ID=%s",
+                            self.__screen_id)
 
-        for show in shows:
+        for s in shows:
             self.__shows.append(
-                show.Show(show[0], show[1], show[2], show[3], show[4], show[5], show[6],))
+                show.Show(s["SHOW_ID"], s["SHOW_TIME"], s["SHOW_AVAILABLE_VIP_SEATS"], s["SHOW_AVAILABLE_UPPER_SEATS"], s["SHOW_AVAILABLE_LOWER_SEATS"], s["FILM_TITLE"], s["SCREEN_ID"],))
 
     def get_screen_id(self):
         return self.__screen_id
@@ -47,22 +47,22 @@ class Screen(object):
         return self.__shows
 
     def add_show(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, film):
-        conn.insert("INSERT INTO SHOWS VALUES(%d, %s, %d, %d, %d, %s);", (show_id, time,
-                    available_vip_seats, available_upper_seats, available_lower_seats, film,))
+        conn.insert("INSERT INTO shows VALUES(%s, %s, %s, %s, %s, %s);", show_id, time,
+                    available_vip_seats, available_upper_seats, available_lower_seats, film)
 
         self.__shows.append(
             show.Show(show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, self, film))
 
     def remove_show(self, show_id):
-        #remove show from 
+        # remove show from
         show = None
         for s in self.__shows:
             if s.get_show_id() == show_id:
                 show = s
-                conn.delete("DELETE FROM SHOWS WHERE SHOW_ID = %s;", (s.get_show_id())) #delete from db
-                self.__shows.remove(s)   #should remove from the list of shows
+                conn.delete("DELETE FROM shows WHERE SHOW_ID = %s;",
+                            (s.get_show_id()))  # delete from db
+                self.__shows.remove(s)  # should remove from the list of shows
                 break
-
 
     # ˅
 

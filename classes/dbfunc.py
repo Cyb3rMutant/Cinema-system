@@ -45,5 +45,6 @@ class Conn():
 conn = Conn()
 
 if __name__ == "__main__":
-    print(conn.select("SELECT * FROM users"))
+    print(conn.select(
+        "SELECT * FROM users u LEFT JOIN cinemas c ON c.CINEMA_ID=u.CINEMA_ID WHERE USER_NAME=%s", "y"))
     conn.close()

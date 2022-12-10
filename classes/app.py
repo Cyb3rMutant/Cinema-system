@@ -21,18 +21,18 @@ class App(tk.Tk):
         # Header
         # Page Name is different for each class. We place them on the class itself. (Top Left Title)
         self.title_label = tk.Label(self.header_frame, text="Horizon Cinemas",
-                                    borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
+                                    borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 24))
         self.title_label.place(x=443, y=5, width=443, height=70)
         self.branch_label = tk.Label(self.header_frame, text="",
-                                     borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
+                                     borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 20))
         # Higher width overlaps border. Had to make it smaller and adjust with X
         self.branch_label.place(x=890, y=5, width=400)
         self.name_label = tk.Label(
-            self.header_frame, text="", borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
+            self.header_frame, text="", borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 20))
         self.name_label.place(x=890, y=40, width=400)
 
         self.page_label = tk.Label(self.header_frame, text="",
-                                   borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 16))
+                                   borderwidth=1, bg='#333333', fg='#DD2424', font=("Arial", 24))
         self.page_label.place(x=0, y=5, width=443, height=70)  # 443 = width/3
 
         self.body_frame = tk.Frame(

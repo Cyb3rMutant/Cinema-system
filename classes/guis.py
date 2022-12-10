@@ -2,6 +2,10 @@ import tkinter as tk
 import tkinter.messagebox
 from tkcalendar import DateEntry
 from datetime import datetime
+from booking_staff import Booking_staff
+from admin import Admin
+from manager import Manager
+
 
 from dbfunc import conn
 # Started using inheritence for windows. In the testing stage atm of it
@@ -11,7 +15,12 @@ from dbfunc import conn
 class Main_frame(tk.Frame):
     def __init__(self, parent, controller):
         self.__app = parent
+        super().__init__(self.__app)
+
+        self.__user = None
+
         self.__controller = controller
+
         self.login()
 
     def clear_frame(self):
@@ -19,7 +28,7 @@ class Main_frame(tk.Frame):
             widgets.destroy()
 
     def login(self):
-        super().__init__(self.__app)
+        self.clear_frame()
         # Create widgets
         self.__app.page_label["text"] = "Login"
         self.__username_label = tk.Label(
@@ -39,70 +48,65 @@ class Main_frame(tk.Frame):
                 self.__username_entry.get(), self.__password_entry.get()))
         self.__login_button.place(x=612, y=460)
 
-    def loggedin(self, data):
+    def show_info(self, message):
         tk.messagebox.showinfo(
-            title="Login Successful", message="You have successfully logged in.")
-        self.clear_frame()
-
-        self.create_dashboard(
-            data["USER_NAME"], data["USER_TYPE"], data["CINEMA_ID"])
+            title="Login Successful", message=message)
 
     def show_error(self, message):
         tk.messagebox.showerror(title="Error", message=message)
 
-    def create_dashboard(self, name, usertype, branch):
-        self.dashboard(name, usertype, branch)
-
-    def dashboard(self, name, usertype, branch):
+    def logged_in(self, user):
         # Page Title
+        self.__user = user
+        self.__app.name_label["text"] = f"{self.__user.get_id()}: {self.__user.get_name()}[{self.__user.__class__.__name__}]"
+        self.__app.branch_label["text"] = self.__user.get_branch().get_address()
+
+        self.dashboard()
+
+    def dashboard(self):
+        self.clear_frame()
         self.__app.page_label["text"] = "Dashboard"
-        self.__app.name_label["text"] = f"{name} [{usertype}]"
-        self.__app.branch_label["text"] = branch
         # Body
-        self.create_booking_btn = tk.Button(
-            self.__app.body_frame, text="Create Booking", borderwidth=1, command=self.create_booking_gui)
         self.view_bookings_btn = tk.Button(
-            self.__app.body_frame, text="View Bookings", borderwidth=1)
-        self.view_film_listings_btn = tk.Button(
-            self.__app.body_frame, text="View Film Listings", borderwidth=1)
+            self.__app.body_frame, text="View Bookings", borderwidth=1, command=self.view_bookings, font=("Arial", 16))
+        self.create_booking_btn = tk.Button(
+            self.__app.body_frame, text="Create Booking", borderwidth=1, command=self.create_booking, font=("Arial", 16))
         self.cancel_booking_btn = tk.Button(
-            self.__app.body_frame, text="Cancel Booking", borderwidth=1)
-
+            self.__app.body_frame, text="Cancel Booking", borderwidth=1, command=self.cancel_booking, font=("Arial", 16))
+        self.view_film_listings_btn = tk.Button(
+            self.__app.body_frame, text="View Film Listings", borderwidth=1, command=self.view_film_listings, font=("Arial", 16))
         self.add_listing_btn = tk.Button(
-            self.__app.body_frame, text="Add Listing", borderwidth=1)
+            self.__app.body_frame, text="Add Listing", borderwidth=1, command=self.add_listing, font=("Arial", 16))
         self.remove_listing_btn = tk.Button(
-            self.__app.body_frame, text="Remove Listing", borderwidth=1)
+            self.__app.body_frame, text="Remove Listing", borderwidth=1, command=self.remove_listing, font=("Arial", 16))
         self.update_listing_btn = tk.Button(
-            self.__app.body_frame, text="Update Listing", borderwidth=1)
+            self.__app.body_frame, text="Update Listing", borderwidth=1, command=self.update_listing, font=("Arial", 16))
         self.generate_report_btn = tk.Button(
-            self.__app.body_frame, text="Generate Report", borderwidth=1)
-
+            self.__app.body_frame, text="Generate Report", borderwidth=1, command=self.generate_report, font=("Arial", 16))
         self.add_new_cinema_btn = tk.Button(
-            self.__app.body_frame, text="Add New Cinema", borderwidth=1)
-        self.add_listing_master_btn = tk.Button(
-            self.__app.body_frame, text="Add Listing to Cinema", borderwidth=1)
+            self.__app.body_frame, text="Add New Cinema", borderwidth=1, command=self.add_new_cinema, font=("Arial", 16))
 
         # Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
-        self.create_booking_btn.place(x=170, y=150, width=240, height=100)
-        self.view_bookings_btn.place(x=420, y=150, width=240, height=100)
-        self.view_film_listings_btn.place(x=670, y=150, width=240, height=100)
-        self.cancel_booking_btn.place(x=920, y=150, width=240, height=100)
+        self.view_bookings_btn.place(x=270, y=100, width=240, height=130)
+        self.create_booking_btn.place(x=520, y=100, width=240, height=130)
+        self.cancel_booking_btn.place(x=770, y=100, width=240, height=130)
+        self.view_film_listings_btn.place(x=270, y=240, width=240, height=130)
 
-        self.add_listing_btn.place(x=170, y=250, width=240, height=100)
-        self.remove_listing_btn.place(x=420, y=250, width=240, height=100)
-        self.update_listing_btn.place(x=670, y=250, width=240, height=100)
-        self.generate_report_btn.place(x=920, y=250, width=240, height=100)
+        if (isinstance(self.__user, Admin)):
+            self.add_listing_btn.place(x=520, y=240, width=240, height=130)
+            self.remove_listing_btn.place(x=770, y=240, width=240, height=130)
+            self.update_listing_btn.place(x=270, y=380, width=240, height=130)
+            self.generate_report_btn.place(x=520, y=380, width=240, height=130)
 
-        self.add_new_cinema_btn.place(x=170, y=350, width=240, height=100)
-        self.add_listing_master_btn.place(x=420, y=350, width=240, height=100)
+            if (isinstance(self.__user, Manager)):
+                self.add_new_cinema_btn.place(
+                    x=770, y=380, width=240, height=130)
 
-    def create_booking_gui(self):
-        self.booking()
-
-    def booking(self):
-
+    def create_booking(self):
+        print("HEREEEEEE")
+        self.clear_frame()
         # Page Name
-        self.__app.page_label["text"] = "Dashboard"
+        self.__app.page_label["text"] = "Create booking"
 
         # Body
         # Creating Widgets
@@ -179,3 +183,35 @@ class Main_frame(tk.Frame):
         self.film_list = conn.select("SELECT FILM_TITLE FROM FILMS")
 
         return self.film_list
+
+    def view_bookings(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "View booking"
+
+    def view_film_listings(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "View film listings"
+
+    def cancel_booking(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Cancel booking"
+
+    def add_listing(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Add listings"
+
+    def remove_listing(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Remove listings"
+
+    def update_listing(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Update listings"
+
+    def generate_report(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Generate report"
+
+    def add_new_cinema(self):
+        self.clear_frame()
+        self.__app.page_label["text"] = "Add new cinema"

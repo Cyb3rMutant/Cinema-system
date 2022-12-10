@@ -1,15 +1,14 @@
-import booking_staff
-import admin
-import manager
-from dbfunc import conn
+from booking_staff import Booking_staff
+from admin import Admin
+from manager import Manager
 
 
 class User_factory():
     @staticmethod
     def get_user_type(type: str):
-        types = {"Booking_staff": booking_staff.Booking_staff,
-                 "Admin": admin.Admin,
-                 "Manager": manager.Manager}
+        types = {"booking_staff": Booking_staff,
+                 "admin": Admin,
+                 "manager": Manager}
 
         if type not in types:
             raise Exception("%s user type does not exist" % type)
@@ -18,5 +17,5 @@ class User_factory():
 
 
 if __name__ == "__main__":
-    admin = User_factory.get_user_type("m")("yazee", 1, None)
+    admin = User_factory.get_user_type("admin")("yazee", 1, None)
     print(type(admin))
