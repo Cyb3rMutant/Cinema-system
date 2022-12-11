@@ -20,7 +20,7 @@ class Films():
                 film.Film(f["FILM_TITLE"], f["FILM_RATING"], f["FILM_GENRE"], f["FILM_YEAR"], f["FILM_AGE_RATING"], f["FILM_DURATION"], f["FILM_DESCRIPTION"], f["FILM_CAST"]))
 
     def __getitem__(self, film_name):
-        return self.__cities[film_name]
+        return self.__films[film_name]
 
     def get_films(self):
         return self.__films

@@ -2,11 +2,10 @@ import tkinter as tk
 import tkinter.messagebox
 from tkcalendar import DateEntry
 from datetime import datetime
-from booking_staff import Booking_staff
 from admin import Admin
 from manager import Manager
-
-
+from city_container import cities
+from film_container import films
 from dbfunc import conn
 # Started using inheritence for windows. In the testing stage atm of it
 # Started create booking GUI, working on validation
@@ -23,12 +22,12 @@ class Main_frame(tk.Frame):
 
         self.login()
 
-    def clear_frame(self):
-        for widgets in self.__app.body_frame.winfo_children():
+    def clear_frame(self, frame):
+        for widgets in frame.winfo_children():
             widgets.destroy()
 
     def login(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         # Create widgets
         self.__app.page_label["text"] = "Login"
         self.__username_label = tk.Label(
@@ -64,78 +63,84 @@ class Main_frame(tk.Frame):
         self.dashboard()
 
     def dashboard(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Dashboard"
         # Body
-        self.view_bookings_btn = tk.Button(
-            self.__app.body_frame, text="View Bookings", borderwidth=1, command=self.view_bookings, font=("Arial", 16))
-        self.create_booking_btn = tk.Button(
-            self.__app.body_frame, text="Create Booking", borderwidth=1, command=self.create_booking, font=("Arial", 16))
-        self.cancel_booking_btn = tk.Button(
-            self.__app.body_frame, text="Cancel Booking", borderwidth=1, command=self.cancel_booking, font=("Arial", 16))
-        self.view_film_listings_btn = tk.Button(
-            self.__app.body_frame, text="View Film Listings", borderwidth=1, command=self.view_film_listings, font=("Arial", 16))
-        self.add_listing_btn = tk.Button(
-            self.__app.body_frame, text="Add Listing", borderwidth=1, command=self.add_listing, font=("Arial", 16))
-        self.remove_listing_btn = tk.Button(
-            self.__app.body_frame, text="Remove Listing", borderwidth=1, command=self.remove_listing, font=("Arial", 16))
-        self.update_listing_btn = tk.Button(
-            self.__app.body_frame, text="Update Listing", borderwidth=1, command=self.update_listing, font=("Arial", 16))
-        self.generate_report_btn = tk.Button(
-            self.__app.body_frame, text="Generate Report", borderwidth=1, command=self.generate_report, font=("Arial", 16))
-        self.add_new_cinema_btn = tk.Button(
-            self.__app.body_frame, text="Add New Cinema", borderwidth=1, command=self.add_new_cinema, font=("Arial", 16))
+        view_bookings_btn = tk.Button(
+            self.__app.body_frame, text="View Bookings", borderwidth=5, command=self.view_bookings, font=("Arial", 16))
+        create_booking_btn = tk.Button(
+            self.__app.body_frame, text="Create Booking", borderwidth=5, command=self.create_booking, font=("Arial", 16))
+        cancel_booking_btn = tk.Button(
+            self.__app.body_frame, text="Cancel Booking", borderwidth=5, command=self.cancel_booking, font=("Arial", 16))
+        view_film_listings_btn = tk.Button(
+            self.__app.body_frame, text="View Film Listings", borderwidth=5, command=self.view_film_listings, font=("Arial", 16))
+        add_listing_btn = tk.Button(
+            self.__app.body_frame, text="Add Listing", borderwidth=5, command=self.add_listing, font=("Arial", 16))
+        remove_listing_btn = tk.Button(
+            self.__app.body_frame, text="Remove Listing", borderwidth=5, command=self.remove_listing, font=("Arial", 16))
+        update_listing_btn = tk.Button(
+            self.__app.body_frame, text="Update Listing", borderwidth=5, command=self.update_listing, font=("Arial", 16))
+        generate_report_btn = tk.Button(
+            self.__app.body_frame, text="Generate Report", borderwidth=5, command=self.generate_report, font=("Arial", 16))
+        add_new_cinema_btn = tk.Button(
+            self.__app.body_frame, text="Add New Cinema", borderwidth=5, command=self.add_new_cinema, font=("Arial", 16))
 
         # Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
-        self.view_bookings_btn.place(x=270, y=100, width=240, height=130)
-        self.create_booking_btn.place(x=520, y=100, width=240, height=130)
-        self.cancel_booking_btn.place(x=770, y=100, width=240, height=130)
-        self.view_film_listings_btn.place(x=270, y=240, width=240, height=130)
+        view_bookings_btn.place(x=270, y=100, width=240, height=130)
+        create_booking_btn.place(x=520, y=100, width=240, height=130)
+        cancel_booking_btn.place(x=770, y=100, width=240, height=130)
+        view_film_listings_btn.place(x=270, y=240, width=240, height=130)
 
         if (isinstance(self.__user, Admin)):
-            self.add_listing_btn.place(x=520, y=240, width=240, height=130)
-            self.remove_listing_btn.place(x=770, y=240, width=240, height=130)
-            self.update_listing_btn.place(x=270, y=380, width=240, height=130)
-            self.generate_report_btn.place(x=520, y=380, width=240, height=130)
+            add_listing_btn.place(x=520, y=240, width=240, height=130)
+            remove_listing_btn.place(x=770, y=240, width=240, height=130)
+            update_listing_btn.place(x=270, y=380, width=240, height=130)
+            generate_report_btn.place(x=520, y=380, width=240, height=130)
 
             if (isinstance(self.__user, Manager)):
-                self.add_new_cinema_btn.place(
-                    x=770, y=380, width=240, height=130)
+                add_new_cinema_btn.place(x=770, y=380, width=240, height=130)
+
+    def view_bookings(self):
+        self.clear_frame(self.__app.body_frame)
+        self.__app.page_label["text"] = "View booking"
+        if (isinstance(self.__user, Admin)):
+            pass
+        else:
+            self.__controller.get_bookings(self.__user.get_branch())
 
     def create_booking(self):
-        print("HEREEEEEE")
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         # Page Name
         self.__app.page_label["text"] = "Create booking"
 
         # Body
         # Creating Widgets
 
-        self.date_today = datetime.now()
-        self.date_label = tk.Label(
+        date_today = datetime.now()
+        date_label = tk.Label(
             self.__app.body_frame, text="Select Date", fg='#DD2424', font=("Arial", 16))
-        self.date_entry = DateEntry(self.__app.body_frame, width=10, font=(
-            "Arial", 15), mindate=self.date_today)
+        date_entry = DateEntry(self.__app.body_frame, width=10, font=(
+            "Arial", 15), mindate=date_today)
 
-        self.select_film_label = tk.Label(
+        select_film_label = tk.Label(
             self.__app.body_frame, text="Select Film", fg='#DD2424', font=("Arial", 16))
-        self.film_list = self.get_film_listings()  # List
-        print(self.film_list)
-        self.options = tk.StringVar(self.__app.body_frame)
-        self.options.set(self.film_list[0])  # default value option
-        self.select_film_entry = tk.OptionMenu(
-            self.__app.body_frame, self.options, *self.film_list)
+        film_list = self.get_film_listings()  # List
+        print(film_list)
+        options = tk.StringVar(self.__app.body_frame)
+        options.set(film_list[0])  # default value option
+        select_film_entry = tk.OptionMenu(
+            self.__app.body_frame, options, *film_list)
 
         # Call check availability function, currently is create showing
-        self.check_showings_btn = tk.Button(self.__app.body_frame, text='Check Showings', bg='#DD2424', fg='#000000', font=(
+        check_showings_btn = tk.Button(self.__app.body_frame, text='Check Showings', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=self.check_film_date_availability)
 
         # Placing Widgets
-        self.date_label.place(x=150, y=0)
-        self.date_entry.place(x=350, y=0)
-        self.select_film_label.place(x=150, y=100)
-        self.select_film_entry.place(x=350, y=100)
-        self.check_showings_btn.place(x=250, y=150)
+        date_label.place(x=150, y=0)
+        date_entry.place(x=350, y=0)
+        select_film_label.place(x=150, y=100)
+        select_film_entry.place(x=350, y=100)
+        check_showings_btn.place(x=250, y=150)
 
     def get_film_listings(self):
         self.film_list = conn.select("SELECT film_name FROM films")
@@ -184,34 +189,88 @@ class Main_frame(tk.Frame):
 
         return self.film_list
 
-    def view_bookings(self):
-        self.clear_frame()
-        self.__app.page_label["text"] = "View booking"
-
     def view_film_listings(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "View film listings"
 
     def cancel_booking(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Cancel booking"
 
+    def update_options(self, city):
+        menu = self.__cinema_options["menu"]
+        menu.delete(0, "end")
+        self.__cinema_choice.set(cities[city].get_cinemas()[0])
+        for cinema in cities[city].get_cinemas():
+            menu.add_command(
+                label=cinema, command=lambda value=cinema: self.__cinema_choice.set(value))
+
+        self.clear_frame(self.__screens_box)
+        for screen in cities[city].get_cinemas()[0].get_screens():
+            l = tk.Checkbutton(
+                self.__screens_box, text=screen).pack(sid=tk.BOTTOM)
+
     def add_listing(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Add listings"
 
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(list(cities.get_cities().keys())[0])
+        self.__city_options_lable = tk.Label(
+            self.__app.body_frame, text="choose city: ")
+        self.__city_options = tk.OptionMenu(
+            self.__app.body_frame, self.__city_choice, *cities.get_cities().keys(), command=self.update_options)  # , command=self.set_cinema(self.__city_choice.get()))
+
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set(
+            cities[self.__city_choice.get()].get_cinemas()[0])
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ")
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *cities[self.__city_choice.get()].get_cinemas())
+
+        self.__film_choice = tk.StringVar()
+        self.__film_choice.set(list(films.get_films().keys())[0])
+        self.__film_options_label = tk.Label(
+            self.__app.body_frame, text="choose film: ")
+        self.__film_options = tk.OptionMenu(
+            self.__app.body_frame, self.__film_choice, *films.get_films().keys())
+
+        self.__date_label = tk.Label(
+            self.__app.body_frame, text="Select Date: ")
+        self.__date_entry = DateEntry(
+            self.__app.body_frame, mindate=datetime.now())
+
+        self.__screens_label = tk.Label(
+            self.__app.body_frame, text="Select screens: ")
+        self.__screens_box = tk.Frame(self.__app.body_frame)
+        for screen in cities[self.__city_choice.get()].get_cinemas()[0].get_screens():
+            l = tk.Checkbutton(
+                self.__screens_box, text=screen).pack()
+
+        self.__city_options_lable.place(x=10, y=10)
+        self.__city_options.place(x=100, y=10)
+        self.__cinema_options_label.place(x=10, y=70)
+        self.__cinema_options.place(x=100, y=70)
+        self.__film_options_label.place(x=10, y=140)
+        self.__film_options.place(x=100, y=140)
+        self.__date_label.place(x=10, y=210)
+        self.__date_entry.place(x=100, y=210)
+        self.__screens_label.place(x=10, y=280)
+        self.__screens_box.place(x=100, y=280)
+
     def remove_listing(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Remove listings"
 
     def update_listing(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Update listings"
 
     def generate_report(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Generate report"
 
     def add_new_cinema(self):
-        self.clear_frame()
+        self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Add new cinema"

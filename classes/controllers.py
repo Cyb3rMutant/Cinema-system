@@ -21,3 +21,10 @@ class Controller():
             self.__view.show_info("You have successfully logged in.")
 
             self.__view.logged_in(user)
+
+    def get_bookings(self, cinema, booking_staff=1):
+        if booking_staff:
+            return self.__model.get_bookings(self, cinema)
+
+        else:
+            return

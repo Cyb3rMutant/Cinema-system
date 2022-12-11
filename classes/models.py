@@ -27,3 +27,9 @@ class Model():
             return user
         else:
             return 0
+
+    def get_bookings(self, cinema):
+        bookings = []
+        for show in cinema:
+            bookings += show.get_bookings()
+        return bookings

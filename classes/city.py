@@ -39,7 +39,7 @@ class City(object):
         return self.__evening_price
 
     def get_cinemas(self):
-        return self._cinemas
+        return self.__cinemas
 
     def __getitem__(self, cinema_id):
         for cinema in self.__cinemas:

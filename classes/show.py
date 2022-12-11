@@ -1,13 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 import booking
 import booking_factory
 import film
 import film_container
-
-
-# ˄
 
 
 class Show(object):
@@ -15,7 +9,7 @@ class Show(object):
 
     # ˄
 
-    def __init__(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, screen, film):
+    def __init__(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, screen, listing):
 
         self.__show_id = show_id
 
@@ -27,17 +21,11 @@ class Show(object):
 
         self.__available_lower_seats = available_lower_seats
 
-        self.__film = film
-
         self.__bookings = list()
 
         self.__screen = screen
 
-        self.__film = film
-
-        # ˅
-        pass
-        # ˄
+        self.__listing = listing
 
     def get_show_id(self):
         return self.__show_id
@@ -63,12 +51,10 @@ class Show(object):
     def get_screen(self):
         return self.__screen
 
-    def set_time(self, time):
-        # ˅
-        pass
-        # ˄
+    def get_listing(self):
+        return self.__listing
 
-    def set_film(self, film):
+    def set_time(self, time):
         # ˅
         pass
         # ˄

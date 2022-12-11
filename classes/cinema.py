@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 import listing
 import screen
-import listing
 from dbfunc import conn
 import film
-# ˄
 
 
 class Cinema(object):
@@ -22,7 +17,7 @@ class Cinema(object):
             "SELECT * FROM screens WHERE CINEMA_ID=%s", self.__cinema_id)
         for s in screens:
             self.__screens.append(
-                screen.Screen(s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"], s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"]))
+                screen.Screen(s["SCREEN_NUMBER"], s["SCREEN_NUM_VIP_SEATS"], s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"]))
 
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema_id)
@@ -60,9 +55,9 @@ class Cinema(object):
             if l.get_listing_id() == listing_id:
                 listing = l
                 break
-
         conn.delete("DELETE FROM listings WHERE LISTING_ID=%s;",
                     listing.get_listing_id)
+        self.__listings.remove(listing)
 
     def add_listing(self, date, film: film.Film):
         # add listing to database (ben)
@@ -73,3 +68,6 @@ class Cinema(object):
         listingID = conn.select("SELECT MAX(LISTING_ID) FROM listings")
         self.__listings.append(listing.Listing(
             listingID, date, film, self))  # end paramter is cinema
+
+    def __str__(self):
+        return self.__address

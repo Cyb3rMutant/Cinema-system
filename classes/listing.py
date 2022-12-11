@@ -52,9 +52,6 @@ class Listing(object):
                     film.get_title(), self.__listing_id)
         self.__film = film
 
-        for show in self.__shows:
-            show.set_film(film)
-
     def update_show_time(self, show_id, time):
         conn.update("UPDATE shows SET SHOW_TIME=%s WHERE SHOW_ID=%s",
                     time, show_id)
