@@ -26,16 +26,16 @@ class Conn():
 
     def insert(self, query: str, *args):
         self.__dbcursor.execute(query, args)
-        conn.commit()
+        self.__conn.commit()
 
 # want to create update method (ben)
     def update(self, query: str, *args):
         self.__dbcursor.execute(query, args)
-        conn.commit()
+        self.__conn.commit()
 
     def delete(self, query: str, *args):
         self.__dbcursor.execute(query, args)
-        conn.commit()
+        self.__conn.commit()
 
     def close(self):
         self.__dbcursor.close()

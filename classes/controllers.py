@@ -28,3 +28,18 @@ class Controller():
 
         else:
             return
+
+    def add_city(self, name, morning_price, afternoon_price, evening_price):
+        print(type(name), type(morning_price), type(
+            afternoon_price), type(evening_price))
+        self.__model.add_city(name, morning_price,
+                              afternoon_price, evening_price)
+
+    def add_cinema(self, city, address, number_of_screens):
+        self.__model.add_cinema(city, address, number_of_screens)
+
+    def get_cities(self):
+        return self.__model.get_cities()
+
+    def get_films(self):
+        return self.__model.get_films()

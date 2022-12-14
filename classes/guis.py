@@ -4,8 +4,6 @@ from tkcalendar import DateEntry
 from datetime import datetime
 from admin import Admin
 from manager import Manager
-from city_container import cities
-from film_container import films
 from dbfunc import conn
 # Started using inheritence for windows. In the testing stage atm of it
 # Started create booking GUI, working on validation
@@ -84,21 +82,24 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="Generate Report", borderwidth=5, command=self.generate_report, font=("Arial", 16))
         add_new_cinema_btn = tk.Button(
             self.__app.body_frame, text="Add New Cinema", borderwidth=5, command=self.add_new_cinema, font=("Arial", 16))
+        add_new_city_btn = tk.Button(
+            self.__app.body_frame, text="Add New city", borderwidth=5, command=self.add_new_city, font=("Arial", 16))
 
         # Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
-        view_bookings_btn.place(x=270, y=100, width=240, height=130)
-        create_booking_btn.place(x=520, y=100, width=240, height=130)
-        cancel_booking_btn.place(x=770, y=100, width=240, height=130)
-        view_film_listings_btn.place(x=270, y=240, width=240, height=130)
+        view_bookings_btn.place(x=270, y=60, width=240, height=130)
+        create_booking_btn.place(x=520, y=60, width=240, height=130)
+        cancel_booking_btn.place(x=770, y=60, width=240, height=130)
+        view_film_listings_btn.place(x=270, y=200, width=240, height=130)
 
         if (isinstance(self.__user, Admin)):
-            add_listing_btn.place(x=520, y=240, width=240, height=130)
-            remove_listing_btn.place(x=770, y=240, width=240, height=130)
-            update_listing_btn.place(x=270, y=380, width=240, height=130)
-            generate_report_btn.place(x=520, y=380, width=240, height=130)
+            add_listing_btn.place(x=520, y=200, width=240, height=130)
+            remove_listing_btn.place(x=770, y=200, width=240, height=130)
+            update_listing_btn.place(x=270, y=340, width=240, height=130)
+            generate_report_btn.place(x=520, y=340, width=240, height=130)
 
             if (isinstance(self.__user, Manager)):
-                add_new_cinema_btn.place(x=770, y=380, width=240, height=130)
+                add_new_cinema_btn.place(x=770, y=340, width=240, height=130)
+                add_new_city_btn.place(x=270, y=480, width=240, height=130)
 
     def view_bookings(self):
         self.clear_frame(self.__app.body_frame)
@@ -197,16 +198,17 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Cancel booking"
 
-    def update_options(self, city):
+    def update_cinemas(self, city):
         menu = self.__cinema_options["menu"]
         menu.delete(0, "end")
-        self.__cinema_choice.set(cities[city].get_cinemas()[0])
-        for cinema in cities[city].get_cinemas():
+        self.__cinema_choice.set(
+            self.__controller.get_cities()[city].get_cinemas()[0])
+        for cinema in self.__controller.get_cities()[city].get_cinemas():
             menu.add_command(
                 label=cinema, command=lambda value=cinema: self.__cinema_choice.set(value))
 
         self.clear_frame(self.__screens_box)
-        for screen in cities[city].get_cinemas()[0].get_screens():
+        for screen in self.__controller.get_cities()[city].get_cinemas()[0].get_screens():
             l = tk.Checkbutton(
                 self.__screens_box, text=screen).pack(sid=tk.BOTTOM)
 
@@ -214,37 +216,43 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Add listings"
 
+        # city
         self.__city_choice = tk.StringVar()
-        self.__city_choice.set(list(cities.get_cities().keys())[0])
+        self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
-            self.__app.body_frame, self.__city_choice, *cities.get_cities().keys(), command=self.update_options)  # , command=self.set_cinema(self.__city_choice.get()))
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), command=self.update_cinemas)  # , command=self.set_cinema(self.__city_choice.get()))
 
+        # cinema
+        self.__cinema = self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[
+            0]
         self.__cinema_choice = tk.StringVar()
-        self.__cinema_choice.set(
-            cities[self.__city_choice.get()].get_cinemas()[0])
+        self.__cinema_choice.set(self.__cinema)
         self.__cinema_options_label = tk.Label(
             self.__app.body_frame, text="choose cinema: ")
         self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *cities[self.__city_choice.get()].get_cinemas())
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas())
 
+        # film
         self.__film_choice = tk.StringVar()
-        self.__film_choice.set(list(films.get_films().keys())[0])
+        self.__film_choice.set(list(self.__controller.get_films().keys())[0])
         self.__film_options_label = tk.Label(
             self.__app.body_frame, text="choose film: ")
         self.__film_options = tk.OptionMenu(
-            self.__app.body_frame, self.__film_choice, *films.get_films().keys())
+            self.__app.body_frame, self.__film_choice, *self.__controller.get_films().keys())
 
+        # date
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date: ")
         self.__date_entry = DateEntry(
             self.__app.body_frame, mindate=datetime.now())
 
+        # screens
         self.__screens_label = tk.Label(
             self.__app.body_frame, text="Select screens: ")
         self.__screens_box = tk.Frame(self.__app.body_frame)
-        for screen in cities[self.__city_choice.get()].get_cinemas()[0].get_screens():
+        for screen in self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0].get_screens():
             l = tk.Checkbutton(
                 self.__screens_box, text=screen).pack()
 
@@ -274,3 +282,63 @@ class Main_frame(tk.Frame):
     def add_new_cinema(self):
         self.clear_frame(self.__app.body_frame)
         self.__app.page_label["text"] = "Add new cinema"
+
+        # city
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
+        self.__city_options_lable = tk.Label(
+            self.__app.body_frame, text="choose city: ")
+        self.__city_options = tk.OptionMenu(
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys())  # , command=self.set_cinema(self.__city_choice.get()))
+
+        self.__cinema_address_lable = tk.Label(
+            self.__app.body_frame, text="Cinema address: ")
+        self.__cinema_address = tk.Entry(self.__app.body_frame)
+
+        self.__number_of_screens_lable = tk.Label(
+            self.__app.body_frame, text="Number of screens: ")
+        self.__number_of_screens = tk.Entry(self.__app.body_frame)
+
+        self.__login_button = tk.Button(self.__app.body_frame, text='Add cinema', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.add_cinema(
+            self.__city_choice.get(), self.__cinema_address.get(), int(self.__number_of_screens.get())))
+        self.__login_button.place(x=612, y=460)
+
+        self.__city_options_lable.place(x=10, y=10)
+        self.__city_options.place(x=100, y=10)
+        self.__cinema_address_lable.place(x=10, y=70)
+        self.__cinema_address.place(x=100, y=70)
+        self.__number_of_screens_lable.place(x=10, y=140)
+        self.__number_of_screens.place(x=100, y=140)
+
+    def add_new_city(self):
+        self.clear_frame(self.__app.body_frame)
+        self.__app.page_label["text"] = "Add new city"
+
+        self.__city_name_lable = tk.Label(
+            self.__app.body_frame, text="City name: ")
+        self.__city_name = tk.Entry(self.__app.body_frame)
+
+        self.__city_morning_price_lable = tk.Label(
+            self.__app.body_frame, text="City morning price: ")
+        self.__city_morning_price = tk.Entry(self.__app.body_frame)
+
+        self.__city_afternoon_price_lable = tk.Label(
+            self.__app.body_frame, text="City afternoon price: ")
+        self.__city_afternoon_price = tk.Entry(self.__app.body_frame)
+
+        self.__city_evening_price_lable = tk.Label(
+            self.__app.body_frame, text="City evening price: ")
+        self.__city_evening_price = tk.Entry(self.__app.body_frame)
+
+        self.__login_button = tk.Button(self.__app.body_frame, text='Add city', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.add_city(
+            self.__city_name.get(), self.__city_morning_price.get(), self.__city_afternoon_price.get(), self.__city_evening_price.get()))
+        self.__login_button.place(x=612, y=460)
+
+        self.__city_name_lable.place(x=10, y=10)
+        self.__city_name.place(x=100, y=10)
+        self.__city_morning_price_lable.place(x=10, y=70)
+        self.__city_morning_price.place(x=100, y=70)
+        self.__city_afternoon_price_lable.place(x=10, y=140)
+        self.__city_afternoon_price.place(x=100, y=140)
+        self.__city_evening_price_lable.place(x=10, y=210)
+        self.__city_evening_price.place(x=100, y=210)

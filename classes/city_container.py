@@ -13,22 +13,16 @@ class Cities():
 
         self.__cities = dict()
 
-        cities = conn.select("SELECT * FROM cities;")
+    def __getitem__(self, key: str):
+        return self.__cities[key]
 
-        for c in cities:
-            self.__cities[c["CITY_NAME"]] = (
-                city.City(c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"]))
-
-    def __getitem__(self, city_name):
-        return self.__cities[city_name]
+    def __setitem__(self, key: str, value: city.City):
+        self.__cities[key] = value
 
     def get_cities(self):
         return self.__cities
 
     def add_city(self, city_name: str, morning_price: int, afternoon_price: int, evening_price: int):
-        conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
-                    (city_name, morning_price, afternoon_price, evening_price,))
-
         self.__cities[city_name] = (
             city.City(city_name, morning_price, afternoon_price, evening_price))
 
@@ -41,6 +35,3 @@ class Cities():
             self.__cities.pop[city_name]
         else:
             print("City doesnt exist")  # print to terminal
-
-
-cities = Cities()

@@ -8,7 +8,7 @@ from dbfunc import conn
 
 
 class City(object):
-    def __init__(self, city_name, morning_price, afternoon_price, evening_price):
+    def __init__(self, city_name: str, morning_price: int, afternoon_price: int, evening_price: int):
 
         self.__city_name = city_name
 
@@ -41,23 +41,19 @@ class City(object):
     def get_cinemas(self):
         return self.__cinemas
 
-    def __getitem__(self, cinema_id):
+    def __getitem__(self, cinema_id: int):
         for cinema in self.__cinemas:
             if cinema.get_cinema_id() == cinema_id:
                 return cinema
 
-    def set_morning_price(self, morning_prince):
+    def set_morning_price(self, morning_prince: int):
         self.__morning_price = morning_prince
 
-    def set_afternoon_price(self, afternoon_price):
+    def set_afternoon_price(self, afternoon_price: int):
         self.__afternoon_price = afternoon_price
 
-    def set_evening_price(self, evening_price):
+    def set_evening_price(self, evening_price: int):
         self.__evening_price = evening_price
 
-    def add_cinema(self, cinema_id, cinema_address):
-
-        conn.insert("INSERT INTO cinemas VALUES (%s, %s);",
-                    (cinema_id, cinema_address,))
-
+    def add_cinema(self, cinema_id: int, cinema_address: str):
         self.__cinemas.append(cinema.Cinema(cinema_id, cinema_address))
