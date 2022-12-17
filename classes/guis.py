@@ -18,6 +18,9 @@ class Main_frame(tk.Frame):
 
         self.__controller = controller
 
+        self.__back_to_dashboard = tk.Button(self.__app.main_frame, text='go back to dashboard', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: [self.__back_to_dashboard.place_forget(), self.dashboard()])
+
         self.login()
 
     def clear_frame(self, frame):
@@ -62,6 +65,7 @@ class Main_frame(tk.Frame):
 
     def dashboard(self):
         self.clear_frame(self.__app.body_frame)
+
         self.__app.page_label["text"] = "Dashboard"
         # Body
         view_bookings_btn = tk.Button(
@@ -103,6 +107,7 @@ class Main_frame(tk.Frame):
 
     def view_bookings(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "View booking"
         if (isinstance(self.__user, Admin)):
             pass
@@ -111,6 +116,7 @@ class Main_frame(tk.Frame):
 
     def create_booking(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         # Page Name
         self.__app.page_label["text"] = "Create booking"
 
@@ -192,10 +198,12 @@ class Main_frame(tk.Frame):
 
     def view_film_listings(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "View film listings"
 
     def cancel_booking(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Cancel booking"
 
     def update_cinemas(self, city):
@@ -214,6 +222,7 @@ class Main_frame(tk.Frame):
 
     def add_listing(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Add listings"
 
         # city
@@ -269,18 +278,22 @@ class Main_frame(tk.Frame):
 
     def remove_listing(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Remove listings"
 
     def update_listing(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Update listings"
 
     def generate_report(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Generate report"
 
     def add_new_cinema(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Add new cinema"
 
         # city
@@ -312,6 +325,7 @@ class Main_frame(tk.Frame):
 
     def add_new_city(self):
         self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Add new city"
 
         self.__city_name_lable = tk.Label(
