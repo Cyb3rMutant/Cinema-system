@@ -116,19 +116,40 @@ class Main_frame(tk.Frame):
 
 
     def update_films_and_shows_based_on_date(self,*args):
-        #Getting film listings airing based on date
-        self.__film_list_titles_update = []
-        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
-            temp_date = str(self.selected_date.get())
-            temp_date = temp_date.replace("/","-")
-            if temp_date == str(listing_on_date.get_date()): self.__film_list_titles_update.append(str(listing_on_date.get_film()))
-        
         menu = self.film_options["menu"]
         menu.delete(0, "end")
         menu2 = self.show_options["menu"]
         menu2.delete(0, "end")        
         self.film_choice.set('')
         self.show_choice.set('')
+
+        self.__film_list_titles_update = []
+        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
+            temp_date = str(self.selected_date.get())
+            temp_date = temp_date.replace("/","-")
+            if temp_date == str(listing_on_date.get_date()): 
+                self.__film_list_titles_update.append(str(listing_on_date.get_film())) #Get all listing titles airing on that date at the cinema
+                self.film_choice.set(self.__film_list_titles_update[0])
+                self.film_options.destroy()
+                self.film_options = tk.OptionMenu(self.__app.body_frame, self.film_choice, *self.__film_list_titles_update, command=self.update_shows_based_on_film)
+                self.film_options.place(x=100, y=150)
+
+                film_title = self.film_choice.get() #Gets film selected
+                self.show_times_list_object = []
+                if str(film_title) == str(listing_on_date.get_film()): 
+                    self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
+
+                self.show_times_list = []
+                for i in range (len(self.show_times_list_object[0])):
+                    self.show_times_list.append(str(self.show_times_list_object[0][i]))
+            
+                #Outputting the shows into optionsmenu
+                for show_time in self.show_times_list:
+                    self.show_choice.set(show_time)
+                    menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))
+                    
+                print(self.show_times_list)
+
 
         
         if len(self.__film_list_titles_update) > 0:
@@ -141,30 +162,12 @@ class Main_frame(tk.Frame):
             #Hardcoded way just replacing the widget with a new one.
             #The code above works, the only problem is that the command attached to film_options to update the show_options gets removed when we change the date. e.g. load page --> change date --> 2 films airing --> click other film --> [Doesn't display showings for newly clicked film, still showing previous film showings]
             #But if we, load page --> dont change date --> change film, it works
-            self.film_choice.set(self.__film_list_titles_update[0])
-            self.film_options.destroy()
-            self.film_options = tk.OptionMenu(self.__app.body_frame, self.film_choice, *self.__film_list_titles_update, command=self.update_shows_based_on_film)
-            self.film_options.place(x=100, y=150)
+
+            print("yay")
 
 
-            #Shows
-            #Gets the shows for film listing selected. It puts it into a list size of 1. e.g. len(show_times_list_object) = 1. len(show_times_list_object[0]) = 4 because 4 shows for the listing
-            film_title_2 = self.film_choice.get() #Gets film selected
-            self.show_times_list_object = []
-            for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
-                if str(film_title_2) == str(listing_on_date.get_film()): self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
             
-            #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
-            self.show_times_list = []
-            for i in range (len(self.show_times_list_object[0])):
-                self.show_times_list.append(str(self.show_times_list_object[0][i]))
-            
-            #Outputting the shows into optionsmenu
-            for show_time in self.show_times_list:
-                self.show_choice.set(show_time)
-                menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))
-                
-            print(self.show_times_list)
+
 
         else:
             print("no films airing today") #Debug
@@ -176,20 +179,25 @@ class Main_frame(tk.Frame):
         menu = self.show_options["menu"]
         menu.delete(0, "end")
         self.show_choice.set('')
-        # film_title = self.film_choice.get()
+        film_title = self.film_choice.get()
         self.show_times_list_object = []
         for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
-            if str(film_title) == str(listing_on_date.get_film()): 
-                self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
             
-                #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
-                self.show_times_list = []
-                for i in range (len(self.show_times_list_object[0])):
-                    self.show_times_list.append(str(self.show_times_list_object[0][i]))
+            temp_date = str(self.selected_date.get())
+            temp_date = temp_date.replace("/","-")
+            if temp_date == str(listing_on_date.get_date()): 
+                if str(film_title) == str(listing_on_date.get_film()): 
                     
-                for show_time in self.show_times_list:
-                    self.show_choice.set(show_time)
-                    menu.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))    
+                    self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
+                
+                    #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
+                    self.show_times_list = []
+                    for i in range (len(self.show_times_list_object[0])):
+                        self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                        
+                    for show_time in self.show_times_list:
+                        self.show_choice.set(show_time)
+                        menu.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))    
 
 
 
@@ -255,15 +263,18 @@ class Main_frame(tk.Frame):
         film_title_2 = self.film_choice.get()
         self.show_times_list_object = []
         for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
-            if str(film_title_2) == str(listing_on_date.get_film()): 
-                self.show_times_list_object.append(listing_on_date.get_shows())
+            temp_date = str(self.selected_date.get())
+            temp_date = temp_date.replace("/","-")
+            if temp_date == str(listing_on_date.get_date()):
+                if str(film_title_2) == str(listing_on_date.get_film()): 
+                    self.show_times_list_object.append(listing_on_date.get_shows())
 
-                #Have this seperate and modify if we decide to have same film title listings on the same day at a cinema. 
-                for i in range (len(self.show_times_list_object[0])):
-                    self.show_times_list.append(str(self.show_times_list_object[0][i]))
-                
-                self.show_times_list.pop(0)
-                
+                    #Have this seperate and modify if we decide to have same film title listings on the same day at a cinema. 
+                    for i in range (len(self.show_times_list_object[0])):
+                        self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                    
+                    self.show_times_list.pop(0)
+                    
 
         self.show_choice = tk.StringVar()
         self.show_choice.set('') 
