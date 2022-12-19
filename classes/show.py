@@ -73,7 +73,8 @@ class Show(object):
 
     # ˄
 
-
+    def __str__(self):
+        return str(self.__time)
 # ˅
 
 # ˄

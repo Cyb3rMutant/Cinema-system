@@ -56,3 +56,6 @@ class Listing(object):
         conn.update("UPDATE shows SET SHOW_TIME=%s WHERE SHOW_ID=%s",
                     time, show_id)
         self.__time
+
+    def __str__(self):
+        return self.__film

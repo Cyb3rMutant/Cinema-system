@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.messagebox
 from tkcalendar import DateEntry
-from datetime import datetime
+from datetime import datetime, date
 from admin import Admin
 from manager import Manager
 from dbfunc import conn
@@ -114,87 +114,169 @@ class Main_frame(tk.Frame):
         else:
             self.__controller.get_bookings(self.__user.get_branch())
 
+
+    def update_films_and_shows_based_on_date(self,*args):
+        #Getting film listings airing based on date
+        self.__film_list_titles_update = []
+        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
+            temp_date = str(self.selected_date.get())
+            temp_date = temp_date.replace("/","-")
+            if temp_date == str(listing_on_date.get_date()): self.__film_list_titles_update.append(str(listing_on_date.get_film()))
+        
+        menu = self.film_options["menu"]
+        menu.delete(0, "end")
+        menu2 = self.show_options["menu"]
+        menu2.delete(0, "end")        
+        self.film_choice.set('')
+        self.show_choice.set('')
+
+        
+        if len(self.__film_list_titles_update) > 0:
+            #Placing film titles into optionsmenu
+            # for film_title in self.__film_list_titles_update:
+            #     self.film_choice.set(film_title)
+            #     # menu.add_command(label=film_title,command=self.update_shows_based_on_film) #Command doesn't work to set the actual value. It still works without the i.
+            #     menu.add_command(label=film_title, command=lambda value=film_title: self.film_choice.set(value)) #Command doesn't work to set the actual value. It still works without the i.
+            
+            #Hardcoded way just replacing the widget with a new one.
+            #The code above works, the only problem is that the command attached to film_options to update the show_options gets removed when we change the date. e.g. load page --> change date --> 2 films airing --> click other film --> [Doesn't display showings for newly clicked film, still showing previous film showings]
+            #But if we, load page --> dont change date --> change film, it works
+            self.film_choice.set(self.__film_list_titles_update[0])
+            self.film_options.destroy()
+            self.film_options = tk.OptionMenu(self.__app.body_frame, self.film_choice, *self.__film_list_titles_update, command=self.update_shows_based_on_film)
+            self.film_options.place(x=100, y=150)
+
+
+            #Shows
+            #Gets the shows for film listing selected. It puts it into a list size of 1. e.g. len(show_times_list_object) = 1. len(show_times_list_object[0]) = 4 because 4 shows for the listing
+            film_title_2 = self.film_choice.get() #Gets film selected
+            self.show_times_list_object = []
+            for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+                if str(film_title_2) == str(listing_on_date.get_film()): self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
+            
+            #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
+            self.show_times_list = []
+            for i in range (len(self.show_times_list_object[0])):
+                self.show_times_list.append(str(self.show_times_list_object[0][i]))
+            
+            #Outputting the shows into optionsmenu
+            for show_time in self.show_times_list:
+                self.show_choice.set(show_time)
+                menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))
+                
+            print(self.show_times_list)
+
+        else:
+            print("no films airing today") #Debug
+
+    
+    def update_shows_based_on_film(self,film_title):
+        print("poo")
+        #Does the same as the code above. Just updating show options when a different film is selected.
+        menu = self.show_options["menu"]
+        menu.delete(0, "end")
+        self.show_choice.set('')
+        # film_title = self.film_choice.get()
+        self.show_times_list_object = []
+        for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+            if str(film_title) == str(listing_on_date.get_film()): 
+                self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
+            
+                #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
+                self.show_times_list = []
+                for i in range (len(self.show_times_list_object[0])):
+                    self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                    
+                for show_time in self.show_times_list:
+                    self.show_choice.set(show_time)
+                    menu.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))    
+
+
+
     def create_booking(self):
+
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1000, y=600)
-        # Page Name
         self.__app.page_label["text"] = "Create booking"
+        #Booking staff. Cinema = get.bla.bla
+        #Admin. 
+        #Labels
+        #Hardcoded cities for dynamic - will look at it later
+        if (isinstance(self.__user, Admin)):
+            self.__select_cinema_label = tk.Label(self.__app.body_frame, text="Select Cinema").place(x=0,y=50)
+            self.cinema_list = ["Bristol","Birmingham","Cardiff","London"]
+            self.cinema_choice = tk.StringVar()
+            self.cinema_choice.set(self.cinema_list[0])
+            self.cinema_options = tk.OptionMenu(self.__app.body_frame, self.cinema_choice, *self.cinema_list, command=self.update_films_and_shows_based_on_date) #Command doesnt work if we change date then change film.
+            self.cinema_options.place(x=100,y=50)
+        else:
+            self.cinema_choice = tk.StringVar()
+            self.cinema_choice.set("Bristol")
 
-        # Body
-        # Creating Widgets
+        #Standard labels
+        self.__date_label = tk.Label(self.__app.body_frame, text="Select Date").place(x=0,y=100)
+        self.__select_film_label = tk.Label(self.__app.body_frame, text="Select Film").place(x=0, y=150)
+        self.__select_show_label = tk.Label(self.__app.body_frame, text="Select Show").place(x=0, y=200)
 
-        date_today = datetime.now()
-        date_label = tk.Label(
-            self.__app.body_frame, text="Select Date", fg='#DD2424', font=("Arial", 16))
-        date_entry = DateEntry(self.__app.body_frame, width=10, font=(
-            "Arial", 15), mindate=date_today)
+        #Date
+        self.selected_date=tk.StringVar()
+        self.__date_today = datetime.now()
+        self.__date_entry = DateEntry(self.__app.body_frame,date_pattern='y/mm/dd', mindate=self.__date_today,textvariable=self.selected_date)
+        self.selected_date.trace('w',self.update_films_and_shows_based_on_date) #Event listener
 
-        select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film", fg='#DD2424', font=("Arial", 16))
-        film_list = self.get_film_listings()  # List
-        print(film_list)
-        options = tk.StringVar(self.__app.body_frame)
-        options.set(film_list[0])  # default value option
-        select_film_entry = tk.OptionMenu(
-            self.__app.body_frame, options, *film_list)
+        #Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
+        self.film_choice = tk.StringVar()
+        self.film_choice.set('')         
+        self.film_list_titles = ['']
+        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
+            temp_date = str(self.selected_date.get())
+            temp_date = temp_date.replace("/","-")
+            if temp_date == str(listing_on_date.get_date()):
+                self.film_list_titles.append(str(listing_on_date.get_film()))
+                #Gets shows for the film thats selected
+                self.shows = []
+                for show in listing_on_date.get_shows():
+                    print(str(show))
+                    self.shows.append(show)
+        
+        #Formatting crap -ignore
+        try:
+            self.film_choice.set(self.film_list_titles[1])
+            self.film_list_titles.pop(0)
+        except: 
+            pass
+        
+        self.film_options = tk.OptionMenu(self.__app.body_frame, self.film_choice, *self.film_list_titles, command=self.update_shows_based_on_film) #Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
+        
 
-        # Call check availability function, currently is create showing
-        check_showings_btn = tk.Button(self.__app.body_frame, text='Check Showings', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=self.check_film_date_availability)
+        #Shows
+        #Search through listings for city -> If film title selected = listing title -> Get shows for listing and put it in list
+        self.show_times_list = ['']
+        film_title_2 = self.film_choice.get()
+        self.show_times_list_object = []
+        for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+            if str(film_title_2) == str(listing_on_date.get_film()): 
+                self.show_times_list_object.append(listing_on_date.get_shows())
 
-        # Placing Widgets
-        date_label.place(x=150, y=0)
-        date_entry.place(x=350, y=0)
-        select_film_label.place(x=150, y=100)
-        select_film_entry.place(x=350, y=100)
-        check_showings_btn.place(x=250, y=150)
+                #Have this seperate and modify if we decide to have same film title listings on the same day at a cinema. 
+                for i in range (len(self.show_times_list_object[0])):
+                    self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                
+                self.show_times_list.pop(0)
+                
 
-    def get_film_listings(self):
-        self.film_list = conn.select("SELECT film_name FROM films")
-        return self.film_list
+        self.show_choice = tk.StringVar()
+        self.show_choice.set('') 
+        self.show_choice.set(self.show_times_list[0])
+        self.show_options = tk.OptionMenu(self.__app.body_frame, self.show_choice, *self.show_times_list)
 
-    def check_film_date_availability(self):
 
-        self.date = self.date_entry.get()  # Type = string
-        # Still need to strip this. Gets the value of optionsmenu entered when button is pressed. Type = string
-        self.film = self.options.get()
 
-    # If valid then  delete labels and create_showing_options()
 
-        # Destroy the labels so we can replace the screen with showing information
-        self.date_label.destroy()
-        self.date_entry.destroy()
-        self.select_film_label.destroy()
-        self.select_film_entry.destroy()
-        self.check_showings_btn.destroy()
+        self.__date_entry.place(x=100,y=100)
+        self.film_options.place(x=100, y=150)
+        self.show_options.place(x=100, y=200)
 
-        self.create_showing_options(self.date, self.film)
-
-    def create_showing_options(self, date, film):
-
-        self.date = date  # Type = string
-        self.film = film  # Type = string
-
-        self.date_label = tk.Label(self.__app.body_frame, text=self.date, fg='#000000', font=(
-            "Arial", 18)).place(x=150, y=100)
-        self.film_title_label = tk.Label(
-            self.__app.body_frame, text=self.film, fg='#000000').place(x=350, y=100)
-
-        self.select_showings_label = tk.Label(
-            self.__app.body_frame, text="Select Showing", fg='#DD2424', font=("Arial", 16)).place(x=150, y=200)
-        self.showings_list = self.get_film_listings()  # List
-        self.options = tk.StringVar(self.__app.body_frame)
-        self.options.set(self.showings_list[0])  # default value option
-        self.select_showing_entry = tk.OptionMenu(
-            self.__app.body_frame, self.options, *self.showings_list).place(x=350, y=200)
-
-        print(self.film)
-        print(self.date)
-
-    def get_showings_list(self):
-        self.film_list = conn.select("SELECT FILM_TITLE FROM FILMS")
-
-        return self.film_list
 
     def view_film_listings(self):
         self.clear_frame(self.__app.body_frame)
@@ -235,7 +317,7 @@ class Main_frame(tk.Frame):
 
         # cinema
         self.__cinema = self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[
-            0]
+        0]
         self.__cinema_choice = tk.StringVar()
         self.__cinema_choice.set(self.__cinema)
         self.__cinema_options_label = tk.Label(
