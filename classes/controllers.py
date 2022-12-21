@@ -43,3 +43,6 @@ class Controller():
 
     def get_films(self):
         return self.__model.get_films()
+
+    def add_booking(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
+        return self.__model.add_booking(booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email)

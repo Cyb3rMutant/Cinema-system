@@ -73,3 +73,14 @@ class Model():
 
     def get_films(self):
         return self.__films.get_films()
+
+    def add_booking(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
+        conn.insert("INSERT INTO bookings(BOOKING_REFERENCE,BOOKING_SEAT_COUNT,BOOKING_DATE,BOOKING_PRICE,SHOW_ID,SEAT_TYPE,CUSTOMER_EMAIL) VALUES (%s, %s, %s, %s, %s, %s, %s);",
+                    booking_reference, num_of_tickets, date, final_ticket_price,show_id,seat_type,customer_email)
+
+        if seat_type == "Lower": query = "UPDATE shows SET SHOW_AVAILABLE_LOWER_SEATS = SHOW_AVAILABLE_LOWER_SEATS - (%s) WHERE SHOW_ID = (%s);"
+        if seat_type == "Upper": query = "UPDATE shows SET SHOW_AVAILABLE_UPPER_SEATS = SHOW_AVAILABLE_UPPER_SEATS - (%s) WHERE SHOW_ID = (%s);" 
+        if seat_type == "VIP": query = "UPDATE shows SET SHOW_AVAILABLE_VIP_SEATS = SHOW_AVAILABLE_VIP_SEATS - (%s) WHERE SHOW_ID = (%s);"
+
+        conn.update(query, num_of_tickets, show_id,)
+        

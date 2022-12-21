@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.messagebox
+import random
 from tkcalendar import DateEntry
 from datetime import datetime, date
 from admin import Admin
@@ -116,7 +117,8 @@ class Main_frame(tk.Frame):
 
 
     def update_films_and_shows_based_on_date(self,*args):
-        
+        try: self.book_now_btn.destroy() 
+        except: pass
         #Clearing both options
         menu = self.film_options["menu"]
         menu.delete(0, "end")
@@ -130,7 +132,6 @@ class Main_frame(tk.Frame):
         #For every listing in the selected cinema on the date chosen, add it to an array
         for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
             temp_date = str(self.selected_date.get())
-            temp_date = temp_date.replace("/","-")
             if temp_date == str(listing_on_date.get_date()): 
                 self.__film_list_titles_update.append(str(listing_on_date.get_film()))
         
@@ -162,31 +163,37 @@ class Main_frame(tk.Frame):
             #For every listing in the cinema
             for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
                 temp_date = str(self.selected_date.get())
-                temp_date = temp_date.replace("/","-")
                 #If the listings date is the same as date selected
                 if temp_date == str(listing_on_date.get_date()):  
                     #If the listings date is the same as date selected AND the listings title is equal to the one chosen            
                     if str(film_title) == str(listing_on_date.get_film()): 
-                        self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
-            
-                        #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
-                        self.show_times_list = []
-                        for i in range (len(self.show_times_list_object[0])):
-                            self.show_times_list.append(str(self.show_times_list_object[0][i]))
                         
+                        #Removed the object way, it was messy and unneeded
+                        #Getting every show time for the listing
+                        self.show_times_list = []
+                        for show in listing_on_date.get_shows():
+                            self.show_times_list.append(show.get_time())
+
                         #Outputting the shows into optionsmenu
-                        for show_time in self.show_times_list:
-                            self.show_choice.set(show_time)
-                            menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))
+                        self.show_choice.set(self.show_times_list[0])
+                        self.show_options.destroy()
+                        self.show_options = tk.OptionMenu(self.__app.body_frame, self.show_choice, *self.show_times_list, command=self.destroy_book_now_btn)
+                        self.show_options.place(x=100, y=200)
+
+                        #Same problem as film options. Cant attach the destroy_book_now_btn command when we do it this way. 
+                        # for show_time in self.show_times_list:
+                        #     self.show_choice.set(show_time)
+                        #     menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))
                 
-            print(self.show_times_list)
+            print(str(self.show_times_list))
 
         else:
             print("no films airing today") #Debug
 
     
     def update_shows_based_on_film(self,film_title):
-        print("poo")
+        try: self.book_now_btn.destroy() 
+        except: pass
         #Does the same as the code above. Just updating show options when a different film is selected.
         menu = self.show_options["menu"]
         menu.delete(0, "end")
@@ -196,23 +203,31 @@ class Main_frame(tk.Frame):
         #For every listing in the cinema
         for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
             temp_date = str(self.selected_date.get())
-            temp_date = temp_date.replace("/","-")
             #If the listings date is the same as date selected
             if temp_date == str(listing_on_date.get_date()):  
                 #If the listings date is the same as date selected AND the listings title is equal to the one chosen  
                 if str(film_title) == str(listing_on_date.get_film()): 
-                    self.show_times_list_object.append(listing_on_date.get_shows()) #Gets list of show times for selected film (the time because __str__ returns time)
-                
-                    #Retrieving the values from the objects (times) and putting it into a list to pass to OptionsMenu
+
+                    #Getting every show time for the listing
                     self.show_times_list = []
-                    for i in range (len(self.show_times_list_object[0])):
-                        self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                    for show in listing_on_date.get_shows():
+                        self.show_times_list.append(show.get_time())
                         
-                    for show_time in self.show_times_list:
-                        self.show_choice.set(show_time)
-                        menu.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))    
+                       #Outputting the shows into optionsmenu
+                        self.show_choice.set(self.show_times_list[0])
+                        self.show_options.destroy()
+                        self.show_options = tk.OptionMenu(self.__app.body_frame, self.show_choice, *self.show_times_list, command=self.destroy_book_now_btn)
+                        self.show_options.place(x=100, y=200)
+
+                        #Same problem as film options. Cant attach the destroy_book_now_btn command when we do it this way. 
+                        # for show_time in self.show_times_list:
+                        #     self.show_choice.set(show_time)
+                        #     menu2.add_command(label=show_time, command=lambda value=show_time: self.show_choice.set(value))  
 
 
+    def destroy_book_now_btn(self, *args):
+        try: self.book_now_btn.destroy() 
+        except: pass
 
     def create_booking(self):
 
@@ -242,11 +257,13 @@ class Main_frame(tk.Frame):
         self.__date_label = tk.Label(self.__app.body_frame, text="Select Date").place(x=0,y=100)
         self.__select_film_label = tk.Label(self.__app.body_frame, text="Select Film").place(x=0, y=150)
         self.__select_show_label = tk.Label(self.__app.body_frame, text="Select Show").place(x=0, y=200)
+        self.__select_seat_type = tk.Label(self.__app.body_frame, text="Select Ticket Type").place(x=0, y=250)
+        self.__select_num_of_seats = tk.Label(self.__app.body_frame, text="Select # of Tickets").place(x=0, y=300)
 
         #Date
         self.selected_date=tk.StringVar()
         self.__date_today = datetime.now()
-        self.__date_entry = DateEntry(self.__app.body_frame,date_pattern='y/mm/dd', mindate=self.__date_today,textvariable=self.selected_date)
+        self.__date_entry = DateEntry(self.__app.body_frame,date_pattern='y-mm-dd', mindate=self.__date_today,textvariable=self.selected_date)
         self.selected_date.trace('w',self.update_films_and_shows_based_on_date) #Event listener
 
         #Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
@@ -257,7 +274,6 @@ class Main_frame(tk.Frame):
         #For every listing in the cinema
         for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
             temp_date = str(self.selected_date.get())
-            temp_date = temp_date.replace("/","-")
             #If the listings date is the same as date selected -> Add it to array for options menu
             if temp_date == str(listing_on_date.get_date()):
                 self.film_list_titles.append(str(listing_on_date.get_film()))
@@ -281,15 +297,15 @@ class Main_frame(tk.Frame):
         #For every listing in the cinema
         for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
             temp_date = str(self.selected_date.get())
-            temp_date = temp_date.replace("/","-")
             #If the listings date is the same as date selected
             if temp_date == str(listing_on_date.get_date()):  
                 #If the listings date is the same as date selected AND the listings title is equal to the one chosen  
                 if str(film_title) == str(listing_on_date.get_film()): 
-                    self.show_times_list_object.append(listing_on_date.get_shows())
 
-                    for i in range (len(self.show_times_list_object[0])):
-                        self.show_times_list.append(str(self.show_times_list_object[0][i]))
+                    #Getting every show time for the listing
+                    self.show_times_list = []
+                    for show in listing_on_date.get_shows():
+                        self.show_times_list.append(show.get_time())
                     
                     self.show_times_list.pop(0)
                 
@@ -297,15 +313,129 @@ class Main_frame(tk.Frame):
         self.show_choice = tk.StringVar()
         self.show_choice.set('') 
         self.show_choice.set(self.show_times_list[0])
-        self.show_options = tk.OptionMenu(self.__app.body_frame, self.show_choice, *self.show_times_list)
+        self.show_options = tk.OptionMenu(self.__app.body_frame, self.show_choice, *self.show_times_list, command=self.destroy_book_now_btn)
 
 
 
+        #Ticket type & Number of tickets entry 
+        self.seat_type_btn = tk.StringVar()
+        self.lower_hall=tk.Radiobutton(self.__app.body_frame,text="Lower",value = "Lower",variable = self.seat_type_btn, tristatevalue=0, command=self.destroy_book_now_btn)
+        self.upper_hall=tk.Radiobutton(self.__app.body_frame,text="Upper",value = "Upper",variable = self.seat_type_btn, tristatevalue=0, command=self.destroy_book_now_btn)
+        self.vip_hall=tk.Radiobutton(self.__app.body_frame,text="VIP",value = "VIP",variable = self.seat_type_btn, tristatevalue=0, command=self.destroy_book_now_btn)
 
+        self.num_of_tickets_list = [1,2,3,4,5]
+        self.num_of_ticket_choice = tk.IntVar()
+        self.num_of_ticket_choice.set(self.num_of_tickets_list[0])
+        self.num_of_ticket_options = tk.OptionMenu(self.__app.body_frame, self.num_of_ticket_choice, *self.num_of_tickets_list,command=self.destroy_book_now_btn)
+
+
+        
+        self.check_availability = tk.Button(self.__app.body_frame, text='Check Availability and Price', command=self.verify_booking_data)
+        
+
+        #Book Now button is only created when we verify the booking data
+
+
+        #Placing interactive widgets
         self.__date_entry.place(x=100,y=100)
         self.film_options.place(x=100, y=150)
         self.show_options.place(x=100, y=200)
 
+        self.lower_hall.place(x=100, y=250)
+        self.upper_hall.place(x=220,y=250)
+        self.vip_hall.place(x=340,y=250)
+
+        self.num_of_ticket_options.place(x=100,y=300)
+        self.check_availability.place(x=50, y=350)
+
+
+
+    def verify_booking_data(self):
+        cinema = self.cinema_choice.get() #Cinema is city in this instance for ease
+        date = self.selected_date.get()
+        film = self.film_choice.get()
+        show = self.show_choice.get()
+        seat_type = self.seat_type_btn.get()
+        num_of_tickets = self.num_of_ticket_choice.get()
+
+        Upper = False; Lower = False; VIP = False
+        if seat_type == "Upper": Upper = True
+        if seat_type == "Lower": Lower = True
+        if seat_type == "VIP": VIP = True
+
+        seat_availability = False
+
+        multiplier = 0
+
+        #If any fields are null its len 0
+        if (len(film) > 0 and len(show) > 0 and len(seat_type) > 0):
+            print("data is filled in correctly!")
+        
+            #For every listing in the cinema
+            for listing_on_date in (self.__controller.get_cities()[cinema].get_cinemas()[0].get_listings()):
+                if str(date) == str(listing_on_date.get_date()):  
+                    if str(film) == str(listing_on_date.get_film()):
+                        #For every showing in for the selected listing
+                        for showing in listing_on_date.get_shows():
+                            if show == str(showing.get_time()):   #Now we have the specific showing that we want since we got it's time. 
+                                show_id = showing.get_show_id() #Get ID for later
+                                #Need to check if theres available seats for seleceted seat type
+                                if Lower == True: 
+                                    if (showing.get_available_lower_seats() - num_of_tickets >= 0) : seat_availability = True; multiplier = 1
+                                if Upper == True: 
+                                    if (showing.get_available_upper_seats() - num_of_tickets >= 0) : seat_availability = True; multiplier = 1.2
+                                if VIP == True: 
+                                    if (showing.get_available_vip_seats() - num_of_tickets >= 0) : seat_availability = True; 
+            
+ 
+
+            if (seat_availability):
+                print("available seats")
+                #Now there are seats available for the showing, check price
+                #Price --> Dependant on SHOWING TIME and CITY and TICKET TYPE
+                 
+                #Generate price of ticket 
+                #12:00:00 turned to 120000
+                show_int = show.replace(":","")
+                show_int = int(show_int)
+                if (show_int >= 80000 and show_int <= 120000):
+                    city_price_lower_hall = self.__controller.get_cities()[cinema].get_morning_price() #cinema is city in this instance
+                if (show_int >= 120001 and show_int <= 170000):
+                    city_price_lower_hall = self.__controller.get_cities()[cinema].get_afternoon_price() #cinema is city in this instance
+                if (show_int >= 170001 and show_int <= 240000):
+                    city_price_lower_hall = self.__controller.get_cities()[cinema].get_evening_price() #cinema is city in this instance
+
+                if (Lower) or (Upper):
+                    one_ticket = city_price_lower_hall * multiplier
+                if (VIP):
+                    one_ticket = (city_price_lower_hall * 1.2) * 1.2
+                
+
+                final_ticket_price = one_ticket * num_of_tickets
+                final_ticket_price = round(final_ticket_price,2)
+
+                #Generate random booking reference
+                booking_reference = random.randint(100000,999999)
+                
+
+                self.book_now_btn = tk.Button(self.__app.body_frame, text='Book Now',  bg='#DD2424', fg='#000000', 
+                command=lambda: self.add_booking_command(booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, "poop@gmail.com"))
+                self.book_now_btn.place(x=50, y=400)
+
+                # self.book_now_btn = tk.Button(self.__app.body_frame, text='Book Now',  bg='#DD2424', fg='#000000')
+
+            else:
+                print("no available seats")
+                
+        else:
+            print("data is not all filled in correctly")
+
+    def add_booking_command(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
+        #pass booking info to this function so we print green labels and receipts etc.
+        self.__controller.add_booking(booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, "poop@gmail.com")
+        print("successfully done booking")
+        print("booking info: ")
+        print(f'{booking_reference}\n{num_of_tickets}\n{date}\n{final_ticket_price}\n{show_id}\n{seat_type}\n poop@gmail.com \n')
 
     def view_film_listings(self):
         self.clear_frame(self.__app.body_frame)
