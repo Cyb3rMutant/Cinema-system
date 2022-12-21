@@ -43,7 +43,7 @@ class Listing(object):
         return self.__shows
 
     def set_date(self, date):
-        conn.update("UPDATE listings SET LISTING_DATE=%s WHERE LISTING_ID=%s",
+        conn.update("UPDATE listings SET LISTING_TIME=%s WHERE LISTING_ID=%s",
                     date, self.__listing_id)
         self.__date = date
 

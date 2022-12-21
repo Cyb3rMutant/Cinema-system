@@ -46,7 +46,7 @@ class Cinema(object):
         listing.set_date(date)
         listing.set_film = film
 
-        conn.update("UPDATE listings SET LISTING_DATE=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
+        conn.update("UPDATE listings SET LISTING_TIME=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
                     date, film.get_title(), listing.get_listing_id())
 
     def remove_listing(self, listing_id):

@@ -38,6 +38,15 @@ class Controller():
     def add_cinema(self, city, address, number_of_screens):
         self.__model.add_cinema(city, address, number_of_screens)
 
+    def remove_listing(self, city, cinema, listings):
+        self.__model.remove_listing(city, cinema, listings)
+
+    def add_listing(self, date, film, city, cinema):
+        self.__model.add_listing(date, film, city, cinema)
+    
+    def update_listing(self, city, original_city, date, film, cinema_id, original_cinema_id, listing_id):
+        self.__model.update_listing(city, original_city, date, film, cinema_id, original_cinema_id, listing_id)
+
     def get_cities(self):
         return self.__model.get_cities()
 

@@ -523,9 +523,137 @@ class Main_frame(tk.Frame):
         self.__app.page_label["text"] = "Remove listings"
 
     def update_listing(self):
+        print("Update listing page opened")   #debugging
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Update listings"
+
+        # city
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
+        self.__city_options_lable = tk.Label(
+            self.__app.body_frame, text="choose city: ")
+        self.__city_options = tk.OptionMenu(
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), command=lambda unused: self.update_cinemas(self.update_listings))  # , command=self.set_cinema(self.__city_choice.get()))
+
+        # cinema
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set(self.__controller.get_cities()[
+                                 self.__city_choice.get()].get_cinemas()[0])
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ")
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=self.update_listings)
+
+        # date
+        self.__date_label = tk.Label(
+            self.__app.body_frame, text="Select Date: ")
+        self.__date_entry = DateEntry(
+            self.__app.body_frame, mindate=datetime.date.today())
+
+        # listings  (need to change this so they can only pick one)
+        self.__listings_label = tk.Label(
+            self.__app.body_frame, text="Select listings: ")
+        self.__listings_box = tk.Frame(self.__app.body_frame)
+        self.__items = []
+        idx = 0
+        for listing in self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0].get_listings():
+            if listing.get_date() < datetime.date.today():
+                continue
+
+            self.__items.append(tk.IntVar())
+            tk.Checkbutton(
+                self.__listings_box, variable=self.__items[idx], text=listing, onvalue=listing.get_listing_id(), offvalue=None).pack()
+            idx += 1
+
+
+        self.__login_button = tk.Button(self.__app.body_frame, text='select listing', bg='#DD2424', fg='#000000', font=("Arial", 18), 
+        command=lambda: self.update_listing_details([int(id.get()) for id in self.__items if id != None], self.__city_choice.get()))
+
+        self.__login_button.place(x=612, y=460)
+
+        self.__city_options_lable.place(x=10, y=10)
+        self.__city_options.place(x=100, y=10)
+        self.__cinema_options_label.place(x=10, y=70)
+        self.__cinema_options.place(x=100, y=70)
+        self.__date_label.place(x=10, y=210)
+        self.__date_entry.place(x=100, y=210)
+        self.__listings_label.place(x=10, y=280)
+        self.__listings_box.place(x=100, y=280)
+
+    #after they have selected a listing in (update listing) this lets them actually change the listings details
+    def update_listing_details(self, listing_ids, city):
+        self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1030, y=130)
+        self.__app.page_label["text"] = "Update listings"
+
+        #get listing id for their chosen listing
+        for id in listing_ids:
+            if id != 0:
+                listing_id = id
+
+        #get cinema, film and date from the paramter listing id
+        #already passing through city as its easier
+        for listing in self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0].get_listings():
+            if listing.get_listing_id() == listing_id:
+                self.__original_cinema_id = listing.get_cinema()
+                self.__original_film = listing.get_film()
+                self.__original_date = listing.get_date()
+
+        self.__original_city = city
+        #all inputs are pre filled with the current values of the listing they want to update
+
+        #display current listing details
+        self.__orignal_listing_label = tk.Label(
+            self.__app.body_frame, text=f'Original Listing Details: City: {self.__original_city}, Cinema ID: {self.__original_cinema_id},\
+ Film: {self.__original_film}, Date: {self.__original_date}', font=("Arial", 12))
+
+        #select city
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(self.__original_city)
+        self.__city_options_lable = tk.Label(
+            self.__app.body_frame, text="choose city: ")
+        self.__city_options = tk.OptionMenu(
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), command=lambda unused: self.update_cinemas(self.update_screens))
+
+        #select cinema
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set("Choose cinema")    
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ")
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=self.update_listings)
+
+        #select film
+        self.__film_choice = tk.StringVar()
+        self.__film_choice.set(self.__original_film)
+        self.__film_options_label = tk.Label(
+            self.__app.body_frame, text="choose film: ")
+        self.__film_options = tk.OptionMenu(
+            self.__app.body_frame, self.__film_choice, *self.__controller.get_films().keys())
+
+        #select date
+        self.__date_label = tk.Label(
+            self.__app.body_frame, text="Select Date: ")
+        self.__date_entry = DateEntry(
+            self.__app.body_frame, mindate=datetime.date.today())
+
+        #update listing button 
+        self.__login_button = tk.Button(self.__app.body_frame, text='update listing', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.update_listing(
+            self.__city_choice.get(), self.__original_city, self.__date_entry.get_date(), self.__film_choice.get(), self.get_id(self.__cinema_choice.get()), self.__original_cinema_id ,listing_id))
+
+        #place buttons
+        self.__login_button.place(x=612, y=460)
+
+        self.__city_options_lable.place(x=10, y=10)
+        self.__city_options.place(x=100, y=10)
+        self.__cinema_options_label.place(x=10, y=70)
+        self.__cinema_options.place(x=100, y=70)
+        self.__film_options_label.place(x=10, y=140)
+        self.__film_options.place(x=100, y=140)
+        self.__date_label.place(x=10, y=210)
+        self.__date_entry.place(x=100, y=210)
+        self.__orignal_listing_label.place(x=290, y=100)
 
     def generate_report(self):
         self.clear_frame(self.__app.body_frame)
