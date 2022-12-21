@@ -417,9 +417,10 @@ class Main_frame(tk.Frame):
                 #Generate random booking reference
                 booking_reference = random.randint(100000,999999)
                 
+                date_today = str(datetime.today().strftime('%Y-%m-%d'))
 
                 self.book_now_btn = tk.Button(self.__app.body_frame, text='Book Now',  bg='#DD2424', fg='#000000', 
-                command=lambda: self.add_booking_command(booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, "poop@gmail.com"))
+                command=lambda: self.add_booking_command(booking_reference, num_of_tickets, date_today, final_ticket_price, show_id, seat_type, "poop@gmail.com"))
                 self.book_now_btn.place(x=50, y=400)
 
                 # self.book_now_btn = tk.Button(self.__app.body_frame, text='Book Now',  bg='#DD2424', fg='#000000')
