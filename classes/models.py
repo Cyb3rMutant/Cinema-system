@@ -73,3 +73,36 @@ class Model():
 
     def get_films(self):
         return self.__films.get_films()
+
+    def remove_listing(self, city, cinema, listings):
+        print(f"\n\n{listings}\n\n")
+        for id in listings: 
+            conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
+            conn.delete(
+                "DELETE FROM listings WHERE LISTING_ID=%s AND CINEMA_ID=%s;", id, cinema)
+            print(f"\n{cinema}")
+            self.__cities[city][cinema].remove_listing(id)
+
+    def add_listing(self, date, film, city, cinema):
+        conn.insert("INSERT INTO listings (LISTING_TIME, FILM_TITLE, CINEMA_ID) VALUES (%s, %s, %s);",
+                    date, film, cinema)
+        # now get the listing id from database
+        listing_id = conn.select(
+            "SELECT MAX(LISTING_ID) as LISTING_ID FROM listings")[0]["LISTING_ID"]
+        self.__cities[city][cinema].add_listing(
+            listing_id, date, self.__films[film])
+
+    def update_listing(self, city, original_city, date, film, cinema_id, original_cinema_id, listing_id):
+        id_list = []  #ugly way of being able to pass listing id to remove listing
+        id_list.append(listing_id)
+        if cinema_id != original_cinema_id:  #if they have changed the cinema 
+            self.remove_listing(original_city, original_cinema_id, id_list)   #listing id needs to be a list to be passed to remove listing
+            self.add_listing(date, film, city, cinema_id)
+        else:  
+            self.__cities[city][cinema_id].update_listing(
+                listing_id, date, self.__films[film])
+            
+      
+
+        
+        
