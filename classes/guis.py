@@ -128,9 +128,17 @@ class Main_frame(tk.Frame):
         self.show_choice.set('')
 
 
+        #Assigns an ID to cinema chosen (0,1,2). The og cinema with all the data will always be 0 cus it came first
+        i=0
+        for obj in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()):
+            if str(self.__cinema_choice.get()) == str(obj.get_address()):
+                self.cinema_num.set(i)
+            i+=1
+
+        
         self.__film_list_titles_update = []
         #For every listing in the selected cinema on the date chosen, add it to an array
-        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
+        for listing_on_date in self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[self.cinema_num.get()].get_listings():
             temp_date = str(self.selected_date.get())
             if temp_date == str(listing_on_date.get_date()): 
                 self.__film_list_titles_update.append(str(listing_on_date.get_film()))
@@ -161,7 +169,7 @@ class Main_frame(tk.Frame):
             film_title = self.film_choice.get() #Gets film selected
             self.show_times_list_object = []
             #For every listing in the cinema
-            for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+            for listing_on_date in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[self.cinema_num.get()].get_listings()):
                 temp_date = str(self.selected_date.get())
                 #If the listings date is the same as date selected
                 if temp_date == str(listing_on_date.get_date()):  
@@ -194,6 +202,15 @@ class Main_frame(tk.Frame):
     def update_shows_based_on_film(self,film_title):
         try: self.book_now_btn.destroy() 
         except: pass
+        
+        #Assigns an ID to cinema chosen (0,1,2). The og cinema with all the data will always be 0 cus it came first
+        i=0
+        for obj in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()):
+            if str(self.__cinema_choice.get()) == str(obj.get_address()):
+                self.cinema_num.set(i)
+            i+=1
+
+
         #Does the same as the code above. Just updating show options when a different film is selected.
         menu = self.show_options["menu"]
         menu.delete(0, "end")
@@ -201,7 +218,7 @@ class Main_frame(tk.Frame):
         self.show_choice.set('')
         self.show_times_list_object = []
         #For every listing in the cinema
-        for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+        for listing_on_date in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[self.cinema_num.get()].get_listings()):
             temp_date = str(self.selected_date.get())
             #If the listings date is the same as date selected
             if temp_date == str(listing_on_date.get_date()):  
@@ -229,6 +246,17 @@ class Main_frame(tk.Frame):
         try: self.book_now_btn.destroy() 
         except: pass
 
+    def update_cinemas_booking(self, city):
+        #Adds all cinemas for selected city
+        menu = self.__cinema_options["menu"]
+        menu.delete(0, "end")
+        self.__cinema_choice.set(self.__controller.get_cities()[city].get_cinemas()[0])
+        self.__cinema_options.destroy()
+        self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=self.update_films_and_shows_based_on_date)
+        self.__cinema_options.place(x=400, y=50)
+        #Updating rest of params based on the new city
+        self.update_films_and_shows_based_on_date()
+
     def create_booking(self):
 
 
@@ -241,17 +269,45 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1000, y=600)
         self.__app.page_label["text"] = "Create booking"
 
-        #Hardcoded cities for dynamic - will look at it later
+        
         if (isinstance(self.__user, Admin)):
-            self.__select_cinema_label = tk.Label(self.__app.body_frame, text="Select Cinema").place(x=0,y=50)
-            self.cinema_list = ["Bristol","Birmingham","Cardiff","London"]
-            self.cinema_choice = tk.StringVar()
-            self.cinema_choice.set(self.cinema_list[0])
-            self.cinema_options = tk.OptionMenu(self.__app.body_frame, self.cinema_choice, *self.cinema_list, command=self.update_films_and_shows_based_on_date) #Command doesnt work if we change date then change film.
-            self.cinema_options.place(x=100,y=50)
+            self.__city_choice = tk.StringVar()
+            self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
+            self.__city_options_lable = tk.Label(self.__app.body_frame, text="choose city: ").place(x=0,y=50)
+            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), command=self.update_cinemas_booking)  #When we change a city, we update its cinemas
+            self.__city_options.place(x=100,y=50)
+
+            
+            self.__cinema = self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0]
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set(self.__cinema)
+            self.__cinema_options_label = tk.Label(self.__app.body_frame, text="choose cinema: ").place(x=300, y=50)
+            self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=self.update_films_and_shows_based_on_date)
+            self.__cinema_options.place(x=400, y=50)
+
+            #Assigns an ID to cinema chosen (0,1,2). The og cinema with all the data will always be 0 cus it came first
+            self.cinema_num = tk.IntVar() 
+            self.cinema_num.set(0)
+            i=0
+            for obj in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()):
+                if str(self.__cinema_choice.get()) == str(obj.get_address()):
+                    self.cinema_num.set(i)
+                i+=1
+
         else:
-            self.cinema_choice = tk.StringVar()
-            self.cinema_choice.set("Bristol")
+            #Still need todo - Get booking staffs city
+            self.__city_choice = tk.StringVar()
+            self.__city_choice.set("Bristol")
+           
+            #Dynamic cinema numbers. Our original cinemas with all the data value will always be 0 because it came first.
+            self.cinema_num = tk.IntVar() #Will be 0 for the OG cinemas we have. If we add any more they'll be 1.2.3.4. etc. (Used as an index)
+            i=0
+            for obj in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()):
+                if str(self.__user.get_branch()) == str(obj.get_address()):
+                    self.cinema_num.set(i)
+                i+=1
+
+
 
         #Standard labels
         self.__date_label = tk.Label(self.__app.body_frame, text="Select Date").place(x=0,y=100)
@@ -272,7 +328,7 @@ class Main_frame(tk.Frame):
         self.film_list_titles = ['']
 
         #For every listing in the cinema
-        for listing_on_date in self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings():
+        for listing_on_date in self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[self.cinema_num.get()].get_listings():
             temp_date = str(self.selected_date.get())
             #If the listings date is the same as date selected -> Add it to array for options menu
             if temp_date == str(listing_on_date.get_date()):
@@ -295,7 +351,7 @@ class Main_frame(tk.Frame):
         self.show_times_list_object = []
         
         #For every listing in the cinema
-        for listing_on_date in (self.__controller.get_cities()[self.cinema_choice.get()].get_cinemas()[0].get_listings()):
+        for listing_on_date in (self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[self.cinema_num.get()].get_listings()):
             temp_date = str(self.selected_date.get())
             #If the listings date is the same as date selected
             if temp_date == str(listing_on_date.get_date()):  
@@ -351,7 +407,7 @@ class Main_frame(tk.Frame):
 
 
     def verify_booking_data(self):
-        cinema = self.cinema_choice.get() #Cinema is city in this instance for ease
+        cinema = self.__city_choice.get() #Cinema is city in this instance for ease
         date = self.selected_date.get()
         film = self.film_choice.get()
         show = self.show_choice.get()
@@ -372,7 +428,7 @@ class Main_frame(tk.Frame):
             print("data is filled in correctly!")
         
             #For every listing in the cinema
-            for listing_on_date in (self.__controller.get_cities()[cinema].get_cinemas()[0].get_listings()):
+            for listing_on_date in (self.__controller.get_cities()[cinema].get_cinemas()[self.cinema_num.get()].get_listings()):
                 if str(date) == str(listing_on_date.get_date()):  
                     if str(film) == str(listing_on_date.get_film()):
                         #For every showing in for the selected listing
