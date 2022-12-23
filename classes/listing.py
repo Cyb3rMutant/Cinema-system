@@ -43,13 +43,9 @@ class Listing(object):
         return self.__shows
 
     def set_date(self, date):
-        conn.update("UPDATE listings SET LISTING_TIME=%s WHERE LISTING_ID=%s",
-                    date, self.__listing_id)
         self.__date = date
 
     def set_film(self, film):
-        conn.update("UPDATE listings SET FILM_TITLE=%s WHERE LISTING_ID=%s",
-                    film.get_title(), self.__listing_id)
         self.__film = film
 
     def update_show_time(self, show_id, time):
@@ -58,4 +54,4 @@ class Listing(object):
         self.__time
 
     def __str__(self):
-        return self.__film
+        return f"listing_id: {self.__listing_id} date: {self.__date} film: {self.__film}"

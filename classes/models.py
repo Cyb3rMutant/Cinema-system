@@ -76,17 +76,20 @@ class Model():
 
     def add_booking(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
         conn.insert("INSERT INTO bookings(BOOKING_REFERENCE,BOOKING_SEAT_COUNT,BOOKING_DATE,BOOKING_PRICE,SHOW_ID,SEAT_TYPE,CUSTOMER_EMAIL) VALUES (%s, %s, %s, %s, %s, %s, %s);",
-                    booking_reference, num_of_tickets, date, final_ticket_price,show_id,seat_type,customer_email)
+                    booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email)
 
-        if seat_type == "Lower": query = "UPDATE shows SET SHOW_AVAILABLE_LOWER_SEATS = SHOW_AVAILABLE_LOWER_SEATS - (%s) WHERE SHOW_ID = (%s);"
-        if seat_type == "Upper": query = "UPDATE shows SET SHOW_AVAILABLE_UPPER_SEATS = SHOW_AVAILABLE_UPPER_SEATS - (%s) WHERE SHOW_ID = (%s);" 
-        if seat_type == "VIP": query = "UPDATE shows SET SHOW_AVAILABLE_VIP_SEATS = SHOW_AVAILABLE_VIP_SEATS - (%s) WHERE SHOW_ID = (%s);"
+        if seat_type == "Lower":
+            query = "UPDATE shows SET SHOW_AVAILABLE_LOWER_SEATS = SHOW_AVAILABLE_LOWER_SEATS - (%s) WHERE SHOW_ID = (%s);"
+        if seat_type == "Upper":
+            query = "UPDATE shows SET SHOW_AVAILABLE_UPPER_SEATS = SHOW_AVAILABLE_UPPER_SEATS - (%s) WHERE SHOW_ID = (%s);"
+        if seat_type == "VIP":
+            query = "UPDATE shows SET SHOW_AVAILABLE_VIP_SEATS = SHOW_AVAILABLE_VIP_SEATS - (%s) WHERE SHOW_ID = (%s);"
 
         conn.update(query, num_of_tickets, show_id,)
-        
+
     def remove_listing(self, city, cinema, listings):
         print(f"\n\n{listings}\n\n")
-        for id in listings: 
+        for id in listings:
             conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
             conn.delete(
                 "DELETE FROM listings WHERE LISTING_ID=%s AND CINEMA_ID=%s;", id, cinema)
@@ -102,17 +105,9 @@ class Model():
         self.__cities[city][cinema].add_listing(
             listing_id, date, self.__films[film])
 
-    def update_listing(self, city, original_city, date, film, cinema_id, original_cinema_id, listing_id):
-        id_list = []  #ugly way of being able to pass listing id to remove listing
-        id_list.append(listing_id)
-        if cinema_id != original_cinema_id:  #if they have changed the cinema 
-            self.remove_listing(original_city, original_cinema_id, id_list)   #listing id needs to be a list to be passed to remove listing
-            self.add_listing(date, film, city, cinema_id)
-        else:  
-            self.__cities[city][cinema_id].update_listing(
-                listing_id, date, self.__films[film])
-            
-      
+    def update_listing(self, city, cinema_id, listing_id, date, film):
+        film = self.__films[film]
+        conn.update("UPDATE listings SET LISTING_TIME=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
+                    date, film.get_title(), listing_id)
 
-        
-        
+        self.__cities[city][cinema_id].update_listing(listing_id, date, film)

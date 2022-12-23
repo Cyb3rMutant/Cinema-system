@@ -15,7 +15,7 @@ class Conn():
 
     def __getConnection(self):
         conn = mysql.connector.connect(
-            host="localhost", user="root", password="avatar", database="asd2")
+            host="localhost", user="root", password="", database="HC")
         return conn
 
     def select(self, query: str, *args):

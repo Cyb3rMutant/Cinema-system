@@ -43,9 +43,9 @@ class Controller():
 
     def add_listing(self, date, film, city, cinema):
         self.__model.add_listing(date, film, city, cinema)
-    
-    def update_listing(self, city, original_city, date, film, cinema_id, original_cinema_id, listing_id):
-        self.__model.update_listing(city, original_city, date, film, cinema_id, original_cinema_id, listing_id)
+
+    def update_listing(self, city, cinema_id, listing_id, date, film):
+        self.__model.update_listing(city, cinema_id, listing_id, date, film)
 
     def get_cities(self):
         return self.__model.get_cities()

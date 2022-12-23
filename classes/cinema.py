@@ -44,30 +44,18 @@ class Cinema(object):
                 listing = l
                 break
         listing.set_date(date)
-        listing.set_film = film
-
-        conn.update("UPDATE listings SET LISTING_TIME=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
-                    date, film.get_title(), listing.get_listing_id())
+        listing.set_film(film)
 
     def remove_listing(self, listing_id):
-        listing = None
         for l in self.__listings:
             if l.get_listing_id() == listing_id:
-                listing = l
+                self.__listings.remove(l)
                 break
-        conn.delete("DELETE FROM listings WHERE LISTING_ID=%s;",
-                    listing.get_listing_id)
-        self.__listings.remove(listing)
 
-    def add_listing(self, date, film: film.Film):
+    def add_listing(self, listing_id, date, film: film.Film):
         # add listing to database (ben)
-        film_title = film.get_title()
-        conn.insert("INSERT INTO LISTINGS VALUES (%s, %s, %s);",
-                    date, film_title, self.__cinema_id)
-        # now get the listing id from database
-        listingID = conn.select("SELECT MAX(LISTING_ID) FROM listings")
         self.__listings.append(listing.Listing(
-            listingID, date, film, self))  # end paramter is cinema
+            listing_id, date, film, self))  # end paramter is cinema
 
     def __str__(self):
-        return self.__address
+        return f"cinema_id: {self.__cinema_id} address: {self.__address}"
