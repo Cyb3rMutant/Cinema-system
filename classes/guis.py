@@ -4,6 +4,8 @@ from tkcalendar import DateEntry
 import datetime
 from admin import Admin
 from manager import Manager
+from tkinter import ttk
+from tkinter.messagebox import showinfo
 import re
 import random
 # Started using inheritence for windows. In the testing stage atm of it
@@ -310,10 +312,94 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "View film listings"
 
+
+
+    def update_cinemas_cancel(self,*args):
+        self.__cinema_options.destroy()
+        self.__cinema_choice.set("choose cinema")
+        self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
+                                                  self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema), self.display_bookings_treeview()])       
+        self.__cinema_options.place(x=400, y=0)
+
+
+    def display_bookings_treeview(self, *args):
+        print(self.__cinema) #object
+
+        #uncomment all the treeview code to see the frame bg
+        frame2 = tk.Frame(self.__app.body_frame,bg='black',width=1100,height=500)
+        frame2.place(x=100,y=90)
+        
+        #treeview doesnt fit into frame, needs an X scroll bar 
+        columns = ('id', 'booking_ref', 'seat_count', 'date','price','show_id','seat_type','cust_email')
+        self.tree = ttk.Treeview(frame2, columns=columns, show='headings')
+        self.tree.heading('id', text='id')
+        self.tree.heading('booking_ref', text='booking_ref')
+        self.tree.heading('seat_count', text='seat_count')
+        self.tree.heading('date', text='date')
+        self.tree.heading('price', text='price')
+        self.tree.heading('show_id', text='show_id')
+        self.tree.heading('seat_type', text='seat_type')
+        self.tree.heading('cust_email', text='cust_email')
+
+        
+        self.tree.bind('<<TreeviewSelect>>', self.item_selected)
+        self.tree.grid(row=0, column=0, sticky=tk.NSEW)
+
+        # add a Y scrollbar
+        scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree.yview)
+        self.tree.configure(yscroll=scrollbar.set)
+        scrollbar.grid(row=0, column=1, sticky='ns')
+
+
+
+
+        # generate sample data
+        contacts = []
+        for n in range(1, 100):
+            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com',f'first {n}', f'last {n}', f'email{n}@example.com'f'first {n}', f'last {n}'))
+
+        # add data to the treeview
+        for contact in contacts:
+            self.tree.insert('', tk.END, values=contact)
+
+        
+    #Event listener, anytime a record is clicked itll print it
+    def item_selected(self, event):
+        for selected_item in self.tree.selection():
+            item = self.tree.item(selected_item)
+            record = item['values']
+            # show a message
+            # tk.showinfo(title='Information', message=','.join(record))
+            print(record)
+
+
+
+
     def cancel_booking(self):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Cancel booking"
+
+        self.__city_options_label = tk.Label(self.__app.body_frame, text="choose city: ").place(x=50, y=0)
+        self.__cinema_options_label = tk.Label(self.__app.body_frame, text="choose cinema: ").place(x=300, y=0)
+
+
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
+        self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), command=self.update_cinemas_cancel) 
+
+        self.__cinema = self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0]
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set("choose cinema")
+        self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
+                                                  self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema), self.display_bookings_treeview()])
+        
+        
+        
+        self.__city_options.place(x=150, y=0)
+        self.__cinema_options.place(x=400, y=0)
+
+
 
 
     def update_screens(self, cinema):
