@@ -207,8 +207,9 @@ class Main_frame(tk.Frame):
 
 
         else:
+            self.__city_choice = tk.StringVar()
             self.__cinema = self.__user.get_branch()
-            self.__city_choice = self.__controller.get_city(self.__cinema)
+            self.__city_choice.set(self.__controller.get_city(self.__cinema))
 
         # Standard labels
         self.__date_label = tk.Label(
