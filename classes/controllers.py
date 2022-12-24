@@ -53,5 +53,33 @@ class Controller():
     def get_films(self):
         return self.__model.get_films()
 
-    def add_booking(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
-        return self.__model.add_booking(booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email)
+    def add_booking(self, city, show, seat_type, num_of_tickets):
+        seat_availability = False
+
+        # For every listing in the cinema
+
+        if seat_type == "lower":
+            seat_availability = show.get_available_lower_seats() > num_of_tickets
+        elif seat_type == "upper":
+            seat_availability = show.get_available_upper_seats() > num_of_tickets
+        elif seat_type == "vip":
+            seat_availability = show.get_available_vip_seats() > num_of_tickets
+
+        if (not seat_availability):
+            self.__view.show_error("no available seats")
+            return
+
+        print("available seats")
+        # Now there are seats available for the show, check price
+        # Price --> Dependant on SHIW TIME and CITY and TICKET TYPE
+
+        # Generate price of ticket
+        # 12:00:00 turned to 120000
+
+        # Generate random booking reference
+
+        self.__model.add_booking(city, show, seat_type,
+                                 num_of_tickets, "poop@gmail.com")
+
+    def get_city(self, cinema):
+        return self.__model.get_city(cinema)

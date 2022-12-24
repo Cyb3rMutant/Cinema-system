@@ -5,6 +5,7 @@ from city_container import Cities
 from film_container import Films
 from city import City
 from film import Film
+import datetime
 
 
 class Model():
@@ -74,18 +75,23 @@ class Model():
     def get_films(self):
         return self.__films.get_films()
 
-    def add_booking(self, booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email):
+    def add_booking(self, city, show, seat_type, num_of_tickets, customer_email):
+        date_today = datetime.date.today()
+
+        city_price = self.get_city_price(city, show.get_time())
+
+        booking_info = show.add_booking(seat_type, num_of_tickets, date_today,
+                                        city_price, customer_email)
+
+        conn.update(
+            f"UPDATE shows SET SHOW_AVAILABLE_{seat_type.upper()}_SEATS = SHOW_AVAILABLE_{seat_type.upper()}_SEATS - %s WHERE SHOW_ID = (%s);", num_of_tickets, show.get_show_id())
+
         conn.insert("INSERT INTO bookings(BOOKING_REFERENCE,BOOKING_SEAT_COUNT,BOOKING_DATE,BOOKING_PRICE,SHOW_ID,SEAT_TYPE,CUSTOMER_EMAIL) VALUES (%s, %s, %s, %s, %s, %s, %s);",
-                    booking_reference, num_of_tickets, date, final_ticket_price, show_id, seat_type, customer_email)
+                    booking_info.get_booking_reference(), booking_info.get_number_of_seats(), booking_info.get_date_of_booking(), booking_info.get_price(), show.get_show_id(), seat_type, customer_email)
 
-        if seat_type == "Lower":
-            query = "UPDATE shows SET SHOW_AVAILABLE_LOWER_SEATS = SHOW_AVAILABLE_LOWER_SEATS - (%s) WHERE SHOW_ID = (%s);"
-        if seat_type == "Upper":
-            query = "UPDATE shows SET SHOW_AVAILABLE_UPPER_SEATS = SHOW_AVAILABLE_UPPER_SEATS - (%s) WHERE SHOW_ID = (%s);"
-        if seat_type == "VIP":
-            query = "UPDATE shows SET SHOW_AVAILABLE_VIP_SEATS = SHOW_AVAILABLE_VIP_SEATS - (%s) WHERE SHOW_ID = (%s);"
-
-        conn.update(query, num_of_tickets, show_id,)
+        print("successfully done booking")
+        print("booking info: ")
+        print(f'{booking_info.get_booking_reference()}\n{booking_info.get_number_of_seats()}\n{booking_info.get_date_of_booking()}\n{booking_info.get_price()}\n{show.get_show_id()}\n{seat_type}\n{customer_email}\n')
 
     def remove_listing(self, city, cinema, listings):
         print(f"\n\n{listings}\n\n")
@@ -111,3 +117,19 @@ class Model():
                     date, film.get_title(), listing_id)
 
         self.__cities[city][cinema_id].update_listing(listing_id, date, film)
+
+    def get_city_price(self, city, show_time):
+        time = conn.select(
+            "SELECT NAME FROM times_of_day WHERE %s BETWEEN START_TIME AND END_TIME;", show_time)[0]["NAME"]
+
+        if time == "morning":
+            return self.__cities[city].get_morning_price()
+        elif time == "afternoon":
+            return self.__cities[city].get_afternoon_price()
+        elif time == "evening":
+            return self.__cities[city].get_evening_price()
+
+    def get_city(self, cinema):
+        for city in self.__cities:
+            if cinema in self.__cities[city].get_cinemas():
+                return city

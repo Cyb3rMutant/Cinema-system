@@ -1,14 +1,7 @@
-import booking
-import booking_factory
-import film
-import film_container
+from booking_factory import Booking_factory
 
 
 class Show(object):
-    # ˅
-
-    # ˄
-
     def __init__(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, screen, listing):
 
         self.__show_id = show_id
@@ -55,14 +48,22 @@ class Show(object):
         return self.__listing
 
     def set_time(self, time):
-        # ˅
         pass
-        # ˄
 
-    def add_booking(self, show, number_of_seats, date_of_booking, price, customer):
-        # ˅
-        pass
-        # ˄
+    def set_available_vip_seats(self, seats):
+        self.__available_vip_seats -= seats
+
+    def set_available_upper_seats(self, seats):
+        self.__available_upper_seats -= seats
+
+    def set_available_lower_seats(self, seats):
+        self.__available_lower_seats -= seats
+
+    def add_booking(self, seat_hall, number_of_seats, date_of_booking, price, customer):
+        booking = Booking_factory.get_booking_seat_hall(seat_hall)(
+            self, number_of_seats, date_of_booking, price, customer)
+        self.__bookings.append(booking)
+        return booking
 
     def cancel_booking(self, Booking_reference):
         pass

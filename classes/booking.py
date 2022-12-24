@@ -1,24 +1,14 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-from abc import *
 import customer
-import receipt_generator
+from receipt_generator import Receipt_generator
 import show
-import ticket_generator
+from ticket_generator import Ticket_generator
+import random
 
 
-# ˄
-
-
-class Booking(object, metaclass=ABCMeta):
-    # ˅
-
-    # ˄
-
-    def __init__(self, show, number_of_seats, date_of_booking, price, customer):
-
-        self.__booking_reference = None   #is this meant to be a parameter in constructor or does it get pulled from db?
+class Booking():
+    def __init__(self, show, number_of_seats, date_of_booking, city_price, customer):
+        # generate a custom one later on
+        self.__booking_reference = random.randint(100000, 999999)
 
         self.__show = show
 
@@ -26,17 +16,9 @@ class Booking(object, metaclass=ABCMeta):
 
         self.__date_of_booking = date_of_booking
 
-        self.__price = price
-
         self.__customer = customer
 
-        self.__ticket_generator = None
-
-        self.__receipt_generator = None
-
-        # ˅
-        pass
-        # ˄
+        self.__price = self.calc_price(city_price) * number_of_seats
 
     def get_booking_reference(self):
         return self.__booking_reference
@@ -56,23 +38,11 @@ class Booking(object, metaclass=ABCMeta):
     def get_customer(self):
         return self.__customer
 
-    @abstractmethod
     def get_ticket(self):
-        # ˅
-        pass
-        # ˄
+        return Receipt_generator.gen_receipt(self)
 
-    @abstractmethod
     def get_receipt(self):
-        # ˅
+        return Ticket_generator.gen_ticket(self)
+
+    def calc_price(self, city_price):
         pass
-        # ˄
-
-    # ˅
-
-    # ˄
-
-
-# ˅
-
-# ˄

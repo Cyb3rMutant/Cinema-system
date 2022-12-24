@@ -4,10 +4,11 @@ import booking_vip_hall
 
 
 class Booking_factory(object):
-    def get_booking_seat_hall(self, type):
+    @staticmethod
+    def get_booking_seat_hall(type):
         types = {
-            "lower_hall": booking_lower_hall.Booking_lower_hall,
-            "upper_hall": booking_upper_hall.Booking_upper_hall,
+            "lower": booking_lower_hall.Booking_lower_hall,
+            "upper": booking_upper_hall.Booking_upper_hall,
             "vip": booking_vip_hall.Booking_vip_hall
         }
 
