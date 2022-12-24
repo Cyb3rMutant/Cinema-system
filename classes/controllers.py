@@ -65,6 +65,10 @@ class Controller():
         elif seat_type == "vip":
             seat_availability = show.get_available_vip_seats() > num_of_tickets
 
+
+        if len(seat_type) == 0:
+            self.__view.show_error("no seat type selected")
+
         if (not seat_availability):
             self.__view.show_error("no available seats")
             return

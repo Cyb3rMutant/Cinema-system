@@ -115,39 +115,46 @@ class Main_frame(tk.Frame):
         else:
             self.__controller.get_bookings(self.__user.get_branch())
 
-    def update_films_and_shows_based_on_date(self):
-        print(self.__cinema)
+    def update_films_and_shows_based_on_date(self, *args):
         try:
             self.__film_options.destroy()
-            self.__shows_options.destroy()
+            self.__show_options.destroy()
             self.__book_now_btn.destroy()
         except:
             pass
 
+        #Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
+        print(f'{type(self.__cinema)} : {self.__cinema}')
+        print(f'{type(self.__cinema_choice.get())} : {self.__cinema_choice.get()}')
+        
+        #Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
+        #And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
+        if str(self.__cinema_choice.get()) == "choose cinema":
+            print('error: choose cinema is selected, wont update film')
+            return 0 
+        
+        
+        #Main. All above is just format
         self.__listings = []
         # For every listing in the cinema
-        print(self.__cinema.get_listings())
         for l in self.__cinema.get_listings():
-            # If the listings date is the same as date selected -> Add it to array for options menu
-            # if str(self.__film_choice.get()) != l.get_film().get_title():
-            #     continue
-            if self.__date_entry.get_date() != l.get_date():
-                continue
+            #If date selected = listings date -> add it to array for optionsmenu
+            if str(self.selected_date.get()) == str(l.get_date()):
+                self.__listings.append(l)
 
-            self.__listings.append(l)
         if not self.__listings:
             print("no shows airing today")
-            return
+            return 0
         # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
         self.__film_choice = tk.StringVar()
-        self.__film_choice.set('choose film')
+        self.__film_choice.set(self.__listings[0])
         self.__film_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__listings, command=self.update_shows)
 
         # Shows
         self.__show = self.__listings[0].get_shows()[0]
         self.__show_choice = tk.StringVar()
-        self.__show_choice.set('choose show time')
+        self.__show_choice.set(self.__show)
         self.__show_options = tk.OptionMenu(
             self.__app.body_frame, self.__show_choice, *self.__listings[0].get_shows(), command=lambda show: [self.set_show(show)])
 
@@ -159,9 +166,10 @@ class Main_frame(tk.Frame):
         self.__book_now_btn.place(x=50, y=350)
 
     def update_shows(self, listing):
+        self.__show_options.destroy()
         self.__show = listing.get_shows()[0]
         self.__show_choice = tk.StringVar()
-        self.__show_choice.set('choose show time')
+        self.__show_choice.set(self.__show) #Instead of "choose show". If we choose city, cinema, date, film AND show is still equal to "choose show", we can still book which it shouldnt. This prevents this by automatically updating shows to the times instead of it.
         self.__show_options = tk.OptionMenu(self.__app.body_frame, self.__show_choice,
                                             *listing.get_shows(), command=lambda show: [self.set_show(show)])
         self.__show_options.place(x=100, y=200)
@@ -178,26 +186,24 @@ class Main_frame(tk.Frame):
         self.__app.page_label["text"] = "Create booking"
 
         if (isinstance(self.__user, Admin)):
+            
+            self.__city_options_label = tk.Label(self.__app.body_frame, text="choose city: ").place(x=0, y=50)
+            self.__cinema_options_label = tk.Label(self.__app.body_frame, text="choose cinema: ").place(x=300, y=50)
+
+
             self.__city_choice = tk.StringVar()
-            self.__city_choice.set(
-                list(self.__controller.get_cities().keys())[0])
-            self.__city_options_lable = tk.Label(
-                self.__app.body_frame, text="choose city: ").place(x=0, y=50)
-            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(
-            ), command=lambda unused: self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date()]))  # When we change a city, we update its cinemas
+            self.__city_choice.set(list(self.__controller.get_cities().keys())[0])
+            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(), 
+            command=lambda unused: self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date()]))  # When we change a city, we update its cinemas
             self.__city_options.place(x=100, y=50)
 
-            self.__cinema = self.__controller.get_cities(
-            )[self.__city_choice.get()].get_cinemas()[0]
+            self.__cinema = self.__controller.get_cities()[self.__city_choice.get()].get_cinemas()[0]
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__cinema)
-            self.__cinema_options_label = tk.Label(
-                self.__app.body_frame, text="choose cinema: ").place(x=300, y=50)
+            self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
                                                   self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date()])
             self.__cinema_options.place(x=400, y=50)
 
-            # Assigns an ID to cinema chosen (0,1,2). The og cinema with all the data will always be 0 cus it came first
 
         else:
             self.__cinema = self.__user.get_branch()
@@ -217,10 +223,10 @@ class Main_frame(tk.Frame):
 
         # Date
         self.__date_today = datetime.date.today()
-        self.__date_entry = DateEntry(
-            self.__app.body_frame, mindate=self.__date_today)
-        self.__refresh_date_btn = tk.Button(
-            self.__app.body_frame, text='refresh date', command=self.update_films_and_shows_based_on_date)
+        self.selected_date = tk.StringVar()
+        self.__date_entry = DateEntry(self.__app.body_frame,date_pattern='y-mm-dd', mindate=self.__date_today, textvariable=self.selected_date)
+        self.selected_date.trace('w',self.update_films_and_shows_based_on_date)
+
 
         self.__seat_type_btn = tk.StringVar()
         self.__lower_hall = tk.Radiobutton(self.__app.body_frame, text="lower", value="lower",
@@ -237,12 +243,9 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, self.__num_of_ticket_choice, *self.num_of_tickets_list)
 
         self.__date_entry.place(x=100, y=100)
-        self.__refresh_date_btn.place(x=250, y=100)
-
         self.__lower_hall.place(x=100, y=250)
         self.__upper_hall.place(x=220, y=250)
         self.__vip_hall.place(x=340, y=250)
-
         self.__num_of_ticket_options.place(x=100, y=300)
 
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
@@ -258,17 +261,18 @@ class Main_frame(tk.Frame):
             self.__listings.append(l)
         if not self.__listings:
             self.__listings
-            return
+            return 0
+
         # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
         self.__film_choice = tk.StringVar()
-        self.__film_choice.set('choose film')
+        self.__film_choice.set(self.__listings[0])
         self.__film_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__listings, command=self.update_shows)
 
         # Shows
         self.__show = self.__listings[0].get_shows()[0]
         self.__show_choice = tk.StringVar()
-        self.__show_choice.set('choose show time')
+        self.__show_choice.set(self.__show)
         self.__show_options = tk.OptionMenu(
             self.__app.body_frame, self.__show_choice, *self.__listings[0].get_shows(), command=lambda show: [self.set_show(show)])
 
@@ -281,6 +285,24 @@ class Main_frame(tk.Frame):
         self.__show_options.place(x=100, y=200)
         self.__book_now_btn.place(x=50, y=350)
 
+
+        
+    def update_cinemas(self, func):
+        try:
+            #Anytime we update city, these should be removed
+            self.__film_options.destroy()
+            self.__show_options.destroy()
+            self.__book_now_btn.destroy()
+        except:
+            pass
+        self.__cinema_choice.set("choose cinema")
+        self.__cinema_options.destroy()
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=func)
+        self.__cinema_options.place(x=400, y=50)
+
+
+
     def view_film_listings(self):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
@@ -291,12 +313,6 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Cancel booking"
 
-    def update_cinemas(self, func):
-        self.__cinema_choice.set("choose cinema")
-        self.__cinema_options.destroy()
-        self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=func)
-        self.__cinema_options.place(x=400, y=50)
 
     def update_screens(self, cinema):
         print(cinema, type(cinema))
