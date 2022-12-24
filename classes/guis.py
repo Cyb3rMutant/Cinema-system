@@ -1,3 +1,4 @@
+from textwrap import wrap
 import tkinter as tk
 import tkinter.messagebox
 from tkcalendar import DateEntry
@@ -327,28 +328,64 @@ class Main_frame(tk.Frame):
 
         #uncomment all the treeview code to see the frame bg
         frame2 = tk.Frame(self.__app.body_frame,bg='black',width=1100,height=500)
-        frame2.place(x=100,y=90)
+        frame2.place(x=50,y=90)
         
-        #treeview doesnt fit into frame, needs an X scroll bar 
-        columns = ('id', 'booking_ref', 'seat_count', 'date','price','show_id','seat_type','cust_email')
-        self.tree = ttk.Treeview(frame2, columns=columns, show='headings')
-        self.tree.heading('id', text='id')
-        self.tree.heading('booking_ref', text='booking_ref')
-        self.tree.heading('seat_count', text='seat_count')
-        self.tree.heading('date', text='date')
-        self.tree.heading('price', text='price')
-        self.tree.heading('show_id', text='show_id')
-        self.tree.heading('seat_type', text='seat_type')
-        self.tree.heading('cust_email', text='cust_email')
+
+
+        # scrollbar
+        
+        #init'ing scrollbars
+        xscrollbar = tk.Scrollbar(frame2, orient=tk.HORIZONTAL)
+        xscrollbar.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        yscrollbar = tk.Scrollbar(frame2)
+        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
+        #creating treeview
+        self.tree_view = ttk.Treeview(frame2, xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        self.tree_view.grid(row=0, column=0)
+        #config'ing scrollbars
+        xscrollbar.config(command=self.tree_view.xview)
+        yscrollbar.config(command=self.tree_view.yview)
 
         
-        self.tree.bind('<<TreeviewSelect>>', self.item_selected)
-        self.tree.grid(row=0, column=0, sticky=tk.NSEW)
+        # #Another version of scroll bar - does the same tbh Y works X doesnt. On this one though the Grey bar for X is there but it wont move
+        # self.tree_view = ttk.Treeview(frame2)
+        # self.vertical_scroll = tk.Scrollbar(frame2, orient=tk.VERTICAL, command=self.tree_view.yview)
+        # self.horizontal_scroll = tk.Scrollbar(frame2, orient=tk.HORIZONTAL, command=self.tree_view.xview)
+        # self.horizontal_scroll.pack(side=tk.BOTTOM, fill=tk.X)
+        # self.vertical_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        # self.tree_view.configure(yscrollcommand=self.vertical_scroll.set)
+        # self.tree_view.configure(xscrollcommand=self.horizontal_scroll.set)
+        # self.tree_view.pack()
 
-        # add a Y scrollbar
-        scrollbar = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.tree.yview)
-        self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(row=0, column=1, sticky='ns')
+
+        #Tree columns
+        self.tree_view['columns'] = "id", "booking_ref", "seat_count","date", "price", "show_id", "seat_type","cust_email"
+
+        self.tree_view.column("#0", width=0,  stretch=tk.NO) #Null column to prevent overflow of large size column (disablet o test) 
+        self.tree_view.column("id", anchor=tk.CENTER, width=140,)
+        self.tree_view.column("booking_ref", anchor=tk.CENTER, width=140)
+        self.tree_view.column("seat_count", anchor=tk.CENTER, width=140)
+        self.tree_view.column("date", anchor=tk.CENTER, width=140)
+        self.tree_view.column("price", anchor=tk.CENTER, width=140)
+        self.tree_view.column("show_id", anchor=tk.CENTER, width=140)
+        self.tree_view.column("seat_type", anchor=tk.CENTER, width=140)
+        self.tree_view.column("cust_email", anchor=tk.CENTER, width = 140)
+
+        #Tree headings
+        self.tree_view.heading("#0", text="", anchor=tk.CENTER)
+        self.tree_view.heading("id", text="id", anchor=tk.CENTER)
+        self.tree_view.heading("booking_ref", text="booking_ref", anchor=tk.CENTER)
+        self.tree_view.heading("seat_count", text="seat_count", anchor=tk.CENTER)
+        self.tree_view.heading("date", text="date", anchor=tk.CENTER)
+        self.tree_view.heading("price", text="price", anchor=tk.CENTER)
+        self.tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
+        self.tree_view.heading("seat_type", text="seat_type", anchor=tk.CENTER)
+        self.tree_view.heading("cust_email", text = "cust_email", anchor= tk.CENTER)
+
+
+
+        self.tree_view.bind('<<TreeviewSelect>>', self.item_selected)
+
 
 
 
@@ -356,17 +393,17 @@ class Main_frame(tk.Frame):
         # generate sample data
         contacts = []
         for n in range(1, 100):
-            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com',f'first {n}', f'last {n}', f'email{n}@example.com'f'first {n}', f'last {n}'))
+            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com',f'first {n}', f'last {n}', f'email{n}@example.com'f'first {n}', f'last {n}', f'lastasfcaewstfgweatwetersdtgertretrrtetreewtwetweetwtwewteewttweew {n}'))
 
         # add data to the treeview
         for contact in contacts:
-            self.tree.insert('', tk.END, values=contact)
+            self.tree_view.insert('', tk.END, values=contact)
 
         
     #Event listener, anytime a record is clicked itll print it
     def item_selected(self, event):
-        for selected_item in self.tree.selection():
-            item = self.tree.item(selected_item)
+        for selected_item in self.tree_view.selection():
+            item = self.tree_view.item(selected_item)
             record = item['values']
             # show a message
             # tk.showinfo(title='Information', message=','.join(record))
