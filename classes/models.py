@@ -130,6 +130,6 @@ class Model():
             return self.__cities[city].get_evening_price()
 
     def get_city(self, cinema):
-        for city in self.__cities:
+        for city in self.__cities.get_cities():
             if cinema in self.__cities[city].get_cinemas():
                 return city

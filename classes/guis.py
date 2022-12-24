@@ -123,17 +123,18 @@ class Main_frame(tk.Frame):
         except:
             pass
 
-        #Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
-        print(f'{type(self.__cinema)} : {self.__cinema}')
-        print(f'{type(self.__cinema_choice.get())} : {self.__cinema_choice.get()}')
-        
-        #Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
-        #And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
-        if str(self.__cinema_choice.get()) == "choose cinema":
-            print('error: choose cinema is selected, wont update film')
-            return 0 
-        
-        
+        try: #Only got this cus it doesnt work with booking staff causes error crash. KEEP it tho, you can remove comments
+            #Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
+            print(f'{type(self.__cinema)} : {self.__cinema}')
+            print(f'{type(self.__cinema_choice.get())} : {self.__cinema_choice.get()}')
+            
+            #Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
+            #And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
+            if str(self.__cinema_choice.get()) == "choose cinema":
+                print('error: choose cinema is selected, wont update film')
+                return 0 
+        except:
+            pass
         #Main. All above is just format
         self.__listings = []
         # For every listing in the cinema
