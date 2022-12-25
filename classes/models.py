@@ -143,6 +143,6 @@ class Model():
                 return city
 
     def cancel_booking(self, booking_reference, show):
-        conn.delete(
-            "DELETE FROM bookings WHERE BOOKING_REFERENCE=%s;", booking_reference)
+        conn.update(
+            "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", show.get_bookings()[booking_reference].get_price()/2, booking_reference)
         show.cancel_booking(booking_reference)

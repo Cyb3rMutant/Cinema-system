@@ -19,7 +19,7 @@ class Show(object):
         self.__bookings = dict()
 
         bookings = conn.select(
-            "SELECT * FROM bookings WHERE SHOW_ID=%s", self.__show_id)
+            "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show_id)
         for b in bookings:
             self.__bookings[b["BOOKING_REFERENCE"]] = Booking_factory.get_booking_seat_hall(b["SEAT_TYPE"])(
                 b["BOOKING_REFERENCE"], self, b["BOOKING_SEAT_COUNT"], b["BOOKING_DATE"], b["BOOKING_PRICE"], Customer("Someone", "7829748", b["CUSTOMER_EMAIL"]))

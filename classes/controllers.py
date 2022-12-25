@@ -26,8 +26,6 @@ class Controller():
         return self.__model.get_bookings_as_list(show)
 
     def add_city(self, name, morning_price, afternoon_price, evening_price):
-        print(type(name), type(morning_price), type(
-            afternoon_price), type(evening_price))
         self.__model.add_city(name, morning_price,
                               afternoon_price, evening_price)
 
@@ -77,5 +75,4 @@ class Controller():
         return self.__model.get_city(cinema)
 
     def cancel_booking(self, booking_reference, show):
-        print(type(booking_reference))
         self.__model.cancel_booking(booking_reference, show)

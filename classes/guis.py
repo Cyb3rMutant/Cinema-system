@@ -311,75 +311,55 @@ class Main_frame(tk.Frame):
             self.__login_button.destroy()
         except:
             pass
-        print(self.__cinema)  # object
+        self.clear_frame(self.__tree_frame)
 
-        # uncomment all the treeview code to see the frame bg
-        frame2 = tk.Frame(self.__app.body_frame, bg='black',
-                          width=700, height=500)
-        frame2.place(x=300, y=300)
+        xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
+        yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
-        # scrollbar
+        self.__tree_view = ttk.Treeview(
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type", "cust_email"))
+        self.__tree_view.grid(row=0, column=0)
+        xscrollbar.configure(command=self.__tree_view.xview)
+        yscrollbar.configure(command=self.__tree_view.yview)
 
-        # init'ing scrollbars
-        xscrollbar = tk.Scrollbar(frame2, orient=tk.HORIZONTAL)
         xscrollbar.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
-        yscrollbar = tk.Scrollbar(frame2)
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
-        # creating treeview
-        self.tree_view = ttk.Treeview(
-            frame2, xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
-        self.tree_view.grid(row=0, column=0)
-        # config'ing scrollbars
-        xscrollbar.config(command=self.tree_view.xview)
-        yscrollbar.config(command=self.tree_view.yview)
-
-        # #Another version of scroll bar - does the same tbh Y works X doesnt. On this one though the Grey bar for X is there but it wont move
-        # self.tree_view = ttk.Treeview(frame2)
-        # self.vertical_scroll = tk.Scrollbar(frame2, orient=tk.VERTICAL, command=self.tree_view.yview)
-        # self.horizontal_scroll = tk.Scrollbar(frame2, orient=tk.HORIZONTAL, command=self.tree_view.xview)
-        # self.horizontal_scroll.pack(side=tk.BOTTOM, fill=tk.X)
-        # self.vertical_scroll.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.tree_view.configure(yscrollcommand=self.vertical_scroll.set)
-        # self.tree_view.configure(xscrollcommand=self.horizontal_scroll.set)
-        # self.tree_view.pack()
-
-        # Tree columns
-        self.tree_view['columns'] = "booking_ref", "seat_count", "date", "price", "show_id", "seat_type", "cust_email"
-
-        # Null column to prevent overflow of large size column (disablet o test)
-        self.tree_view.column("#0", width=0,  stretch=tk.NO)
-        self.tree_view.column("booking_ref", anchor=tk.CENTER, width=140)
-        self.tree_view.column("seat_count", anchor=tk.CENTER, width=140)
-        self.tree_view.column("date", anchor=tk.CENTER, width=140)
-        self.tree_view.column("price", anchor=tk.CENTER, width=140)
-        self.tree_view.column("show_id", anchor=tk.CENTER, width=140)
-        self.tree_view.column("seat_type", anchor=tk.CENTER, width=140)
-        self.tree_view.column("cust_email", anchor=tk.CENTER, width=140)
 
         # Tree headings
-        self.tree_view.heading("#0", text="", anchor=tk.CENTER)
-        self.tree_view.heading(
+        self.__tree_view.heading(
             "booking_ref", text="booking_ref", anchor=tk.CENTER)
-        self.tree_view.heading(
+        self.__tree_view.heading(
             "seat_count", text="seat_count", anchor=tk.CENTER)
-        self.tree_view.heading("date", text="date", anchor=tk.CENTER)
-        self.tree_view.heading("price", text="price", anchor=tk.CENTER)
-        self.tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
-        self.tree_view.heading("seat_type", text="seat_type", anchor=tk.CENTER)
-        self.tree_view.heading(
+        self.__tree_view.heading("date", text="date", anchor=tk.CENTER)
+        self.__tree_view.heading("price", text="price", anchor=tk.CENTER)
+        self.__tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "seat_type", text="seat_type", anchor=tk.CENTER)
+        self.__tree_view.heading(
             "cust_email", text="cust_email", anchor=tk.CENTER)
 
-        self.tree_view.bind('<<TreeviewSelect>>',
-                            lambda unused: self.item_selected())
+        # Null column to prevent overflow of large size column (disablet o test)
+        self.__tree_view.column("#0", width=0,  stretch=tk.NO)
+        self.__tree_view.column("booking_ref", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("seat_count", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("date", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("price", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("show_id", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("seat_type", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("cust_email", anchor=tk.CENTER, width=140)
+
+        self.__tree_view.bind('<<TreeviewSelect>>',
+                              lambda unused: self.item_selected())
 
         # generate sample data
         # add data to the treeview
         for data in self.__controller.get_bookings_as_list(self.__show):
-            self.tree_view.insert('', tk.END, values=data)
+            self.__tree_view.insert('', tk.END, values=data)
 
     # Event listener, anytime a record is clicked itll print it
     def item_selected(self):
-        record = self.tree_view.item(self.tree_view.selection()[0])["values"]
+        record = self.__tree_view.item(
+            self.__tree_view.selection()[0])["values"]
 
         self.__login_button = tk.Button(self.__app.body_frame, text='cancel booking', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: (self.__controller.cancel_booking(str(record[0]), self.__show), self.display_bookings_treeview()))
@@ -438,6 +418,11 @@ class Main_frame(tk.Frame):
             'w', lambda *unused: self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview))
 
         self.__date_entry.place(x=100, y=100)
+
+        # uncomment all the treeview code to see the frame bg
+        self.__tree_frame = tk.Frame(self.__app.body_frame,
+                                     width=700, height=500)
+        self.__tree_frame.place(x=300, y=300)
 
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
         self.__listings = []

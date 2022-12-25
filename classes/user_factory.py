@@ -18,4 +18,3 @@ class User_factory():
 
 if __name__ == "__main__":
     admin = User_factory.get_user_type("admin")("yazee", 1, None)
-    print(type(admin))
