@@ -1,4 +1,6 @@
 from booking_factory import Booking_factory
+from dbfunc import conn
+from customer import Customer
 
 
 class Show(object):
@@ -14,7 +16,13 @@ class Show(object):
 
         self.__available_lower_seats = available_lower_seats
 
-        self.__bookings = list()
+        self.__bookings = dict()
+
+        bookings = conn.select(
+            "SELECT * FROM bookings WHERE SHOW_ID=%s", self.__show_id)
+        for b in bookings:
+            self.__bookings[b["BOOKING_REFERENCE"]] = Booking_factory.get_booking_seat_hall(b["SEAT_TYPE"])(
+                b["BOOKING_REFERENCE"], self, b["BOOKING_SEAT_COUNT"], b["BOOKING_DATE"], b["BOOKING_PRICE"], Customer("Someone", "7829748", b["CUSTOMER_EMAIL"]))
 
         self.__screen = screen
 
@@ -59,14 +67,14 @@ class Show(object):
     def set_available_lower_seats(self, seats):
         self.__available_lower_seats -= seats
 
-    def add_booking(self, seat_hall, number_of_seats, date_of_booking, price, customer):
+    def add_booking(self, booking_reference, seat_hall, number_of_seats, date_of_booking, price, customer):
         booking = Booking_factory.get_booking_seat_hall(seat_hall)(
-            self, number_of_seats, date_of_booking, price, customer)
-        self.__bookings.append(booking)
+            booking_reference, self, number_of_seats, date_of_booking, price, customer)
+        self.__bookings[booking_reference] = booking
         return booking
 
     def cancel_booking(self, Booking_reference):
-        pass
+        self.__bookings.pop(Booking_reference)
 
     def __str__(self):
         return str(self.__time)

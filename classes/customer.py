@@ -11,11 +11,11 @@ class Customer(object):
 
         self.__email = email
 
-        payment = conn.select(
-            "SELECT * FROM PAYMENTS WHERE CUSTOMER_EMAIL=%s", (self.__email,))
+        # payment = conn.select(
+        #     "SELECT * FROM PAYMENTS WHERE CUSTOMER_EMAIL=%s", (self.__email,))
 
-        self.__payment = payment.Payment(
-            payment[0], payment[1], payment[2], payment[3])
+        # self.__payment = payment.Payment(
+        #     payment[0], payment[1], payment[2], payment[3])
 
     def get_name(self):
         return self.__name

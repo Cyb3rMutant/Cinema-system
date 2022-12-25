@@ -22,12 +22,8 @@ class Controller():
 
             self.__view.logged_in(user)
 
-    def get_bookings(self, cinema, booking_staff=1):
-        if booking_staff:
-            return self.__model.get_bookings(self, cinema)
-
-        else:
-            return
+    def get_bookings_as_list(self, show):
+        return self.__model.get_bookings_as_list(show)
 
     def add_city(self, name, morning_price, afternoon_price, evening_price):
         print(type(name), type(morning_price), type(
@@ -65,7 +61,6 @@ class Controller():
         elif seat_type == "vip":
             seat_availability = show.get_available_vip_seats() > num_of_tickets
 
-
         if len(seat_type) == 0:
             self.__view.show_error("no seat type selected")
 
@@ -74,16 +69,13 @@ class Controller():
             return
 
         print("available seats")
-        # Now there are seats available for the show, check price
-        # Price --> Dependant on SHIW TIME and CITY and TICKET TYPE
-
-        # Generate price of ticket
-        # 12:00:00 turned to 120000
-
-        # Generate random booking reference
 
         self.__model.add_booking(city, show, seat_type,
                                  num_of_tickets, "poop@gmail.com")
 
     def get_city(self, cinema):
         return self.__model.get_city(cinema)
+
+    def cancel_booking(self, booking_reference, show):
+        print(type(booking_reference))
+        self.__model.cancel_booking(booking_reference, show)

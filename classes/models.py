@@ -6,6 +6,8 @@ from film_container import Films
 from city import City
 from film import Film
 import datetime
+from customer import Customer
+import random
 
 
 class Model():
@@ -44,11 +46,15 @@ class Model():
         else:
             return 0
 
-    def get_bookings(self, cinema):
+    def get_bookings_as_list(self, show):
         bookings = []
-        for show in cinema:
-            bookings += show.get_bookings()
+        for b in show.get_bookings().values():
+            bookings.append(b.as_list())
         return bookings
+        # return conn.select("SELECT b.* FROM bookings b\
+        #                 LEFT JOIN shows s ON b.SHOW_ID=s.SHOW_ID\
+        #                     LEFT JOIN listings l ON s.LISTING_ID=l.LISTING_ID\
+        #                         WHERE l.CINEMA_ID=%s", cinema.get_cinema_id())
 
     def add_city(self, city_name, morning_price, afternoon_price, evening_price):
         conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
@@ -76,12 +82,14 @@ class Model():
         return self.__films.get_films()
 
     def add_booking(self, city, show, seat_type, num_of_tickets, customer_email):
+        booking_reference = str(random.randint(100000, 999999))
+
         date_today = datetime.date.today()
 
         city_price = self.get_city_price(city, show.get_time())
 
-        booking_info = show.add_booking(seat_type, num_of_tickets, date_today,
-                                        city_price, customer_email)
+        booking_info = show.add_booking(booking_reference, seat_type, num_of_tickets,
+                                        date_today, city_price, Customer("Someone", "798405324542", customer_email))
 
         conn.update(
             f"UPDATE shows SET SHOW_AVAILABLE_{seat_type.upper()}_SEATS = SHOW_AVAILABLE_{seat_type.upper()}_SEATS - %s WHERE SHOW_ID = (%s);", num_of_tickets, show.get_show_id())
@@ -133,3 +141,8 @@ class Model():
         for city in self.__cities.get_cities():
             if cinema in self.__cities[city].get_cinemas():
                 return city
+
+    def cancel_booking(self, booking_reference, show):
+        conn.delete(
+            "DELETE FROM bookings WHERE BOOKING_REFERENCE=%s;", booking_reference)
+        show.cancel_booking(booking_reference)

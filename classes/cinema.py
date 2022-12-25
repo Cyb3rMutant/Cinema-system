@@ -11,7 +11,7 @@ class Cinema(object):
 
         self.__address = address
         self.__screens = list()
-        self.__listings = list()
+        self.__listings = dict()
 
         screens = conn.select(
             "SELECT * FROM screens WHERE CINEMA_ID=%s", self.__cinema_id)
@@ -22,8 +22,8 @@ class Cinema(object):
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema_id)
         for l in listings:
-            self.__listings.append(listing.Listing(
-                l["LISTING_ID"], l["LISTING_TIME"], l["FILM_TITLE"], l["CINEMA_ID"]))
+            self.__listings[l["LISTING_ID"]] = listing.Listing(
+                l["LISTING_ID"], l["LISTING_TIME"], l["FILM_TITLE"], l["CINEMA_ID"])
 
     def get_cinema_id(self):
         return self.__cinema_id
@@ -38,24 +38,17 @@ class Cinema(object):
         return self.__listings
 
     def update_listing(self, listing_id, date, film):
-        listing = None
-        for l in self.__listings:
-            if l.get_listing_id() == listing_id:
-                listing = l
-                break
+        listing = self.__listings[listing_id]
         listing.set_date(date)
         listing.set_film(film)
 
     def remove_listing(self, listing_id):
-        for l in self.__listings:
-            if l.get_listing_id() == listing_id:
-                self.__listings.remove(l)
-                break
+        self.__listings.pop(listing_id)
 
     def add_listing(self, listing_id, date, film: film.Film):
         # add listing to database (ben)
-        self.__listings.append(listing.Listing(
-            listing_id, date, film, self))  # end paramter is cinema
+        self.__listings[listing_id] = listing.Listing(
+            listing_id, date, film, self)  # end paramter is cinema
 
     def __str__(self):
         return f"cinema_id: {self.__cinema_id} address: {self.__address}"

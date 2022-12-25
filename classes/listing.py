@@ -19,13 +19,14 @@ class Listing(object):
 
         self.__cinema = cinema
 
-        self.__shows = list()
+        self.__shows = dict()
 
         shows = conn.select("SELECT * FROM shows WHERE LISTING_ID=%s",
                             self.__listing_id)
         for s in shows:
-            self.__shows.append(
-                show.Show(s["SHOW_ID"], s["SHOW_TIME"], s["SHOW_AVAILABLE_VIP_SEATS"], s["SHOW_AVAILABLE_UPPER_SEATS"], s["SHOW_AVAILABLE_LOWER_SEATS"], s["FILM_TITLE"], s["SCREEN_ID"]))
+            self.__shows[s["SHOW_ID"]] = show.Show(s["SHOW_ID"], s["SHOW_TIME"], s["SHOW_AVAILABLE_VIP_SEATS"],
+                                                   s["SHOW_AVAILABLE_UPPER_SEATS"], s["SHOW_AVAILABLE_LOWER_SEATS"], s["SCREEN_ID"], s["SCREEN_ID"])
+        print(self.__shows)
 
     def get_listing_id(self):
         return self.__listing_id
