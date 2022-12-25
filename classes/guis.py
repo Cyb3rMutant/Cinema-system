@@ -118,13 +118,6 @@ class Main_frame(tk.Frame):
             self.__controller.get_bookings(self.__user.get_branch())
 
     def update_films_and_shows_based_on_date(self, btn_text, btn_command):
-        try:
-            self.__film_options.destroy()
-            self.__show_options.destroy()
-            self.__btn.destroy()
-        except:
-            pass
-
         try:  # Only got this cus it doesnt work with booking staff causes error crash. KEEP it tho, you can remove comments
             # Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
             print(f'{type(self.__cinema)} : {self.__cinema}')
@@ -201,7 +194,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 list(self.__controller.get_cities().keys())[0])
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(),
-                                                command=lambda unused: self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__city_choice.get()), self.__show, str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))]))  # When we change a city, we update its cinemas
+                                                command=lambda unused: (self.remove_create_stuff(),  self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__city_choice.get()), self.__show, str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])))  # When we change a city, we update its cinemas
             self.__city_options.place(x=100, y=50)
 
             self.__cinema = self.__controller.get_cities(
@@ -420,9 +413,9 @@ class Main_frame(tk.Frame):
         self.__date_entry.place(x=100, y=100)
 
         # uncomment all the treeview code to see the frame bg
-        self.__tree_frame = tk.Frame(self.__app.body_frame,
-                                     width=700, height=500)
-        self.__tree_frame.place(x=300, y=300)
+        self.__tree_frame = tk.Frame(
+            self.__app.body_frame, width=700, height=400, bg='gainsboro')
+        self.__tree_frame.place(x=300, y=200)
 
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
         self.__listings = []
@@ -796,3 +789,12 @@ class Main_frame(tk.Frame):
 
     def set_cinema(self, cinema):
         self.__cinema = cinema
+
+    def remove_create_stuff(self):
+
+        try:
+            self.__film_options.destroy()
+            self.__show_options.destroy()
+            self.__btn.destroy()
+        except:
+            pass
