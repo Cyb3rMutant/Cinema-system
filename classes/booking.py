@@ -5,6 +5,8 @@ from ticket_generator import Ticket_generator
 
 
 class Booking():
+    seat_type = None
+
     def __init__(self, booking_reference, show, number_of_seats, date_of_booking, city_price, customer):
         # generate a custom one later on
         self._booking_reference = booking_reference
@@ -42,6 +44,9 @@ class Booking():
 
     def get_receipt(self):
         return Ticket_generator.gen_ticket(self)
+
+    def get_seat_type(self):
+        return self.__class__.seat_type
 
     def calc_price(self, city_price):
         pass

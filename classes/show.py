@@ -74,7 +74,7 @@ class Show(object):
         return booking
 
     def cancel_booking(self, Booking_reference):
-        self.__bookings.pop(Booking_reference)
+        del self.__bookings[Booking_reference]
 
     def __str__(self):
         return str(self.__time)

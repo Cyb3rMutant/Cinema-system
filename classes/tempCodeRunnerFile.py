@@ -1,3 +1,4 @@
-x = {"1": 1, "2": 2}
-print(x)
-print(x.pop("11"))
+l = [0, 1, 2]
+print(l)
+del l[1]
+print(l)

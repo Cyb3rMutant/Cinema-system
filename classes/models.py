@@ -143,6 +143,9 @@ class Model():
                 return city
 
     def cancel_booking(self, booking_reference, show):
+        booking = show.get_bookings()[booking_reference]
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", show.get_bookings()[booking_reference].get_price()/2, booking_reference)
+        conn.update(
+            f"UPDATE shows SET SHOW_AVAILABLE_{booking.get_seat_type().upper()}_SEATS = SHOW_AVAILABLE_{booking.get_seat_type().upper()}_SEATS + %s WHERE SHOW_ID = %s", booking.get_number_of_seats(), show.get_show_id())
         show.cancel_booking(booking_reference)
