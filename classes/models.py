@@ -91,9 +91,6 @@ class Model():
         booking_info = show.add_booking(booking_reference, seat_type, num_of_tickets,
                                         date_today, city_price, Customer("Someone", "798405324542", customer_email))
 
-        conn.update(
-            f"UPDATE shows SET SHOW_AVAILABLE_{seat_type.upper()}_SEATS = SHOW_AVAILABLE_{seat_type.upper()}_SEATS - %s WHERE SHOW_ID = (%s);", num_of_tickets, show.get_show_id())
-
         conn.insert("INSERT INTO bookings(BOOKING_REFERENCE,BOOKING_SEAT_COUNT,BOOKING_DATE,BOOKING_PRICE,SHOW_ID,SEAT_TYPE,CUSTOMER_EMAIL) VALUES (%s, %s, %s, %s, %s, %s, %s);",
                     booking_info.get_booking_reference(), booking_info.get_number_of_seats(), booking_info.get_date_of_booking(), booking_info.get_price(), show.get_show_id(), seat_type, customer_email)
 
@@ -146,6 +143,4 @@ class Model():
         booking = show.get_bookings()[booking_reference]
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", show.get_bookings()[booking_reference].get_price()/2, booking_reference)
-        conn.update(
-            f"UPDATE shows SET SHOW_AVAILABLE_{booking.get_seat_type().upper()}_SEATS = SHOW_AVAILABLE_{booking.get_seat_type().upper()}_SEATS + %s WHERE SHOW_ID = %s", booking.get_number_of_seats(), show.get_show_id())
         show.cancel_booking(booking_reference)

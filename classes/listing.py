@@ -10,7 +10,6 @@ from dbfunc import conn
 
 class Listing(object):
     def __init__(self, listing_id, date, film, cinema):
-
         self.__listing_id = listing_id
 
         self.__date = date
@@ -23,10 +22,11 @@ class Listing(object):
 
         shows = conn.select("SELECT * FROM shows WHERE LISTING_ID=%s",
                             self.__listing_id)
+        print(shows)
         for s in shows:
-            self.__shows[s["SHOW_ID"]] = show.Show(s["SHOW_ID"], s["SHOW_TIME"], s["SHOW_AVAILABLE_VIP_SEATS"],
-                                                   s["SHOW_AVAILABLE_UPPER_SEATS"], s["SHOW_AVAILABLE_LOWER_SEATS"], s["SCREEN_ID"], s["SCREEN_ID"])
-        print(self.__shows)
+            print(cinema.get_screens()[s["SCREEN_ID"]])
+            self.__shows[s["SHOW_ID"]] = show.Show(
+                s["SHOW_ID"], s["SHOW_TIME"], cinema.get_screens()[s["SCREEN_ID"]], self)
 
     def get_listing_id(self):
         return self.__listing_id

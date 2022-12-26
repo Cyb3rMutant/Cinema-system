@@ -4,17 +4,17 @@ from customer import Customer
 
 
 class Show(object):
-    def __init__(self, show_id, time, available_vip_seats, available_upper_seats, available_lower_seats, screen, listing):
+    def __init__(self, show_id, time, screen, listing):
 
         self.__show_id = show_id
 
         self.__time = time
 
-        self.__available_vip_seats = available_vip_seats
+        self.__available_vip_seats = screen.get_num_vip_seats()
 
-        self.__available_upper_seats = available_upper_seats
+        self.__available_upper_seats = screen.get_num_upper_seats()
 
-        self.__available_lower_seats = available_lower_seats
+        self.__available_lower_seats = screen.get_num_lower_seats()
 
         self.__bookings = dict()
 

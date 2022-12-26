@@ -10,20 +10,20 @@ class Cinema(object):
         self.__cinema_id = cinema_id
 
         self.__address = address
-        self.__screens = list()
+        self.__screens = dict()
         self.__listings = dict()
 
         screens = conn.select(
-            "SELECT * FROM screens WHERE CINEMA_ID=%s", self.__cinema_id)
+            "SELECT * FROM screens WHERE CINEMA_ID=%s ORDER BY SCREEN_NUMBER;", self.__cinema_id)
         for s in screens:
-            self.__screens.append(
-                screen.Screen(s["SCREEN_NUMBER"], s["SCREEN_NUM_VIP_SEATS"], s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"]))
-
+            self.__screens[s["SCREEN_ID"]] = screen.Screen(
+                s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"], s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"], s["SCREEN_NUMBER"])
+        # print(self.__screens)
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema_id)
         for l in listings:
             self.__listings[l["LISTING_ID"]] = listing.Listing(
-                l["LISTING_ID"], l["LISTING_TIME"], l["FILM_TITLE"], l["CINEMA_ID"])
+                l["LISTING_ID"], l["LISTING_TIME"], l["FILM_TITLE"], self)
 
     def get_cinema_id(self):
         return self.__cinema_id

@@ -51,7 +51,7 @@ class Controller():
         seat_availability = False
 
         # For every listing in the cinema
-
+        print(show.get_show_id())
         if seat_type == "lower":
             print(show.get_available_lower_seats(), num_of_tickets)
             seat_availability = show.get_available_lower_seats() >= num_of_tickets
@@ -61,8 +61,7 @@ class Controller():
         elif seat_type == "vip":
             print(show.get_available_vip_seats(), num_of_tickets)
             seat_availability = show.get_available_vip_seats() >= num_of_tickets
-
-        if len(seat_type) == 0:
+        else:
             self.__view.show_error("no seat type selected")
 
         if (not seat_availability):
