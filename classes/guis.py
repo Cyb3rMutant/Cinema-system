@@ -527,8 +527,11 @@ class Main_frame(tk.Frame):
         # date
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date: ")
+        self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
+        self.__selected_date.trace(
+            'w', lambda *unused: self.update_listings_one(self.__cinema))
 
         # # screens
         # self.__screens_label = tk.Label(
@@ -583,8 +586,11 @@ class Main_frame(tk.Frame):
         # date
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date: ")
+        self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
+        self.__selected_date.trace(
+            'w', lambda *unused: self.update_listings_one(self.__cinema))
 
         # listings
         self.__listings_label = tk.Label(
@@ -641,8 +647,11 @@ class Main_frame(tk.Frame):
         # date
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date: ")
+        self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
+        self.__selected_date.trace(
+            'w', lambda *unused: self.update_listings_one(self.__cinema))
 
         # listings  (need to change this so they can only pick one)
         self.__listings_label = tk.Label(
@@ -700,8 +709,11 @@ class Main_frame(tk.Frame):
         # select date
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date: ")
+        self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
+        self.__selected_date.trace(
+            'w', lambda *unused: self.update_listings_one(self.__cinema))
 
         # update listing button
         self.__login_button = tk.Button(self.__app.body_frame, text='update listing', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.update_listing(
