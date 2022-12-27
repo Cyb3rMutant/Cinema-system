@@ -114,11 +114,105 @@ class Main_frame(tk.Frame):
     def view_bookings(self):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
-        self.__app.page_label["text"] = "View booking"
-        if (isinstance(self.__user, Admin)):
-            pass
+        self.__app.page_label["text"] = "View bookings"
+       
+        self.__btn = tk.Button(
+            self.__app.body_frame, text='view', command=lambda: check_cinema_select(self, self.__cinema_choice.get())) 
+
+        self.__tree_frame = tk.Frame(
+            self.__app.body_frame, width=700, height=400, bg='gainsboro')
+        self.__tree_frame.place(x=150, y=200)
+
+        if (isinstance(self.__user, Admin)): #if manager or admin
+            self.__city_options_label = tk.Label(
+                self.__app.body_frame, text="choose city: ").place(x=10, y=30)
+            self.__cinema_options_label = tk.Label(
+                self.__app.body_frame, text="choose cinema: ").place(x=300, y=30)
+
+            self.__city_choice = tk.StringVar()
+            self.__city_choice.set(
+                list(self.__controller.get_cities().keys())[0])
+            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(),
+                                                command=lambda unused: self.update_cinemas(lambda cinema: [self.set_cinema(cinema)]))  # When we change a city, we update its cinemas
+            self.__city_options.place(x=100, y=30)
+
+            self.__cinema = self.__controller.get_cities(
+            )[self.__city_choice.get()].get_cinemas()[0]
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set("choose cinema")
+            self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
+                                                  self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema)])
+            self.__cinema_options.place(x=400, y=30)
+
+            self.__btn.place(x=10, y=90)
         else:
-            self.__controller.get_bookings(self.__user.get_branch())
+            self.__city_choice = tk.StringVar()
+            self.__cinema = self.__user.get_branch()
+            self.__city_choice.set(self.__controller.get_city(self.__cinema))
+            #no point having an extra button to view bookings
+            self.view_bookings_treeview()
+
+        
+        #easiest way to check they have picked a cinema
+        def check_cinema_select(self, choice):
+            if str(choice) == "choose cinema":
+                print("No cinema selected")
+                self.clear_frame(self.__tree_frame)   #clear tree views
+            else:
+                self.view_bookings_treeview()
+
+        
+
+
+    def view_bookings_treeview(self):
+        try:
+            self.__login_button.destroy()
+        except:
+            pass
+        self.clear_frame(self.__tree_frame)
+
+        xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
+        yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
+
+        self.__tree_view = ttk.Treeview(
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type", "cust_email"))
+        self.__tree_view.grid(row=0, column=0)
+        xscrollbar.configure(command=self.__tree_view.xview)
+        yscrollbar.configure(command=self.__tree_view.yview)
+
+        xscrollbar.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
+
+        # Tree headings
+        self.__tree_view.heading(
+            "booking_ref", text="booking_ref", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "seat_count", text="seat_count", anchor=tk.CENTER)
+        self.__tree_view.heading("date", text="date", anchor=tk.CENTER)
+        self.__tree_view.heading("price", text="price", anchor=tk.CENTER)
+        self.__tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "seat_type", text="seat_type", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "cust_email", text="cust_email", anchor=tk.CENTER)
+
+        # Null column to prevent overflow of large size column (disablet o test)
+        self.__tree_view.column("#0", width=0,  stretch=tk.NO)
+        self.__tree_view.column("booking_ref", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("seat_count", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("date", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("price", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("show_id", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("seat_type", anchor=tk.CENTER, width=140)
+        self.__tree_view.column("cust_email", anchor=tk.CENTER, width=140)
+
+        
+        for listing in self.__cinema.get_listings().values():
+            for show in listing.get_shows().values():
+                for data in self.__controller.get_bookings_as_list(show):
+                    self.__tree_view.insert('', tk.END, values=data)
+
+
 
     def update_films_and_shows_based_on_date(self, btn_text, btn_command):
         self.remove_create_stuff()
