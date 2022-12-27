@@ -151,13 +151,48 @@ class Model():
         duration = datetime.timedelta(
             minutes=listing.get_film().get_duration()+30)
 
-        data = conn.select("SELECT b.`SCREEN_ID` FROM(SELECT s.`SCREEN_ID`, `SHOW_TIME`, COUNT(sh.`SCREEN_ID`) as cnt FROM screens s\
-                                LEFT JOIN shows sh ON s.`SCREEN_ID`=sh.`SCREEN_ID`\
-                                    WHERE `CINEMA_ID` = %s\
-                                        GROUP BY s.`SCREEN_ID`\
-                                            HAVING cnt < 4) as b\
-                                                WHERE `SHOW_TIME`\
-                                                    NOT BETWEEN ADDTIME(%s, '-00:30:00') and ADDTIME(%s, %s)", cinema.get_cinema_id(), time, time, duration)
+        data = conn.select("SELECT `SCREEN_ID`\
+                            FROM screens\
+                            WHERE `SCREEN_ID` NOT IN ( (\
+                                        SELECT\
+                                            s2.`SCREEN_ID`\
+                                        FROM screens s2\
+                                            LEFT JOIN shows sh2 ON s2.`SCREEN_ID` = sh2.`SCREEN_ID`\
+                                            LEFT JOIN listings l2 ON sh2.`LISTING_ID` = l2.`LISTING_ID`\
+                                        WHERE\
+                                            s2.`SCREEN_ID`\
+                                            AND s2.`CINEMA_ID` = %s\
+                                            AND l2.`LISTING_TIME` = %s\
+                                        GROUP BY\
+                                            s2.`SCREEN_ID`\
+                                        HAVING\
+                                            COUNT(sh2.`SCREEN_ID`) >= 4\
+                                    )\
+                                    UNION (\
+                                        SELECT\
+                                            s1.`SCREEN_ID`\
+                                        FROM screens s1\
+                                            LEFT JOIN shows sh1 ON s1.`SCREEN_ID` = sh1.`SCREEN_ID`\
+                                            LEFT JOIN listings l1 ON sh1.`LISTING_ID` = l1.`LISTING_ID`\
+                                            LEFT JOIN films f1 ON l1.`FILM_TITLE` = f1.`FILM_TITLE`\
+                                        WHERE\
+                                            s1.`CINEMA_ID` = %s\
+                                            AND l1.`LISTING_TIME` = %s\
+                                            AND ( (\
+                                                    ADDTIME(%s, '-00:30:00') BETWEEN `SHOW_TIME` AND ADDTIME(\
+                                                        `SHOW_TIME`,\
+                                                        SEC_TO_TIME(`FILM_DURATION` * 60)\
+                                                    )\
+                                                )\
+                                                OR (\
+                                                    `SHOW_TIME` BETWEEN ADDTIME(%s, '-00:30:00')\
+                                                    AND ADDTIME(%s, %s)\
+                                                )\
+                                            )\
+                                    )\
+                                )\
+                                AND `CINEMA_ID` = %s;\
+    ", cinema.get_cinema_id(), listing.get_date(), cinema.get_cinema_id(), listing.get_date(), time, time, time, duration, cinema.get_cinema_id())
         print(data)
         if not data:
             return 0
