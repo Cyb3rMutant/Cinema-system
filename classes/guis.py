@@ -152,6 +152,11 @@ class Main_frame(tk.Frame):
             #no point having an extra button to view bookings
             self.view_bookings_treeview()
 
+        #optional
+        self.search_entry = tk.Entry(self.__app.body_frame)
+        self.search_btn = tk.Button(self.__app.body_frame, text='Search', command=lambda: self.validate_search(self.search_entry.get())) 
+        self.search_btn.place(x=50, y=550)
+        self.search_entry.place(x=100,y=550)
         
         #easiest way to check they have picked a cinema
         def check_cinema_select(self, choice):
@@ -161,10 +166,16 @@ class Main_frame(tk.Frame):
             else:
                 self.view_bookings_treeview()
 
-        
+    #optional function
+    def validate_search(self,booking_ref):
+        try:
+            booking_ref = int(booking_ref)
+            if len(str(booking_ref)) != 6: self.show_error("Not 6 integers"); return 0
+            self.view_bookings_treeview(search=True, bookingRef=booking_ref)
+        except:
+            self.show_error("string entered"); return 0
 
-
-    def view_bookings_treeview(self):
+    def view_bookings_treeview(self, search=False, bookingRef=000000):
         try:
             self.__login_button.destroy()
         except:
@@ -206,12 +217,33 @@ class Main_frame(tk.Frame):
         self.__tree_view.column("seat_type", anchor=tk.CENTER, width=140)
         self.__tree_view.column("cust_email", anchor=tk.CENTER, width=140)
 
-        
-        for listing in self.__cinema.get_listings().values():
-            for show in listing.get_shows().values():
-                for data in self.__controller.get_bookings_as_list(show):
-                    self.__tree_view.insert('', tk.END, values=data)
+        if search==False: #City selection search
+            print(bookingRef)
+            for listing in self.__cinema.get_listings().values():
+                for show in listing.get_shows().values():
+                    for data in self.__controller.get_bookings_as_list(show):
+                        self.__tree_view.insert('', tk.END, values=data)
+        #optional
+        if search==True:
+            #Admin search 
+            if (isinstance(self.__user, Admin)):
+                print("admin")
+                for city in self.__controller.get_cities().values():
+                    for cinema in city.get_cinemas():
+                        for listing in cinema.get_listings().values():
+                            for show in listing.get_shows().values():
+                                for booking in show.get_bookings().values():
+                                    if int(bookingRef) == int(booking.get_booking_reference()):
+                                        self.__tree_view.insert('', tk.END, values=booking.as_list())
 
+            #Booking staff search 
+            else:
+                print("bstaff")
+                for listing in self.__cinema.get_listings().values():
+                    for show in listing.get_shows().values():
+                        for booking in show.get_bookings().values():
+                            if int(bookingRef) == int(booking.get_booking_reference()):
+                                self.__tree_view.insert('', tk.END, values=booking.as_list())
 
 
     def update_films_and_shows_based_on_date(self, btn_text, btn_command):
