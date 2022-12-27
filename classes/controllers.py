@@ -51,7 +51,6 @@ class Controller():
         seat_availability = False
 
         # For every listing in the cinema
-        print(show.get_show_id())
         if seat_type == "lower":
             print(show.get_available_lower_seats(), num_of_tickets)
             seat_availability = show.get_available_lower_seats() >= num_of_tickets
@@ -78,3 +77,7 @@ class Controller():
 
     def cancel_booking(self, booking_reference, show):
         self.__model.cancel_booking(booking_reference, show)
+
+    def add_show(self, listing_id, cinema, time):
+        if not self.__model.add_show(listing_id, cinema, time):
+            self.__view.show_error("no available screens")

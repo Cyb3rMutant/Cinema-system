@@ -17,4 +17,3 @@ class Booking_upper_hall(booking_lower_hall.Booking_lower_hall):
 
     def __del__(self):
         self._show.set_available_upper_seats(-self._number_of_seats)
-        print("done")

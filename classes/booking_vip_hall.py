@@ -17,4 +17,3 @@ class Booking_vip_hall(booking_upper_hall.Booking_upper_hall):
 
     def __del__(self):
         self._show.set_available_vip_seats(-self._number_of_seats)
-        print("done")

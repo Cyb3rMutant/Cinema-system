@@ -144,3 +144,33 @@ class Model():
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", show.get_bookings()[booking_reference].get_price()/2, booking_reference)
         show.cancel_booking(booking_reference)
+
+    def add_show(self, listing_id, cinema, time):
+        listing = cinema.get_listings()[listing_id]
+
+        duration = datetime.timedelta(
+            minutes=listing.get_film().get_duration()+30)
+
+        data = conn.select("SELECT b.`SCREEN_ID` FROM(SELECT s.`SCREEN_ID`, `SHOW_TIME`, COUNT(sh.`SCREEN_ID`) as cnt FROM screens s\
+                                LEFT JOIN shows sh ON s.`SCREEN_ID`=sh.`SCREEN_ID`\
+                                    WHERE `CINEMA_ID` = %s\
+                                        GROUP BY s.`SCREEN_ID`\
+                                            HAVING cnt < 4) as b\
+                                                WHERE `SHOW_TIME`\
+                                                    NOT BETWEEN ADDTIME(%s, '-00:30:00') and ADDTIME(%s, %s)", cinema.get_cinema_id(), time, time, duration)
+        print(data)
+        if not data:
+            return 0
+
+        screen_id = data[0]["SCREEN_ID"]
+        conn.insert(
+            "INSERT INTO shows(SHOW_TIME, SCREEN_ID, LISTING_ID) VALUES (%s, %s, %s);", time, screen_id, listing_id)
+
+        show_id = conn.select(
+            "SELECT MAX(SHOW_ID) as SHOW_ID FROM shows")[0]["SHOW_ID"]
+        print(show_id)
+        screen = cinema.get_screens()[screen_id]
+
+        listing.add_show(show_id, time, screen)
+
+        return 1

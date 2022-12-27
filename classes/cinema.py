@@ -1,6 +1,7 @@
 import listing
 import screen
 from dbfunc import conn
+import film_container
 import film
 
 
@@ -18,12 +19,12 @@ class Cinema(object):
         for s in screens:
             self.__screens[s["SCREEN_ID"]] = screen.Screen(
                 s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"], s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"], s["SCREEN_NUMBER"])
-        # print(self.__screens)
+
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema_id)
         for l in listings:
             self.__listings[l["LISTING_ID"]] = listing.Listing(
-                l["LISTING_ID"], l["LISTING_TIME"], l["FILM_TITLE"], self)
+                l["LISTING_ID"], l["LISTING_TIME"], film_container.Films.get_film(l["FILM_TITLE"]), self)
 
     def get_cinema_id(self):
         return self.__cinema_id
