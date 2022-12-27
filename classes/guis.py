@@ -190,16 +190,16 @@ class Main_frame(tk.Frame):
         if (isinstance(self.__user, Admin)):
 
             self.__city_options_label = tk.Label(
-                self.__app.body_frame, text="choose city: ").place(x=0, y=50)
+                self.__app.body_frame, text="choose city: ").place(x=10, y=30)
             self.__cinema_options_label = tk.Label(
-                self.__app.body_frame, text="choose cinema: ").place(x=300, y=50)
+                self.__app.body_frame, text="choose cinema: ").place(x=300, y=30)
 
             self.__city_choice = tk.StringVar()
             self.__city_choice.set(
                 list(self.__controller.get_cities().keys())[0])
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(),
                                                 command=lambda unused: (self.remove_create_stuff(),  self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__city_choice.get()), self.__show, str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])))  # When we change a city, we update its cinemas
-            self.__city_options.place(x=100, y=50)
+            self.__city_options.place(x=100, y=30)
 
             self.__cinema = self.__controller.get_cities(
             )[self.__city_choice.get()].get_cinemas()[0]
@@ -207,7 +207,7 @@ class Main_frame(tk.Frame):
             self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
                                                   self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__city_choice.get()), self.__show, str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])
-            self.__cinema_options.place(x=400, y=50)
+            self.__cinema_options.place(x=400, y=30)
 
         else:
             self.__city_choice = tk.StringVar()
@@ -216,15 +216,15 @@ class Main_frame(tk.Frame):
 
         # Standard labels
         self.__date_label = tk.Label(
-            self.__app.body_frame, text="Select Date").place(x=0, y=100)
+            self.__app.body_frame, text="Select Date").place(x=10, y=90)
         self.__select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film").place(x=0, y=150)
+            self.__app.body_frame, text="Select Film").place(x=10, y=150)
         self.__select_show_label = tk.Label(
-            self.__app.body_frame, text="Select Show").place(x=0, y=200)
+            self.__app.body_frame, text="Select Show").place(x=10, y=210)
         self.__select_seat_type = tk.Label(
-            self.__app.body_frame, text="Select Ticket Type").place(x=0, y=250)
+            self.__app.body_frame, text="Select Ticket Type").place(x=10, y=270)
         self.__select_num_of_seats = tk.Label(
-            self.__app.body_frame, text="Select # of Tickets").place(x=0, y=300)
+            self.__app.body_frame, text="Select # of Tickets").place(x=10, y=330)
 
         # Date
         self.__date_today = datetime.date.today()
@@ -247,11 +247,11 @@ class Main_frame(tk.Frame):
         self.__num_of_ticket_options = tk.Spinbox(
             self.__app.body_frame, textvariable=self.__num_of_ticket_choice, from_=1, to=5, width=5)
 
-        self.__date_entry.place(x=100, y=100)
-        self.__lower_hall.place(x=100, y=250)
-        self.__upper_hall.place(x=220, y=250)
-        self.__vip_hall.place(x=340, y=250)
-        self.__num_of_ticket_options.place(x=100, y=300)
+        self.__date_entry.place(x=100, y=90)
+        self.__lower_hall.place(x=120, y=270)
+        self.__upper_hall.place(x=240, y=270)
+        self.__vip_hall.place(x=360, y=270)
+        self.__num_of_ticket_options.place(x=120, y=330)
 
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
         self.__listings = []
@@ -295,7 +295,7 @@ class Main_frame(tk.Frame):
         self.__cinema_options.destroy()
         self.__cinema_options = tk.OptionMenu(
             self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[self.__city_choice.get()].get_cinemas(), command=func)
-        self.__cinema_options.place(x=400, y=50)
+        self.__cinema_options.place(x=400, y=30)
 
     def view_film_listings(self):
         self.clear_frame(self.__app.body_frame)
@@ -369,16 +369,16 @@ class Main_frame(tk.Frame):
         if (isinstance(self.__user, Admin)):
 
             self.__city_options_label = tk.Label(
-                self.__app.body_frame, text="choose city: ").place(x=0, y=50)
+                self.__app.body_frame, text="choose city: ").place(x=10, y=30)
             self.__cinema_options_label = tk.Label(
-                self.__app.body_frame, text="choose cinema: ").place(x=300, y=50)
+                self.__app.body_frame, text="choose cinema: ").place(x=300, y=30)
 
             self.__city_choice = tk.StringVar()
             self.__city_choice.set(
                 list(self.__controller.get_cities().keys())[0])
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities().keys(),
                                                 command=lambda unused: self.update_cinemas(lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview)]))  # When we change a city, we update its cinemas
-            self.__city_options.place(x=100, y=50)
+            self.__city_options.place(x=100, y=30)
 
             self.__cinema = self.__controller.get_cities(
             )[self.__city_choice.get()].get_cinemas()[0]
@@ -386,7 +386,7 @@ class Main_frame(tk.Frame):
             self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cities()[
                                                   self.__city_choice.get()].get_cinemas(), command=lambda cinema: [self.set_cinema(cinema), self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview)])
-            self.__cinema_options.place(x=400, y=50)
+            self.__cinema_options.place(x=400, y=30)
 
         else:
             self.__city_choice = tk.StringVar()
@@ -395,15 +395,15 @@ class Main_frame(tk.Frame):
 
         # Standard labels
         self.__date_label = tk.Label(
-            self.__app.body_frame, text="Select Date").place(x=0, y=100)
+            self.__app.body_frame, text="Select Date").place(x=10, y=90)
         self.__select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film").place(x=0, y=150)
+            self.__app.body_frame, text="Select Film").place(x=10, y=150)
         self.__select_show_label = tk.Label(
-            self.__app.body_frame, text="Select Show").place(x=0, y=200)
+            self.__app.body_frame, text="Select Show").place(x=10, y=210)
         self.__select_seat_type = tk.Label(
-            self.__app.body_frame, text="Select Ticket Type").place(x=0, y=250)
+            self.__app.body_frame, text="Select Ticket Type").place(x=10, y=270)
         self.__select_num_of_seats = tk.Label(
-            self.__app.body_frame, text="Select # of Tickets").place(x=0, y=300)
+            self.__app.body_frame, text="Select # of Tickets").place(x=10, y=330)
 
         # Date
         self.__date_today = datetime.date.today()
@@ -413,7 +413,7 @@ class Main_frame(tk.Frame):
         self.__selected_date.trace(
             'w', lambda *unused: self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview))
 
-        self.__date_entry.place(x=100, y=100)
+        self.__date_entry.place(x=100, y=90)
 
         # uncomment all the treeview code to see the frame bg
         self.__tree_frame = tk.Frame(
@@ -454,8 +454,8 @@ class Main_frame(tk.Frame):
 
         # Placing interactive widgets
         self.__film_options.place(x=100, y=150)
-        self.__show_options.place(x=100, y=200)
-        self.__btn.place(x=50, y=350)
+        self.__show_options.place(x=100, y=210)
+        self.__btn.place(x=50, y=390)
 
     def update_screens(self, cinema):
         print(cinema, type(cinema))
@@ -549,14 +549,14 @@ class Main_frame(tk.Frame):
             self.__date_entry.get_date(), self.__film_choice.get(), self.__city_choice.get(), self.get_id(self.__cinema_choice.get())))
         self.__login_button.place(x=612, y=460)
 
-        self.__city_options_lable.place(x=10, y=10)
-        self.__city_options.place(x=100, y=10)
-        self.__cinema_options_label.place(x=10, y=70)
-        self.__cinema_options.place(x=100, y=70)
-        self.__film_options_label.place(x=10, y=140)
-        self.__film_options.place(x=100, y=140)
-        self.__date_label.place(x=10, y=210)
-        self.__date_entry.place(x=100, y=210)
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=100, y=30)
+        self.__cinema_options_label.place(x=300, y=30)
+        self.__cinema_options.place(x=400, y=30)
+        self.__film_options_label.place(x=10, y=90)
+        self.__film_options.place(x=100, y=90)
+        self.__date_label.place(x=10, y=150)
+        self.__date_entry.place(x=100, y=150)
         # self.__screens_label.place(x=10, y=280)
         # self.__screens_box.place(x=100, y=280)
 
@@ -611,14 +611,14 @@ class Main_frame(tk.Frame):
             self.__city_choice.get(), self.get_id(self.__cinema_choice.get()), [int(id.get()) for id in self.__items if id != None]))
         self.__login_button.place(x=612, y=460)
 
-        self.__city_options_lable.place(x=10, y=10)
-        self.__city_options.place(x=100, y=10)
-        self.__cinema_options_label.place(x=10, y=70)
-        self.__cinema_options.place(x=100, y=70)
-        self.__date_label.place(x=10, y=210)
-        self.__date_entry.place(x=100, y=210)
-        self.__listings_label.place(x=10, y=280)
-        self.__listings_box.place(x=100, y=280)
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=100, y=30)
+        self.__cinema_options_label.place(x=300, y=30)
+        self.__cinema_options.place(x=400, y=30)
+        self.__date_label.place(x=10, y=90)
+        self.__date_entry.place(x=100, y=90)
+        self.__listings_label.place(x=10, y=150)
+        self.__listings_box.place(x=100, y=150)
 
     def update_listing(self):
         print("Update listing page opened")  # debugging
@@ -670,14 +670,14 @@ class Main_frame(tk.Frame):
 
         self.__login_button.place(x=612, y=460)
 
-        self.__city_options_lable.place(x=10, y=10)
-        self.__city_options.place(x=100, y=10)
-        self.__cinema_options_label.place(x=10, y=70)
-        self.__cinema_options.place(x=100, y=70)
-        self.__date_label.place(x=10, y=210)
-        self.__date_entry.place(x=100, y=210)
-        self.__listings_label.place(x=10, y=280)
-        self.__listings_box.place(x=100, y=280)
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=100, y=30)
+        self.__cinema_options_label.place(x=300, y=30)
+        self.__cinema_options.place(x=400, y=30)
+        self.__date_label.place(x=10, y=90)
+        self.__date_entry.place(x=100, y=90)
+        self.__listings_label.place(x=10, y=150)
+        self.__listings_box.place(x=100, y=150)
 
     # after they have selected a listing in (update listing) this lets them actually change the listings details
     def update_listing_details(self, listing_id, city, cinema):
@@ -696,7 +696,7 @@ class Main_frame(tk.Frame):
 
         # display current listing details
         self.__orignal_listing_label = tk.Label(
-            self.__app.body_frame, text=f'Original Listing Details: City: {city}, Cinema ID: {cinema},Film: {self.__original_film}, Date: {self.__original_date}', font=("Arial", 12))
+            self.__app.body_frame, text=f'Original Listing Details:\n City: {city}\n Cinema ID: {cinema}\n Film: {self.__original_film}\n Date: {self.__original_date}', font=("Arial", 12))
 
         # select film
         self.__film_choice = tk.StringVar()
@@ -722,11 +722,11 @@ class Main_frame(tk.Frame):
         # place buttons
         self.__login_button.place(x=612, y=460)
 
-        self.__film_options_label.place(x=10, y=140)
-        self.__film_options.place(x=100, y=140)
-        self.__date_label.place(x=10, y=210)
-        self.__date_entry.place(x=100, y=210)
-        self.__orignal_listing_label.place(x=290, y=100)
+        self.__film_options_label.place(x=10, y=30)
+        self.__film_options.place(x=100, y=30)
+        self.__date_label.place(x=10, y=90)
+        self.__date_entry.place(x=100, y=90)
+        self.__orignal_listing_label.place(x=500, y=30)
 
     def generate_report(self):
         self.clear_frame(self.__app.body_frame)
@@ -793,17 +793,17 @@ class Main_frame(tk.Frame):
 
         self.__login_button.place(x=612, y=460)
 
-        self.__city_options_lable.place(x=10, y=10)
-        self.__city_options.place(x=100, y=10)
-        self.__cinema_options_label.place(x=10, y=70)
-        self.__cinema_options.place(x=100, y=70)
-        self.__date_label.place(x=10, y=210)
-        self.__date_entry.place(x=100, y=210)
-        self.__listings_label.place(x=10, y=280)
-        self.__listings_box.place(x=100, y=280)
-        self.__time_label.place(x=10, y=400)
-        self.__hours_options.place(x=100, y=400)
-        self.__minutes_options.place(x=150, y=400)
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=100, y=30)
+        self.__cinema_options_label.place(x=300, y=30)
+        self.__cinema_options.place(x=400, y=30)
+        self.__date_label.place(x=10, y=90)
+        self.__date_entry.place(x=100, y=90)
+        self.__listings_label.place(x=10, y=150)
+        self.__listings_box.place(x=100, y=150)
+        self.__time_label.place(x=10, y=270)
+        self.__hours_options.place(x=100, y=270)
+        self.__minutes_options.place(x=150, y=270)
 
     def add_new_cinema(self):
         self.clear_frame(self.__app.body_frame)
@@ -830,12 +830,12 @@ class Main_frame(tk.Frame):
             self.__city_choice.get(), self.__cinema_address.get(), int(self.__number_of_screens.get())))
         self.__login_button.place(x=612, y=460)
 
-        self.__city_options_lable.place(x=10, y=10)
-        self.__city_options.place(x=100, y=10)
-        self.__cinema_address_lable.place(x=10, y=70)
-        self.__cinema_address.place(x=100, y=70)
-        self.__number_of_screens_lable.place(x=10, y=140)
-        self.__number_of_screens.place(x=100, y=140)
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=130, y=30)
+        self.__cinema_address_lable.place(x=10, y=90)
+        self.__cinema_address.place(x=130, y=90)
+        self.__number_of_screens_lable.place(x=10, y=150)
+        self.__number_of_screens.place(x=130, y=150)
 
     def add_new_city(self):
         self.clear_frame(self.__app.body_frame)
@@ -862,14 +862,14 @@ class Main_frame(tk.Frame):
             self.__city_name.get(), self.__city_morning_price.get(), self.__city_afternoon_price.get(), self.__city_evening_price.get()))
         self.__login_button.place(x=612, y=460)
 
-        self.__city_name_lable.place(x=10, y=10)
-        self.__city_name.place(x=100, y=10)
-        self.__city_morning_price_lable.place(x=10, y=70)
-        self.__city_morning_price.place(x=100, y=70)
-        self.__city_afternoon_price_lable.place(x=10, y=140)
-        self.__city_afternoon_price.place(x=100, y=140)
+        self.__city_name_lable.place(x=10, y=30)
+        self.__city_name.place(x=130, y=30)
+        self.__city_morning_price_lable.place(x=10, y=90)
+        self.__city_morning_price.place(x=130, y=90)
+        self.__city_afternoon_price_lable.place(x=10, y=150)
+        self.__city_afternoon_price.place(x=130, y=150)
         self.__city_evening_price_lable.place(x=10, y=210)
-        self.__city_evening_price.place(x=100, y=210)
+        self.__city_evening_price.place(x=130, y=210)
 
     def get_id(self, string):
         return int(re.search(r'\d+', string).group())
