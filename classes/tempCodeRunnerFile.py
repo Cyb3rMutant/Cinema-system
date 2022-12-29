@@ -1,1 +1,2 @@
-guis
+if '':
+    print("yes")

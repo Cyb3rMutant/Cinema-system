@@ -44,6 +44,9 @@ class Controller():
     def get_cities(self):
         return self.__model.get_cities()
 
+    def get_city(self, name=None):
+        return self.__model.get_city(name)
+
     def get_films(self):
         return self.__model.get_films()
 
@@ -72,8 +75,8 @@ class Controller():
         self.__model.add_booking(city, show, seat_type,
                                  num_of_tickets, "poop@gmail.com")
 
-    def get_city(self, cinema):
-        return self.__model.get_city(cinema)
+    def get_cinema_city(self, cinema):
+        return self.__model.get_cinema_city(cinema)
 
     def cancel_booking(self, booking_reference, show):
         self.__model.cancel_booking(booking_reference, show)
@@ -81,3 +84,6 @@ class Controller():
     def add_show(self, listing_id, cinema, time):
         if not self.__model.add_show(listing_id, cinema, time):
             self.__view.show_error("no available screens")
+
+    def get_booking(self, booking_ref):
+        return self.__model.get_booking(booking_ref)

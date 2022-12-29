@@ -10,7 +10,8 @@ class Booking_upper_hall(booking_lower_hall.Booking_lower_hall):
         show.set_available_upper_seats(number_of_seats)
 
     def calc_price(self, city_price):
-        return city_price+(booking_lower_hall.Booking_lower_hall.calc_price(self, city_price)*0.2)
+        b = booking_lower_hall.Booking_lower_hall.calc_price(self, city_price)
+        return b+b*0.2
 
     def as_list(self):
         return [self._booking_reference, self._number_of_seats, self._date_of_booking, self._price, self._show.get_show_id(), "upper", self._customer.get_email()]

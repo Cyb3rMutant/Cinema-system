@@ -76,7 +76,13 @@ class Model():
         self.__cities[city].add_cinema(cinema_id, address)
 
     def get_cities(self):
-        return self.__cities.get_cities()
+        return list(self.__cities.get_cities().keys())
+
+    def get_city(self, name=None):
+        if name:
+            return self.__cities[name]
+        else:
+            return self.get_cities()[0]
 
     def get_films(self):
         return self.__films.get_films()
@@ -134,13 +140,12 @@ class Model():
         elif time == "evening":
             return self.__cities[city].get_evening_price()
 
-    def get_city(self, cinema):
+    def get_cinema_city(self, cinema):
         for city in self.__cities.get_cities():
             if cinema in self.__cities[city].get_cinemas():
                 return city
 
     def cancel_booking(self, booking_reference, show):
-        booking = show.get_bookings()[booking_reference]
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", show.get_bookings()[booking_reference].get_price()/2, booking_reference)
         show.cancel_booking(booking_reference)
@@ -209,3 +214,20 @@ class Model():
         listing.add_show(show_id, time, screen)
 
         return 1
+
+    def get_booking(self, booking_ref):
+        data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                            FROM bookings b\
+                                LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                            WHERE\
+                                b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
+        print(data)
+        return self.__cities[
+            data["CITY_NAME"]][
+                data["CINEMA_ID"]].get_listings()[
+                    data["LISTING_ID"]].get_shows()[
+                        data["SHOW_ID"]].get_bookings()[
+                            data["BOOKING_REFERENCE"]]
