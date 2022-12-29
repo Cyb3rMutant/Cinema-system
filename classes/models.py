@@ -1,3 +1,4 @@
+from admin import Admin
 from dbfunc import conn
 from passlib.hash import sha256_crypt
 from user_factory import User_factory
@@ -215,15 +216,27 @@ class Model():
 
         return 1
 
-    def get_booking(self, booking_ref):
-        data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
-                            FROM bookings b\
-                                LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
-                                LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                                LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
-                                LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
-                            WHERE\
-                                b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
+    def get_booking(self, booking_ref,cinema_id, user):
+        if (isinstance(user, Admin)):
+            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                FROM bookings b\
+                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                WHERE\
+                                    b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
+
+        else:
+            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                FROM bookings b\
+                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                WHERE\
+                                    b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, cinema_id)[0]
+
         print(data)
         return self.__cities[
             data["CITY_NAME"]][

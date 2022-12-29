@@ -85,5 +85,5 @@ class Controller():
         if not self.__model.add_show(listing_id, cinema, time):
             self.__view.show_error("no available screens")
 
-    def get_booking(self, booking_ref):
-        return self.__model.get_booking(booking_ref)
+    def get_booking(self, booking_ref, cinema_id, user):
+        return self.__model.get_booking(booking_ref,cinema_id, user)

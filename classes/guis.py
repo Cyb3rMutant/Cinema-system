@@ -156,7 +156,7 @@ class Main_frame(tk.Frame):
         # optional
         self.search_entry = tk.Entry(self.__app.body_frame)
         self.search_btn = tk.Button(self.__app.body_frame, text='Search',
-                                    command=lambda: self.validate_search(self.search_entry.get()))
+                                    command=lambda: self.validate_search(self.search_entry.get(),"view"))
         self.search_btn.place(x=300, y=550)
         self.search_entry.place(x=100, y=550)
 
@@ -169,7 +169,7 @@ class Main_frame(tk.Frame):
                 self.view_bookings_treeview()
 
     # optional function
-    def validate_search(self, booking_ref):
+    def validate_search(self, booking_ref,page):
         try:
             booking_ref = int(booking_ref)
         except:
@@ -179,7 +179,9 @@ class Main_frame(tk.Frame):
         if len(str(booking_ref)) != 6:
             self.show_error("Not 6 integers")
             return
-        self.view_bookings_treeview(search=True, booking_ref=booking_ref)
+        if page == "view": self.view_bookings_treeview(search=True, booking_ref=booking_ref)
+        if page == "cancel": self.display_bookings_treeview(search=True, booking_ref=booking_ref)
+        
 
     def view_bookings_treeview(self, search=False, booking_ref=000000):
         try:
@@ -232,7 +234,7 @@ class Main_frame(tk.Frame):
         # optional
         if search == True:
             self.__tree_view.insert(
-                '', tk.END, values=self.__controller.get_booking(booking_ref).as_list())
+                '', tk.END, values=self.__controller.get_booking(booking_ref, self.__cinema.get_cinema_id(), self.__user).as_list())
 
     def update_films_and_shows_based_on_date(self, btn_text, btn_command):
         self.remove_create_stuff()
@@ -417,7 +419,7 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "View film listings"
 
-    def display_bookings_treeview(self):
+    def display_bookings_treeview(self,search=False,booking_ref=000000):
         try:
             self.__login_button.destroy()
         except:
@@ -461,6 +463,23 @@ class Main_frame(tk.Frame):
 
         self.__tree_view.bind('<<TreeviewSelect>>',
                               lambda unused: self.item_selected())
+
+
+
+        #SEARCH
+        if search == False:  # City selection search
+            print(booking_ref)
+            for listing in self.__cinema.get_listings().values():
+                for show in listing.get_shows().values():
+                    for data in self.__controller.get_bookings_as_list(show):
+                        self.__tree_view.insert('', tk.END, values=data)
+        # optional
+        if search == True:
+            self.__tree_view.insert(
+                '', tk.END, values=self.__controller.get_booking(booking_ref, self.__cinema.get_cinema_id(), self.__user).as_list())
+
+
+
 
         # generate sample data
         # add data to the treeview
@@ -509,6 +528,18 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_cinema_city(self.__cinema))
 
+
+
+        #search - not working for some reason doesnt place properly
+        self.search_entry = tk.Entry(self.__app.body_frame)
+        self.search_btn = tk.Button(self.__app.body_frame, text='Search',command=lambda: self.validate_search(self.search_entry.get(), "cancel"))
+
+        self.search_entry.place(x=100, y=550)
+        self.search_btn.place(x=300, y=550)
+
+
+
+
         # Standard labels
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date").place(x=10, y=90)
@@ -531,18 +562,12 @@ class Main_frame(tk.Frame):
 
         self.__date_entry.place(x=100, y=90)
 
-        # uncomment all the treeview code to see the frame bg
-        self.__tree_frame = tk.Frame(
-            self.__app.body_frame, width=700, height=400, bg='gainsboro')
+        self.__tree_frame = tk.Frame(self.__app.body_frame, width=700, height=400, bg='gainsboro')
         self.__tree_frame.place(x=300, y=200)
 
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
         self.__listings = []
-        # For every listing in the cinema
         for l in self.__cinema.get_listings().values():
-            # If the listings date is the same as date selected -> Add it to array for options menu
-            # if str(self.__film_choice.get()) != l.get_film().get_title():
-            #     continue
             if self.__date_entry.get_date() != l.get_date():
                 continue
 
@@ -551,7 +576,6 @@ class Main_frame(tk.Frame):
             self.__listings
             return 0
 
-        # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
         self.__film_choice = tk.StringVar()
         self.__film_choice.set(self.__listings[0])
         self.__film_options = tk.OptionMenu(
