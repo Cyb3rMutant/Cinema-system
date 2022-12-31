@@ -1,2 +1,1 @@
-if '':
-    print("yes")
+GE

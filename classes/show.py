@@ -71,6 +71,9 @@ class Show(object):
         booking = Booking_factory.get_booking_seat_hall(seat_hall)(
             booking_reference, self, number_of_seats, date_of_booking, price, customer)
         self.__bookings[booking_reference] = booking
+        if booking.check_seats():
+            del self.__bookings[booking_reference]
+            return 0
         return booking
 
     def cancel_booking(self, Booking_reference):
