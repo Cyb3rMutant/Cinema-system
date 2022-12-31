@@ -99,7 +99,7 @@ class Model():
 
         print("successfully done booking")
         print("booking info: ")
-        print(f'{booking_info.get_booking_reference()}\n{booking_info.get_number_of_seats()}\n{booking_info.get_date_of_booking()}\n{booking_info.get_price()}\n{self.__show.get_show_id()}\n{seat_type}\n{customer_email}\n')
+        print(f'booking reference:{booking_info.get_booking_reference()}\nnum_of_seats:{booking_info.get_number_of_seats()}\ndate_today:{booking_info.get_date_of_booking()}\nprice:{booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{seat_type}\ncust_email:{customer_email}\n')
 
     def remove_listing(self, listings):
         for id in listings:
@@ -229,18 +229,24 @@ class Model():
 
     def get_listings(self):
         listings = []
+        print(f'city_seleceted:{self.__city}')
+        print(f'cinema_selected{self.__cinema}')
         for l in list(self.__cinema.get_listings().values()):
             if l.get_date() == self.__date:
                 listings.append(l)
         return listings
 
     def get_listing(self, id=None):
-        if id:
+        if id != None:
             self.__listing = self.__cinema.get_listings()[id]
+            return self.__listing
         else:
-            self.__listing = list(self.__cinema.get_listings().values())[0]
-        print(self.__listing)
-        return self.__listing
+            for l in list(self.__cinema.get_listings().values()):
+                if str(l.get_date()) == str(self.__date):
+                    self.__listing = l                   
+                    return self.__listing
+            return 
+
 
     def get_shows(self):
         return self.__listing.get_shows().values()

@@ -235,9 +235,9 @@ class Main_frame(tk.Frame):
                 return
         except:
             pass
-        # Main. All above is just format
 
-        # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
+
+        self.__controller.set_date(str(self.__selected_date.get()))
         listing = self.__controller.get_listing()
         if not listing:
             return
@@ -280,12 +280,13 @@ class Main_frame(tk.Frame):
             self.__city_choice = tk.StringVar()
             self.__city_choice.set(
                 self.__controller.get_city())
-            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get()))))))  # When we change a city, we update its cinemas
+            self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), 
+            command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema:(self.__controller.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))))))  # When we change a city, we update its cinemas
+
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__controller.get_cinema())
+            self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(
                 cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])
             self.__cinema_options.place(x=400, y=30)
@@ -315,7 +316,7 @@ class Main_frame(tk.Frame):
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
             'w', lambda *unused: self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.add_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get()))))
-        self.__controller.set_date(str(datetime.date.today()))
+        self.__controller.set_date(str(self.__selected_date.get()))
 
         self.__seat_type_btn = tk.StringVar()
         self.__lower_hall = tk.Radiobutton(self.__app.body_frame, text="lower", value="lower",
@@ -866,7 +867,7 @@ class Main_frame(tk.Frame):
         return int(re.search(r'\d+', string).group())
 
     def remove_create_stuff(self):
-
+        self.__controller.set_date(str(self.__selected_date.get()))
         try:
             self.__film_options.destroy()
             self.__show_options.destroy()
@@ -874,11 +875,12 @@ class Main_frame(tk.Frame):
         except:
             pass
 
-    def update_cinemas(self, func=lambda: None):
-        self.__cinema_choice.set(self.__controller.get_cinema())
+    def update_cinemas(self, func):
+        self.remove_create_stuff()
+        self.__cinema_choice.set("choose cinema")
         self.__cinema_options.destroy()
         self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), func()))
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=func)
         self.__cinema_options.place(x=400, y=30)
 
     def update_listings_many(self):
