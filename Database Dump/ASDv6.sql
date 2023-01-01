@@ -1,3 +1,5 @@
+create database HC3;
+use HC3;
 -- MariaDB dump 10.19  Distrib 10.9.4-MariaDB, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: HC

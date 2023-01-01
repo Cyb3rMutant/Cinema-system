@@ -63,12 +63,23 @@ class Model():
                     bookings.append(b.as_list())
         return bookings
 
-    def get_all_listings_as_list(self):
+    def get_cinema_listings_as_list(self):
         listings = []
         for l in self.__cinema.get_listings().values():
             listings.append(l.as_list())
         return listings
 
+    def get_shows_for_listing(self, listing_id):
+        data = conn.select("SELECT `SHOW_ID`, `SHOW_TIME`, `SCREEN_ID` FROM shows WHERE LISTING_ID = %s;", listing_id) #quick way of doing it
+        try:
+            sh_list = []
+            for sh in data:
+                sh_list.append([sh["SHOW_ID"], sh["SHOW_TIME"], sh["SCREEN_ID"]])
+            return sh_list
+        except:
+            print("no shows airing for listing")
+
+            
     def max_shows(self):
         data = conn.select("SELECT COUNT(s.`SHOW_ID`) as c FROM shows s\
                                 LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
@@ -223,23 +234,6 @@ class Model():
         return 1
 
     def get_booking(self, booking_ref):
-        data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
-                            FROM bookings b\
-                                LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
-                                LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                                LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
-                                LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
-                            WHERE\
-                                b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
-        print(data)
-        return self.__cities[
-            data["CITY_NAME"]][
-                data["CINEMA_ID"]].get_listings()[
-                    data["LISTING_ID"]].get_shows()[
-                        data["SHOW_ID"]].get_bookings()[
-                            data["BOOKING_REFERENCE"]]
-
-    def get_booking_roh_tree(self, booking_ref):
         if (isinstance(self.__user, Admin)):
             data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
                                 FROM bookings b\

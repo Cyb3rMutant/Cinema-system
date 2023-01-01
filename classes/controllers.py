@@ -28,8 +28,6 @@ class Controller():
     def get_all_bookings_as_list(self):
         return self.__model.get_all_bookings_as_list()
 
-    def get_all_listings_as_list(self):
-        return self.__model.get_all_listings_as_list()
 
     def max_shows(self):
         return self.__model.max_shows()
@@ -80,9 +78,6 @@ class Controller():
     def get_booking(self, booking_ref):
         return self.__model.get_booking(booking_ref)
 
-    def get_booking_roh_tree(self, booking_ref):
-        return self.__model.get_booking_roh_tree(booking_ref)
-
     def get_cities(self):
         return self.__model.get_cities()
 
@@ -106,6 +101,14 @@ class Controller():
 
     def get_show(self, id=None):
         return self.__model.get_show(id)
+
+
+    def get_cinema_listings_as_list(self):
+        return self.__model.get_cinema_listings_as_list()
+
+    def get_shows_for_listing(self, listing_id):
+        return self.__model.get_shows_for_listing(listing_id)
+
 
     def set_city(self, city):
         return self.__model.set_city(city)
