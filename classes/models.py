@@ -70,16 +70,18 @@ class Model():
         return listings
 
     def get_shows_for_listing(self, listing_id):
-        data = conn.select("SELECT `SHOW_ID`, `SHOW_TIME`, `SCREEN_ID` FROM shows WHERE LISTING_ID = %s;", listing_id) #quick way of doing it
+        # quick way of doing it
+        data = conn.select(
+            "SELECT `SHOW_ID`, `SHOW_TIME`, `SCREEN_ID` FROM shows WHERE LISTING_ID = %s;", listing_id)
         try:
             sh_list = []
             for sh in data:
-                sh_list.append([sh["SHOW_ID"], sh["SHOW_TIME"], sh["SCREEN_ID"]])
+                sh_list.append(
+                    [sh["SHOW_ID"], sh["SHOW_TIME"], sh["SCREEN_ID"]])
             return sh_list
         except:
             print("no shows airing for listing")
 
-            
     def max_shows(self):
         data = conn.select("SELECT COUNT(s.`SHOW_ID`) as c FROM shows s\
                                 LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
@@ -187,13 +189,13 @@ class Model():
 
     def cancel_booking(self, booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date):
         b = self.__show.get_bookings()[booking_reference]
-
-        if b.get_show().get_listing().get_date()-datetime.date.today() <= 1:
+        timedelta = b.get_show().get_listing().get_date()-datetime.date.today()
+        if (timedelta.days) <= 0:
             return -2
 
         data = conn.select(
-            "SELECT CARD_ENDING_DIGITS FROM bookings b LEFT JOIN customers c ON b.`CUSTOMER_EMAIL`=c.`CUSTOMER_EMAIL`\
-                WHERE CUSTOMER_EMAIL=%S;", customer_email)
+            "SELECT `CARD_ENDING_DIGITS` FROM bookings b LEFT JOIN customers c ON b.`CUSTOMER_EMAIL`=c.`CUSTOMER_EMAIL`\
+                WHERE c.`CUSTOMER_EMAIL`=%s;", customer_email)
 
         if not data:
             return -1
