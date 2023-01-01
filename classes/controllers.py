@@ -28,7 +28,6 @@ class Controller():
     def get_all_bookings_as_list(self):
         return self.__model.get_all_bookings_as_list()
 
-
     def max_shows(self):
         return self.__model.max_shows()
 
@@ -74,11 +73,13 @@ class Controller():
     def cancel_booking(self, booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date):
         match (self.__model.cancel_booking(booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date)):
             case -2:
-                self.__model.show_error("Unable to cancel, show is tomorrow")
+                self.__view.show_error("Unable to cancel, show is tomorrow")
             case -1:
-                self.__model.show_error("")
+                self.__view.show_error("email does not match any records")
             case 0:
-                self.__model.show_error("")
+                self.__view.show_error("card info is incorrect")
+            case _:
+                self.__view.show_info("booking cancelled")
 
     def add_show(self, time):
         if not self.__model.add_show(time):
@@ -111,15 +112,17 @@ class Controller():
     def get_show(self, id=None):
         return self.__model.get_show(id)
 
+<<<<<<< HEAD
     def clear_data(self):
         return self.__model.clear_data()
 
+=======
+>>>>>>> bb12e69bcecd035882db94719296c759c7b1b0ec
     def get_cinema_listings_as_list(self):
         return self.__model.get_cinema_listings_as_list()
 
     def get_shows_for_listing(self, listing_id):
         return self.__model.get_shows_for_listing(listing_id)
-
 
     def set_city(self, city):
         return self.__model.set_city(city)

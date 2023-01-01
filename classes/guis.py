@@ -433,7 +433,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-            command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema:(self.__controller.set_cinema(cinema)))))  # When we change a city, we update its cinemas
+                                                command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))  # When we change a city, we update its cinemas
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
@@ -471,10 +471,12 @@ class Main_frame(tk.Frame):
         yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
 
         # Tree headings
-        self.__tree_view.heading("listing_id", text="listing_id", anchor=tk.CENTER)
-        self.__tree_view.heading("listing_time", text="listing_time", anchor=tk.CENTER)
-        self.__tree_view.heading("film_title", text="film_title", anchor=tk.CENTER)
-
+        self.__tree_view.heading(
+            "listing_id", text="listing_id", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "listing_time", text="listing_time", anchor=tk.CENTER)
+        self.__tree_view.heading(
+            "film_title", text="film_title", anchor=tk.CENTER)
 
         # Null column to prevent overflow of large size column (disablet o test)
         self.__tree_view.column("#0", width=0,  stretch=tk.NO)
@@ -482,38 +484,42 @@ class Main_frame(tk.Frame):
         self.__tree_view.column("listing_time", anchor=tk.CENTER, width=310)
         self.__tree_view.column("film_title", anchor=tk.CENTER, width=310)
 
-        self.__tree_view.bind('<<TreeviewSelect>>', lambda unused: self.item_selected_listings())
+        self.__tree_view.bind('<<TreeviewSelect>>',
+                              lambda unused: self.item_selected_listings())
 
-        #Going to insert view listings data here
+        # Going to insert view listings data here
         for data in self.__controller.get_cinema_listings_as_list():
             self.__tree_view.insert('', tk.END, values=data)
 
+    # On select- print its show times for the listing selected as a label or any other way
 
-   
-    #On select- print its show times for the listing selected as a label or any other way
     def item_selected_listings(self):
-        record = self.__tree_view.item(self.__tree_view.selection()[0])["values"] #Selected record
+        record = self.__tree_view.item(self.__tree_view.selection()[0])[
+            "values"]  # Selected record
         show_data = self.__controller.get_shows_for_listing(record[0])
-        
-        self.__show_tree_frame = tk.Frame(self.__app.body_frame,width=300, height=300, bg='gainsboro')
+
+        self.__show_tree_frame = tk.Frame(
+            self.__app.body_frame, width=300, height=300, bg='gainsboro')
         self.__show_tree_frame.place(x=900, y=400)
 
         self.__show_tree_view = ttk.Treeview(
             self.__show_tree_frame, selectmode="extended", columns=("show_id", "show_time", "screen_id"))
         self.__show_tree_view.grid(row=0, column=0)
 
-        self.__show_tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
-        self.__show_tree_view.heading("show_time", text="show_time", anchor=tk.CENTER)
-        self.__show_tree_view.heading("screen_id", text="screen_id", anchor=tk.CENTER)
-
+        self.__show_tree_view.heading(
+            "show_id", text="show_id", anchor=tk.CENTER)
+        self.__show_tree_view.heading(
+            "show_time", text="show_time", anchor=tk.CENTER)
+        self.__show_tree_view.heading(
+            "screen_id", text="screen_id", anchor=tk.CENTER)
 
         self.__show_tree_view.column("#0", width=0,  stretch=tk.NO)
         self.__show_tree_view.column("show_id", anchor=tk.CENTER, width=100)
         self.__show_tree_view.column("show_time", anchor=tk.CENTER, width=100)
-        self.__show_tree_view.column("screen_id", anchor=tk.CENTER, width=100)        
+        self.__show_tree_view.column("screen_id", anchor=tk.CENTER, width=100)
 
         for data in show_data:
-            self.__show_tree_view.insert('', tk.END, values=data)   
+            self.__show_tree_view.insert('', tk.END, values=data)
 
     def display_bookings_treeview(self, search=False, booking_ref=000000):
         try:
@@ -663,8 +669,8 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="expiry date: ")
         self.__expiry_date = tk.Entry(self.__app.body_frame)
 
-        self.__customer_email_lable.place(x=730-60, y=500)
-        self.__customer_email.place(x=850-60, y=500)
+        self.__customer_email_lable.place(x=450, y=500)
+        self.__customer_email.place(x=570, y=500)
         self.__name_on_card_lable.place(x=730, y=500)
         self.__name_on_card.place(x=850, y=500)
         self.__card_number_lable.place(x=730, y=600)
