@@ -68,8 +68,14 @@ class Controller():
     def get_cinema_city(self):
         return self.__model.get_cinema_city()
 
-    def cancel_booking(self, booking_reference):
-        self.__model.cancel_booking(booking_reference)
+    def cancel_booking(self, booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date):
+        match (self.__model.cancel_booking(booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date)):
+            case -2:
+                self.__model.show_error("Unable to cancel, show is tomorrow")
+            case -1:
+                self.__model.show_error("")
+            case 0:
+                self.__model.show_error("")
 
     def add_show(self, time):
         if not self.__model.add_show(time):
