@@ -205,7 +205,7 @@ class Model():
         b.get_customer().set_payment(Payment(name_on_card, card_number, cvv, expiry_date))
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", self.__show.get_bookings()[booking_reference].get_price()/2, booking_reference)
-        b.get_customer().get_payment().refund(b.get_price())
+        b.get_customer().get_payment().refund(b.get_price()/2)
         self.__show.cancel_booking(booking_reference)
 
     def add_show(self, time):
