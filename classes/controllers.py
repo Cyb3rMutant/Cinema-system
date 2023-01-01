@@ -51,7 +51,7 @@ class Controller():
 
         ret = self.__model.add_booking(seat_type,
                                        num_of_tickets, "poop@gmail.com")
-
+        
         if ret == 0:
             self.__view.show_error("no seat type selected")
         elif (ret == -1):
@@ -71,6 +71,9 @@ class Controller():
 
     def get_booking(self, booking_ref):
         return self.__model.get_booking(booking_ref)
+
+    def get_booking_roh_tree(self, booking_ref, user):
+        return self.__model.get_booking_roh_tree(booking_ref, user)
 
     def get_cities(self):
         return self.__model.get_cities()

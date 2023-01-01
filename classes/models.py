@@ -1,4 +1,5 @@
 from dbfunc import conn
+from admin import Admin
 from passlib.hash import sha256_crypt
 from user_factory import User_factory
 from city_container import Cities
@@ -54,7 +55,8 @@ class Model():
 
     def get_all_bookings_as_list(self):
         bookings = []
-        for l in self.get_listings():
+        print(self.__cinema)
+        for l in self.__cinema.get_listings().values():
             for s in l.get_shows().values():
                 for b in s.get_bookings().values():
                     bookings.append(b.as_list())
@@ -206,6 +208,43 @@ class Model():
                     data["LISTING_ID"]].get_shows()[
                         data["SHOW_ID"]].get_bookings()[
                             data["BOOKING_REFERENCE"]]
+
+
+
+
+    def get_booking_roh_tree(self, booking_ref, user):
+        if (isinstance(user, Admin)):
+            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                FROM bookings b\
+                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                WHERE\
+                                    b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
+
+        else:
+            cinema_id = conn.select("SELECT CINEMA_ID FROM users WHERE USER_NAME = %s",user.get_name()) #get cinema id here
+            cinema_id = cinema_id[0]['CINEMA_ID']
+                
+            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                FROM bookings b\
+                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                WHERE\
+                                    b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, cinema_id)[0]
+
+        print(data)
+        return self.__cities[
+            data["CITY_NAME"]][
+                data["CINEMA_ID"]].get_listings()[
+                    data["LISTING_ID"]].get_shows()[
+                        data["SHOW_ID"]].get_bookings()[
+                            data["BOOKING_REFERENCE"]]
+
+
 
     def get_cities(self):
         return self.__cities.get_cities().values()
