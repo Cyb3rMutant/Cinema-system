@@ -347,3 +347,8 @@ class Model():
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
         self.__date = date.date()
         print(self.__date, type(self.__date))
+
+
+    def clear_data(self):
+        self.__city = None
+        self.__cinema = None

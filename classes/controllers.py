@@ -42,7 +42,10 @@ class Controller():
     def remove_listing(self, listings):
         self.__model.remove_listing(listings)
 
-    def add_listing(self, film):
+    def add_listing(self, film,cinema):
+        if cinema == "choose cinema":
+            self.__view.show_error("CHOOSE CINEMA IS SELECTED")
+            return 
         self.__model.add_listing(film)
 
     def update_listing(self, film):
@@ -108,6 +111,8 @@ class Controller():
     def get_show(self, id=None):
         return self.__model.get_show(id)
 
+    def clear_data(self):
+        return self.__model.clear_data()
 
     def get_cinema_listings_as_list(self):
         return self.__model.get_cinema_listings_as_list()
