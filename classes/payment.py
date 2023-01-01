@@ -24,3 +24,9 @@ class Payment(object):
 
     def get_cvv(self):
         return self._cvv
+
+    def pay(self, amount):
+        print(f"payment of {amount} complete")
+
+    def refund(self, amount):
+        print(f"refund of {amount} complete")

@@ -80,4 +80,5 @@ class Show(object):
         del self.__bookings[Booking_reference]
 
     def __str__(self):
+        print(self.__time)
         return str(self.__time)

@@ -48,6 +48,9 @@ class Booking():
     def get_seat_type(self):
         return self.__class__.seat_type
 
+    def set_customer(self, customer):
+        self._customer = customer
+
     def calc_price(self, city_price):
         pass
 

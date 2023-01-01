@@ -28,6 +28,12 @@ class Controller():
     def get_all_bookings_as_list(self):
         return self.__model.get_all_bookings_as_list()
 
+    def get_all_listings_as_list(self):
+        return self.__model.get_all_listings_as_list()
+
+    def max_shows(self):
+        return self.__model.max_shows()
+
     def add_city(self, name, morning_price, afternoon_price, evening_price):
         self.__model.add_city(name, morning_price,
                               afternoon_price, evening_price)
@@ -47,17 +53,19 @@ class Controller():
     def get_films(self):
         return self.__model.get_films()
 
-    def add_booking(self, seat_type, num_of_tickets):
-
-        ret = self.__model.add_booking(seat_type,
-                                       num_of_tickets, "poop@gmail.com")
-        
-        if ret == 0:
+    def validate_booking(self, seat_type, num_of_tickets):
+        ret = self.__model.validate_booking(seat_type, num_of_tickets)
+        if ret == -1:
             self.__view.show_error("no seat type selected")
-        elif (ret == -1):
+        elif (ret == 0):
             self.__view.show_error("no available seats")
         else:
-            self.__view.show_info("booking success")
+            self.__view.show_info("seats available")
+            self.__view.book_now(
+                ret.as_list(), ret.get_ticket(), ret.get_receipt())
+
+    def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
+        return self.__model.add_booking(customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date)
 
     def get_cinema_city(self):
         return self.__model.get_cinema_city()
@@ -72,8 +80,8 @@ class Controller():
     def get_booking(self, booking_ref):
         return self.__model.get_booking(booking_ref)
 
-    def get_booking_roh_tree(self, booking_ref, user):
-        return self.__model.get_booking_roh_tree(booking_ref, user)
+    def get_booking_roh_tree(self, booking_ref):
+        return self.__model.get_booking_roh_tree(booking_ref)
 
     def get_cities(self):
         return self.__model.get_cities()

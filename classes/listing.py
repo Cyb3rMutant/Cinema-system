@@ -58,3 +58,7 @@ class Listing(object):
 
     def __str__(self):
         return f"listing_id: {self.__listing_id} date: {self.__date} film: {self.__film}"
+
+    def as_list(self):
+        print(self.__shows)
+        return [self.__listing_id, self.__date, self.__film, "\n".join([str(s) for s in self.__shows.values()])]

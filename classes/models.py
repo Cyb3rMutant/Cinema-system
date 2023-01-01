@@ -8,6 +8,7 @@ from city import City
 from film import Film
 import datetime
 from customer import Customer
+from payment import Payment
 import random
 
 
@@ -40,10 +41,10 @@ class Model():
         if (sha256_crypt.verify(password, hash)):
             cinema = self.__cities[data["CITY_NAME"]][data["CINEMA_ID"]]
 
-            user = User_factory.get_user_type(data["USER_TYPE"])(
+            self.__user = User_factory.get_user_type(data["USER_TYPE"])(
                 data["USER_NAME"], data["USER_ID"], cinema)
 
-            return user
+            return self.__user
         else:
             return 0
 
@@ -61,6 +62,22 @@ class Model():
                 for b in s.get_bookings().values():
                     bookings.append(b.as_list())
         return bookings
+
+    def get_all_listings_as_list(self):
+        listings = []
+        for l in self.__cinema.get_listings().values():
+            listings.append(l.as_list())
+        return listings
+
+    def max_shows(self):
+        data = conn.select("SELECT COUNT(s.`SHOW_ID`) as c FROM shows s\
+                                LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                            WHERE l.`CINEMA_ID` = %s\
+                            GROUP BY s.`LISTING_ID` ORDER BY c DESC LIMIT 1", self.__cinema.get_cinema_id())
+        if not data:
+            return 1
+        else:
+            return data[0]["c"]
 
     def add_city(self, city_name, morning_price, afternoon_price, evening_price):
         conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
@@ -84,7 +101,7 @@ class Model():
     def get_films(self):
         return self.__films.get_films()
 
-    def add_booking(self, seat_type, num_of_tickets, customer_email):
+    def validate_booking(self, seat_type, num_of_tickets):
         if not seat_type:
             return -1
 
@@ -92,16 +109,29 @@ class Model():
 
         city_price = self.get_city_price()
 
-        booking_info = self.__show.add_booking(booking_reference, seat_type, num_of_tickets,
-                                               datetime.date.today(), city_price, Customer("Someone", "798405324542", customer_email))
-        if not booking_info:
+        self.__booking_info = self.__show.add_booking(booking_reference, seat_type, num_of_tickets,
+                                                      datetime.date.today(), city_price, None)
+        if not self.__booking_info:
             return 0
-        conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL) VALUES (%s, %s, %s, %s, %s, %s, %s);",
-                    booking_info.get_booking_reference(), booking_info.get_number_of_seats(), booking_info.get_date_of_booking(), booking_info.get_price(), self.__show.get_show_id(), seat_type, customer_email)
+
+        return self.__booking_info
+
+    def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
+        self.__booking_info.set_customer(Customer(customer_name, customer_phone, customer_email, Payment(
+            name_on_card, card_number, expiry_date, cvv)))
+
+        conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
+                    customer_email, customer_name, customer_phone, card_number[-4])
+
+        conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+                    self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
+
+        self.__booking_info.get_customer().get_payment().pay(
+            self.__booking_info.get_price())
 
         print("successfully done booking")
         print("booking info: ")
-        print(f'booking reference:{booking_info.get_booking_reference()}\nnum_of_seats:{booking_info.get_number_of_seats()}\ndate_today:{booking_info.get_date_of_booking()}\nprice:{booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{seat_type}\ncust_email:{customer_email}\n')
+        print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
 
     def remove_listing(self, listings):
         for id in listings:
@@ -209,11 +239,8 @@ class Model():
                         data["SHOW_ID"]].get_bookings()[
                             data["BOOKING_REFERENCE"]]
 
-
-
-
-    def get_booking_roh_tree(self, booking_ref, user):
-        if (isinstance(user, Admin)):
+    def get_booking_roh_tree(self, booking_ref):
+        if (isinstance(self.__user, Admin)):
             data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
                                 FROM bookings b\
                                     LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
@@ -224,9 +251,7 @@ class Model():
                                     b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
 
         else:
-            cinema_id = conn.select("SELECT CINEMA_ID FROM users WHERE USER_NAME = %s",user.get_name()) #get cinema id here
-            cinema_id = cinema_id[0]['CINEMA_ID']
-                
+
             data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
                                 FROM bookings b\
                                     LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
@@ -234,7 +259,7 @@ class Model():
                                     LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
                                     LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
                                 WHERE\
-                                    b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, cinema_id)[0]
+                                    b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, self.__user.get_branch().get_cinema_id())[0]
 
         print(data)
         return self.__cities[
@@ -243,8 +268,6 @@ class Model():
                     data["LISTING_ID"]].get_shows()[
                         data["SHOW_ID"]].get_bookings()[
                             data["BOOKING_REFERENCE"]]
-
-
 
     def get_cities(self):
         return self.__cities.get_cities().values()
@@ -282,10 +305,9 @@ class Model():
         else:
             for l in list(self.__cinema.get_listings().values()):
                 if str(l.get_date()) == str(self.__date):
-                    self.__listing = l                   
+                    self.__listing = l
                     return self.__listing
-            return 
-
+            return
 
     def get_shows(self):
         return self.__listing.get_shows().values()

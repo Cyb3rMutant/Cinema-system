@@ -3,7 +3,7 @@ from dbfunc import conn
 
 
 class Customer(object):
-    def __init__(self, name, phone, email):
+    def __init__(self, name, phone, email, payment=None):
 
         self.__name = name
 
@@ -11,11 +11,7 @@ class Customer(object):
 
         self.__email = email
 
-        # payment = conn.select(
-        #     "SELECT * FROM PAYMENTS WHERE CUSTOMER_EMAIL=%s", (self.__email,))
-
-        # self.__payment = payment.Payment(
-        #     payment[0], payment[1], payment[2], payment[3])
+        self.__payment = payment
 
     def get_name(self):
         return self.__name
@@ -25,3 +21,9 @@ class Customer(object):
 
     def get_email(self):
         return self.__email
+
+    def get_payment(self):
+        return self.__payment
+
+    def set_payment(self, payment):
+        self.__payment = payment
