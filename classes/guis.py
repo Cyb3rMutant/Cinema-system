@@ -187,7 +187,7 @@ class Main_frame(tk.Frame):
 
         ttk.Style().configure('Treeview', rowheight=20)
         self.__tree_view = ttk.Treeview(
-            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type", "cust_email"))
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type"))
         self.__tree_view.grid(row=0, column=0)
         xscrollbar.configure(command=self.__tree_view.xview)
         yscrollbar.configure(command=self.__tree_view.yview)
@@ -205,8 +205,6 @@ class Main_frame(tk.Frame):
         self.__tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
         self.__tree_view.heading(
             "seat_type", text="seat_type", anchor=tk.CENTER)
-        self.__tree_view.heading(
-            "cust_email", text="cust_email", anchor=tk.CENTER)
 
         # Null column to prevent overflow of large size column (disablet o test)
         self.__tree_view.column("#0", width=0,  stretch=tk.NO)
@@ -216,7 +214,6 @@ class Main_frame(tk.Frame):
         self.__tree_view.column("price", anchor=tk.CENTER, width=140)
         self.__tree_view.column("show_id", anchor=tk.CENTER, width=140)
         self.__tree_view.column("seat_type", anchor=tk.CENTER, width=140)
-        self.__tree_view.column("cust_email", anchor=tk.CENTER, width=140)
 
         if search == False:  # City selection search
             print(booking_ref)
@@ -241,11 +238,8 @@ class Main_frame(tk.Frame):
             pass
 
         self.__controller.set_date(str(self.__selected_date.get()))
-        listing = self.__controller.get_listing()
-        if not listing:
-            return
         self.__film_choice = tk.StringVar()
-        self.__film_choice.set(listing)
+        self.__film_choice.set(self.__controller.get_listing())
         self.__film_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
 
@@ -343,11 +337,8 @@ class Main_frame(tk.Frame):
         # Films - Gets all listing titles (film titles) based on the date selected. Only here for first loadup of page, as after the first load whenever date is changed it goes to function
 
         # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
-        listing = self.__controller.get_listing()
-        if not listing:
-            return
         self.__film_choice = tk.StringVar()
-        self.__film_choice.set(listing)
+        self.__film_choice.set(self.__controller.get_listing())
         self.__film_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
 
@@ -519,7 +510,7 @@ class Main_frame(tk.Frame):
 
         ttk.Style().configure('Treeview', rowheight=20)
         self.__tree_view = ttk.Treeview(
-            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type", "cust_email"))
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type"))
         self.__tree_view.grid(row=0, column=0)
         xscrollbar.configure(command=self.__tree_view.xview)
         yscrollbar.configure(command=self.__tree_view.yview)
@@ -537,8 +528,6 @@ class Main_frame(tk.Frame):
         self.__tree_view.heading("show_id", text="show_id", anchor=tk.CENTER)
         self.__tree_view.heading(
             "seat_type", text="seat_type", anchor=tk.CENTER)
-        self.__tree_view.heading(
-            "cust_email", text="cust_email", anchor=tk.CENTER)
 
         # Null column to prevent overflow of large size column (disablet o test)
         self.__tree_view.column("#0", width=0,  stretch=tk.NO)
@@ -548,7 +537,6 @@ class Main_frame(tk.Frame):
         self.__tree_view.column("price", anchor=tk.CENTER, width=140)
         self.__tree_view.column("show_id", anchor=tk.CENTER, width=140)
         self.__tree_view.column("seat_type", anchor=tk.CENTER, width=140)
-        self.__tree_view.column("cust_email", anchor=tk.CENTER, width=140)
 
         self.__tree_view.bind('<<TreeviewSelect>>',
                               lambda unused: self.item_selected())
@@ -568,7 +556,7 @@ class Main_frame(tk.Frame):
             self.__tree_view.selection()[0])["values"]
 
         self.__login_button = tk.Button(self.__app.body_frame, text='cancel booking', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: (self.__controller.cancel_booking(str(record[0])), self.display_bookings_treeview()))
+            "Arial", 18), command=lambda: (self.__controller.cancel_booking(str(record[0]), self.__customer_email.get(), self.__name_on_card.get(), self.__card_number.get(), self.__cvv.get(), self.__expiry_date.get()), self.display_bookings_treeview()))
         self.__login_button.place(x=212, y=560)
 
     def cancel_booking(self):
@@ -638,9 +626,38 @@ class Main_frame(tk.Frame):
         self.__btn = tk.Button(
             self.__app.body_frame, text='refresh', command=self.display_bookings_treeview)
 
+        self.__customer_email_lable = tk.Label(
+            self.__app.body_frame, text="customer email: ")
+        self.__customer_email = tk.Entry(self.__app.body_frame)
+
+        self.__name_on_card_lable = tk.Label(
+            self.__app.body_frame, text="name on card: ")
+        self.__name_on_card = tk.Entry(self.__app.body_frame)
+
+        self.__card_number_lable = tk.Label(
+            self.__app.body_frame, text="card number: ")
+        self.__card_number = tk.Entry(self.__app.body_frame)
+
+        self.__cvv_lable = tk.Label(
+            self.__app.body_frame, text="cvv: ")
+        self.__cvv = tk.Entry(self.__app.body_frame)
+
+        self.__expiry_date_lable = tk.Label(
+            self.__app.body_frame, text="expiry date: ")
+        self.__expiry_date = tk.Entry(self.__app.body_frame)
+
+        self.__customer_email_lable.place(x=730-60, y=500)
+        self.__customer_email.place(x=850-60, y=500)
+        self.__name_on_card_lable.place(x=730, y=500)
+        self.__name_on_card.place(x=850, y=500)
+        self.__card_number_lable.place(x=730, y=600)
+        self.__card_number.place(x=850, y=600)
+        self.__cvv_lable.place(x=1010, y=500)
+        self.__cvv.place(x=1130, y=500)
+        self.__expiry_date_lable.place(x=1010, y=600)
+        self.__expiry_date.place(x=1130, y=600)
+
         # Placing interactive widgets
-        self.__film_options.place(x=100, y=150)
-        self.__show_options.place(x=100, y=210)
         self.__btn.place(x=50, y=390)
 
     def add_listing(self):
@@ -763,7 +780,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(
-        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cienma(cinema), self.update_listings_one()))))
+        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
@@ -871,7 +888,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
-            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cienma(cinema), self.update_listings_one()))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
 
         # cinema
         self.__cinema_choice = tk.StringVar()

@@ -17,7 +17,7 @@ class Booking_vip_hall(booking_upper_hall.Booking_upper_hall):
         return self._show.get_available_vip_seats() < 0
 
     def as_list(self):
-        return [self._booking_reference, self._number_of_seats, self._date_of_booking, self._price, self._show.get_show_id(), "vip", self._customer.get_email()]
+        return [self._booking_reference, self._number_of_seats, self._date_of_booking, self._price, self._show.get_show_id(), "vip"]
 
     def __del__(self):
         self._show.set_available_vip_seats(-self._number_of_seats)

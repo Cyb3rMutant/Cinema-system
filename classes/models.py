@@ -121,7 +121,7 @@ class Model():
             name_on_card, card_number, expiry_date, cvv)))
 
         conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
-                    customer_email, customer_name, customer_phone, card_number[-4])
+                    customer_email, customer_name, customer_phone, card_number[-4:])
 
         conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
                     self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
@@ -174,9 +174,25 @@ class Model():
         self.__city = self.__cities[city_name]
         return self.__city
 
-    def cancel_booking(self, booking_reference):
+    def cancel_booking(self, booking_reference, customer_email, name_on_card, card_number, cvv, expiry_date):
+        b = self.__show.get_bookings()[booking_reference]
+
+        if b.get_show().get_listing().get_date()-datetime.date.today() <= 1:
+            return -2
+
+        data = conn.select(
+            "SELECT CARD_ENDING_DIGITS FROM bookings b LEFT JOIN customers c ON b.`CUSTOMER_EMAIL`=c.`CUSTOMER_EMAIL`\
+                WHERE CUSTOMER_EMAIL=%S;", customer_email)
+
+        if not data:
+            return -1
+        if data[0]["CARD_ENDING_DIGITS"] != card_number[-4:]:
+            return 0
+
+        b.get_customer().set_payment(Payment(name_on_card, card_number, cvv, expiry_date))
         conn.update(
             "UPDATE bookings SET REFUND=%s WHERE BOOKING_REFERENCE=%s;", self.__show.get_bookings()[booking_reference].get_price()/2, booking_reference)
+        b.get_customer().get_payment().refund(b.get_price())
         self.__show.cancel_booking(booking_reference)
 
     def add_show(self, time):
@@ -291,11 +307,11 @@ class Model():
 
     def get_listings(self):
         listings = []
-        print(f'city_seleceted:{self.__city}')
-        print(f'cinema_selected{self.__cinema}')
         for l in list(self.__cinema.get_listings().values()):
             if l.get_date() == self.__date:
                 listings.append(l)
+        if not listings:
+            listings.append("no listings")
         return listings
 
     def get_listing(self, id=None):
@@ -303,20 +319,22 @@ class Model():
             self.__listing = self.__cinema.get_listings()[id]
             return self.__listing
         else:
-            for l in list(self.__cinema.get_listings().values()):
-                if str(l.get_date()) == str(self.__date):
-                    self.__listing = l
-                    return self.__listing
-            return
+            self.__listing = self.get_listings()[0]
+        return self.__listing
 
     def get_shows(self):
-        return self.__listing.get_shows().values()
+        if self.__listing == "no listings":
+            return ["no shows"]
+        shows = list(self.__listing.get_shows().values())
+        if not shows:
+            shows.append("no shows")
+        return shows
 
     def get_show(self, id=None):
         if id:
             self.__show = self.__listing.get_shows()[id]
         else:
-            self.__show = list(self.__listing.get_shows().values())[0]
+            self.__show = self.get_shows()[0]
         return self.__show
 
     def set_city(self, city):
