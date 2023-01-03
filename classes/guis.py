@@ -74,6 +74,7 @@ class Main_frame(tk.Frame):
         self.dashboard()
 
     def dashboard(self):
+        self.__controller.clear_data()
         self.clear_frame(self.__app.body_frame)
 
         self.__app.page_label["text"] = "Dashboard"
@@ -125,7 +126,6 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "View bookings"
-        self.__controller.clear_data()
 
         self.__view_btn = tk.Button(
             self.__app.body_frame, text='view', command=lambda: self.view_bookings_treeview())
@@ -244,7 +244,6 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Create booking"
-        self.__controller.clear_data()
 
         if (isinstance(self.__user, Admin)):
 
@@ -654,7 +653,7 @@ class Main_frame(tk.Frame):
         self.__expiry_date.place(x=1130, y=600)
 
         # Placing interactive widgets
-        self.__btn.place(x=50, y=390)
+        self.__btn.place(x=50, y=350)
 
     def add_listing(self):
         self.clear_frame(self.__app.body_frame)

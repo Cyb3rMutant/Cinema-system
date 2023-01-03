@@ -25,6 +25,7 @@ class Model():
         for c in cities:
             self.__cities[c["CITY_NAME"]] = City(
                 c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"])
+        self.__booking_in_progress = False
 
     def validate_login(self, username, password):
         data = conn.select(
@@ -126,12 +127,13 @@ class Model():
                                                       datetime.date.today(), city_price, None)
         if not self.__booking_info:
             return 0
-
+        self.__booking_in_progress = True
         return self.__booking_info
 
     def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
         self.__booking_info.set_customer(Customer(customer_name, customer_phone, customer_email, Payment(
             name_on_card, card_number, expiry_date, cvv)))
+        self.__booking_in_progress = False
 
         conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
                     customer_email, customer_name, customer_phone, card_number[-4:])
@@ -365,5 +367,14 @@ class Model():
         print(self.__date, type(self.__date))
 
     def clear_data(self):
+        print("in clear")
+        if self.__booking_in_progress:
+            print("in if")
+            self.__show.cancel_booking(
+                self.__booking_info.get_booking_reference())
+            self.__booking_info = None
         self.__city = None
         self.__cinema = None
+        self.__listing = None
+        self.__show = None
+        self.__date = None

@@ -23,7 +23,6 @@ class Listing(object):
         shows = conn.select("SELECT * FROM shows WHERE LISTING_ID=%s",
                             self.__listing_id)
         for s in shows:
-            print(cinema.get_screens()[s["SCREEN_ID"]])
             self.__shows[s["SHOW_ID"]] = show.Show(
                 s["SHOW_ID"], s["SHOW_TIME"], cinema.get_screens()[s["SCREEN_ID"]], self)
 
@@ -48,11 +47,6 @@ class Listing(object):
     def set_film(self, film):
         self.__film = film
 
-    def update_show_time(self, show_id, time):
-        conn.update("UPDATE shows SET SHOW_TIME=%s WHERE SHOW_ID=%s",
-                    time, show_id)
-        self.__time
-
     def add_show(self, show_id, time, screen):
         self.__shows[show_id] = show.Show(show_id, time, screen, self)
 
@@ -63,5 +57,4 @@ class Listing(object):
         return f"listing_id: {self.__listing_id} date: {self.__date} film: {self.__film}"
 
     def as_list(self):
-        print(self.__shows)
         return [self.__listing_id, self.__date, self.__film, "\n".join([str(s) for s in self.__shows.values()])]
