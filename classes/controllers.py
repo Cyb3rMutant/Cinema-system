@@ -22,6 +22,10 @@ class Controller():
 
             self.__view.logged_in(user)
 
+    def logout(self):
+        self.__view.login()
+        self.__model.logout()
+
     def get_bookings_as_list(self):
         return self.__model.get_bookings_as_list()
 
@@ -38,13 +42,16 @@ class Controller():
     def add_cinema(self, address, number_of_screens):
         self.__model.add_cinema(address, number_of_screens)
 
-    def remove_listing(self, listings):
-        self.__model.remove_listing(listings)
+    def remove_listing(self):
+        self.__model.remove_listing()
 
-    def add_listing(self, film,cinema):
+    def remove_show(self):
+        self.__model.remove_show()
+
+    def add_listing(self, film, cinema):
         if cinema == "choose cinema":
             self.__view.show_error("CHOOSE CINEMA IS SELECTED")
-            return 
+            return
         self.__model.add_listing(film)
 
     def update_listing(self, film):
@@ -85,8 +92,11 @@ class Controller():
         if not self.__model.add_show(time):
             self.__view.show_error("no available screens")
 
-    def get_booking(self, booking_ref):
-        return self.__model.get_booking(booking_ref)
+    def add_user(self, name, password, user_type):
+        return self.__model.add_user(name, password, user_type)
+
+    def get_user_types(self):
+        return self.__model.get_user_types()
 
     def get_cities(self):
         return self.__model.get_cities()
@@ -112,12 +122,12 @@ class Controller():
     def get_show(self, id=None):
         return self.__model.get_show(id)
 
-<<<<<<< HEAD
+    def get_booking(self, booking_ref):
+        return self.__model.get_booking(booking_ref)
+
     def clear_data(self):
         return self.__model.clear_data()
 
-=======
->>>>>>> bb12e69bcecd035882db94719296c759c7b1b0ec
     def get_cinema_listings_as_list(self):
         return self.__model.get_cinema_listings_as_list()
 

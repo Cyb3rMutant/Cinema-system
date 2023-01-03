@@ -48,6 +48,9 @@ class Model():
         else:
             return 0
 
+    def logout(self):
+        self.__user = None
+
     def get_bookings_as_list(self):
         bookings = []
         for b in self.__show.get_bookings().values():
@@ -146,12 +149,18 @@ class Model():
         print("booking info: ")
         print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
 
-    def remove_listing(self, listings):
-        for id in listings:
-            conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
-            conn.delete(
-                "DELETE FROM listings WHERE LISTING_ID=%s AND CINEMA_ID=%s;", id, self.__cinema.get_cinema_id())
-            self.__cinema.remove_listing(id)
+    def remove_listing(self):
+        id = self.__listing.get_listing_id()
+        conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
+        conn.delete(
+            "DELETE FROM listings WHERE LISTING_ID=%s;", id)
+        self.__cinema.remove_listing(id)
+
+    def remove_show(self):
+        id = self.__show.get_show_id()
+        conn.delete(
+            "DELETE FROM shows WHERE SHOW_ID=%s;", id)
+        self.__cinema.remove_show(id)
 
     def add_listing(self, film):
         conn.insert("INSERT INTO listings (LISTING_TIME, FILM_TITLE, CINEMA_ID) VALUES (%s, %s, %s);",
@@ -251,6 +260,11 @@ class Model():
 
         return 1
 
+    def add_user(self, name, password, user_type):
+        password = sha256_crypt.hash(password)
+        conn.insert(
+            "INSERT INTO users(USER_NAME, USER_PASSWORD_HASH, USER_TYPE, CINEMA_ID) VALUES (%s, %s, %s, %s);", name, password, user_type, self.__cinema.get_cinema_id())
+
     def get_booking(self, booking_ref):
         if (isinstance(self.__user, Admin)):
             data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
@@ -280,6 +294,9 @@ class Model():
                     data["LISTING_ID"]].get_shows()[
                         data["SHOW_ID"]].get_bookings()[
                             data["BOOKING_REFERENCE"]]
+
+    def get_user_types(self):
+        return [t["USER_TYPE"] for t in conn.select("SELECT USER_TYPE FROM user_types;")]
 
     def get_cities(self):
         return self.__cities.get_cities().values()
@@ -349,7 +366,6 @@ class Model():
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
         self.__date = date.date()
         print(self.__date, type(self.__date))
-
 
     def clear_data(self):
         self.__city = None

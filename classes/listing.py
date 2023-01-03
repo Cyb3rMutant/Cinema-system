@@ -56,6 +56,9 @@ class Listing(object):
     def add_show(self, show_id, time, screen):
         self.__shows[show_id] = show.Show(show_id, time, screen, self)
 
+    def remove_show(self, show_id):
+        self.__shows.pop(show_id)
+
     def __str__(self):
         return f"listing_id: {self.__listing_id} date: {self.__date} film: {self.__film}"
 

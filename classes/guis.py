@@ -24,6 +24,9 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard = tk.Button(self.__app.main_frame, text='go back to dashboard', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: [self.__back_to_dashboard.place_forget(), self.dashboard()])
 
+        self.__log_out = tk.Button(
+            self.__app.header_frame, text="logout", command=lambda: (self.__log_out.place_forget(), self.__controller.logout()))
+
         self.login()
 
     def clear_frame(self, frame):
@@ -31,6 +34,9 @@ class Main_frame(tk.Frame):
             widgets.destroy()
 
     def login(self):
+        self.__user = None
+        self.__app.name_label["text"] = ""
+        self.__app.branch_label["text"] = ""
         self.clear_frame(self.__app.body_frame)
         # Create widgets
         self.__app.page_label["text"] = "Login"
@@ -60,6 +66,7 @@ class Main_frame(tk.Frame):
 
     def logged_in(self, user):
         # Page Title
+        self.__log_out.place(x=0, y=0)
         self.__user = user
         self.__app.name_label["text"] = f"{self.__user.get_id()}: {self.__user.get_name()}[{self.__user.__class__.__name__}]"
         self.__app.branch_label["text"] = self.__user.get_branch().get_address()
@@ -93,6 +100,8 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="Add New Cinema", borderwidth=5, command=self.add_new_cinema, font=("Arial", 16))
         add_new_city_btn = tk.Button(
             self.__app.body_frame, text="Add New city", borderwidth=5, command=self.add_new_city, font=("Arial", 16))
+        add_new_user_btn = tk.Button(
+            self.__app.body_frame, text="Add New user", borderwidth=5, command=self.add_new_user, font=("Arial", 16))
 
         # Placing Widgets - Adjust Y Value for each user. This is for Manager view at the moment.
         view_bookings_btn.place(x=270, y=60, width=240, height=130)
@@ -110,6 +119,7 @@ class Main_frame(tk.Frame):
             if (isinstance(self.__user, Manager)):
                 add_new_cinema_btn.place(x=270, y=480, width=240, height=130)
                 add_new_city_btn.place(x=520, y=480, width=240, height=130)
+                add_new_user_btn.place(x=770, y=480, width=240, height=130)
 
     def view_bookings(self):
         self.clear_frame(self.__app.body_frame)
@@ -134,7 +144,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))  # When we change a city, we update its cinemas
+                                                command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
@@ -186,7 +196,6 @@ class Main_frame(tk.Frame):
         xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
-        ttk.Style().configure('Treeview', rowheight=20)
         self.__tree_view = ttk.Treeview(
             self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type"))
         self.__tree_view.grid(row=0, column=0)
@@ -225,42 +234,10 @@ class Main_frame(tk.Frame):
             self.__tree_view.insert(
                 '', tk.END, values=self.__controller.get_booking(booking_ref).as_list())
 
-    def update_films_and_shows_based_on_date(self, btn_text, btn_command):
-        self.remove_create_stuff()
-        try:  # Only got this cus it doesnt work with booking staff causes error crash. KEEP it tho, you can remove comments
-            # Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
-
-            # Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
-            # And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
-            if str(self.__cinema_choice.get()) == "choose cinema":
-                print('error: choose cinema is selected, wont update film')
-                return
-        except:
-            pass
-
-        self.__controller.set_date(str(self.__selected_date.get()))
-        self.__film_choice = tk.StringVar()
-        self.__film_choice.set(self.__controller.get_listing())
-        self.__film_options = tk.OptionMenu(
-            self.__app.body_frame, self.__film_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
-
-        # Shows
-        self.__show_choice = tk.StringVar()
-        self.__show_choice.set(self.__controller.get_show())
-        self.__show_options = tk.OptionMenu(
-            self.__app.body_frame, self.__show_choice, *self.__controller.get_shows(), command=lambda show: self.__controller.set_show(show))
-
-        self.__btn = tk.Button(
-            self.__app.body_frame, text=btn_text, command=btn_command)
-
-        self.__film_options.place(x=100, y=150)
-        self.__show_options.place(x=100, y=200)
-        self.__btn.place(x=50, y=350)
-
     def create_booking(self):
 
-        # When we change cinema option value --> update_films_and_shows_based_on_date. (Because we fill in the rest of paramaeters using city chosen)
-        # When we change date value --> update_films_and_shows_based_on_date (We fetch all listings showing at a specific day at the cinema)
+        # When we change cinema option value --> update_listings_and_shows_based_on_date. (Because we fill in the rest of paramaeters using city chosen)
+        # When we change date value --> update_listings_and_shows_based_on_date (We fetch all listings showing at a specific day at the cinema)
         # When we change a film value -->  update_shows (We fetch all showing times for the listing)
         # When we chang ea show --> Nothing
 
@@ -268,7 +245,6 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Create booking"
         self.__controller.clear_data()
-
 
         if (isinstance(self.__user, Admin)):
 
@@ -281,14 +257,14 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))))))  # When we change a city, we update its cinemas
+                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))))))
 
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
             self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(
-                cinema), self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])
+                cinema), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])
             self.__cinema_options.place(x=400, y=30)
 
         else:
@@ -310,12 +286,11 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="Select # of Tickets").place(x=10, y=330)
 
         # Date
-        self.__date_today = datetime.date.today()
         self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: self.update_films_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get()))))
+            'w', lambda *unused: self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get()))))
         self.__controller.set_date(str(self.__selected_date.get()))
 
         self.__seat_type_btn = tk.StringVar()
@@ -328,8 +303,8 @@ class Main_frame(tk.Frame):
 
         self.__num_of_ticket_choice = tk.IntVar()
         self.__num_of_ticket_choice.set(1)
-        self.__num_of_ticket_options = tk.Spinbox(
-            self.__app.body_frame, textvariable=self.__num_of_ticket_choice, from_=1, to=5, width=5)
+        self.__num_of_ticket_options = tk.OptionMenu(
+            self.__app.body_frame, self.__num_of_ticket_choice, *range(1, 6))
 
         self.__date_entry.place(x=100, y=90)
         self.__lower_hall.place(x=120, y=270)
@@ -342,7 +317,7 @@ class Main_frame(tk.Frame):
         # Command doesnt work if we change date then change film, only works first time loaded thats why i hardcoded destroy widget in the update_film_and_show function.
         self.__film_choice = tk.StringVar()
         self.__film_choice.set(self.__controller.get_listing())
-        self.__film_options = tk.OptionMenu(
+        self.__listing_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
 
         # Shows
@@ -356,7 +331,7 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text='Book now', command=lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))
 
         # Placing interactive widgets
-        self.__film_options.place(x=100, y=150)
+        self.__listing_options.place(x=100, y=150)
         self.__show_options.place(x=100, y=200)
         self.__btn.place(x=50, y=350)
 
@@ -433,7 +408,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))  # When we change a city, we update its cinemas
+                                                command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
@@ -531,7 +506,6 @@ class Main_frame(tk.Frame):
         xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
-        ttk.Style().configure('Treeview', rowheight=20)
         self.__tree_view = ttk.Treeview(
             self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("booking_ref", "seat_count", "date", "price", "show_id", "seat_type"))
         self.__tree_view.grid(row=0, column=0)
@@ -597,13 +571,13 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview)))))  # When we change a city, we update its cinemas
+                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)))))
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
             self.__cinema_choice.set("choose cinema")
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [
-                                                  self.__controller.set_cinema(cinema), self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview)])
+                                                  self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)])
             self.__cinema_options.place(x=400, y=30)
 
         else:
@@ -624,12 +598,11 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="Select Show").place(x=10, y=210)
 
         # Date
-        self.__date_today = datetime.date.today()
         self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: self.update_films_and_shows_based_on_date("refresh", self.display_bookings_treeview))
+            'w', lambda *unused: self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview))
         self.__controller.set_date(str(datetime.date.today()))
 
         self.__date_entry.place(x=100, y=90)
@@ -694,7 +667,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
-            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas_add_listing(lambda cinema: self.__controller.set_cinema(cinema))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: self.__controller.set_cinema(cinema))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
@@ -707,9 +680,9 @@ class Main_frame(tk.Frame):
         # film
         self.__film_choice = tk.StringVar()
         self.__film_choice.set(list(self.__controller.get_films().keys())[0])
-        self.__film_options_label = tk.Label(
+        self.__listing_options_label = tk.Label(
             self.__app.body_frame, text="choose film: ")
-        self.__film_options = tk.OptionMenu(
+        self.__listing_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__controller.get_films().keys())
 
         # date
@@ -730,8 +703,8 @@ class Main_frame(tk.Frame):
         self.__city_options.place(x=100, y=30)
         self.__cinema_options_label.place(x=300, y=30)
         self.__cinema_options.place(x=400, y=30)
-        self.__film_options_label.place(x=10, y=90)
-        self.__film_options.place(x=100, y=90)
+        self.__listing_options_label.place(x=10, y=90)
+        self.__listing_options.place(x=100, y=90)
         self.__date_label.place(x=10, y=150)
         self.__date_entry.place(x=100, y=150)
 
@@ -740,56 +713,58 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Remove listings"
 
-        # city
-        self.__city_choice = tk.StringVar()
-        self.__city_choice.set(self.__controller.get_city())
-        self.__city_options_lable = tk.Label(
-            self.__app.body_frame, text="choose city: ")
-        self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(
-        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_many()))))
+        self.__city_options_label = tk.Label(
+            self.__app.body_frame, text="choose city: ").place(x=10, y=30)
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ").place(x=300, y=30)
 
-        # cinema
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(
+            self.__controller.get_city())
+        self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
+                                            command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing), self.update_shows()))))))
+        self.__city_options.place(x=100, y=30)
+
         self.__cinema_choice = tk.StringVar()
         self.__cinema_choice.set(self.__controller.get_cinema())
-        self.__cinema_options_label = tk.Label(
-            self.__app.body_frame, text="choose cinema: ")
-        self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_many()))
+        self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [
+            self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing), self.update_shows()))])
+        self.__cinema_options.place(x=400, y=30)
 
-        # date
+        # Standard labels
         self.__date_label = tk.Label(
-            self.__app.body_frame, text="Select Date: ")
+            self.__app.body_frame, text="Select Date").place(x=10, y=90)
+        self.__select_film_label = tk.Label(
+            self.__app.body_frame, text="Select Film").place(x=10, y=150)
+        self.__select_show_label = tk.Label(
+            self.__app.body_frame, text="Select Show").place(x=10, y=210)
+
+        # Date
         self.__selected_date = tk.StringVar()
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings_one()))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings(lambda listing: (self.__controller.set_listing(listing), self.update_shows()))))
         self.__controller.set_date(str(datetime.date.today()))
 
-        # listings
-        self.__listings_label = tk.Label(
-            self.__app.body_frame, text="Select listings: ")
-        self.__listings_box = tk.Frame(self.__app.body_frame)
-        self.__items = []
-        idx = 0
-        for listing in self.__controller.get_listings():
-            self.__items.append(tk.IntVar())
-            tk.Checkbutton(
-                self.__listings_box, variable=self.__items[idx], text=listing, onvalue=listing.get_listing_id(), offvalue=None).pack()
-            idx += 1
+        self.__listing_choice = tk.StringVar()
+        self.__listing_choice.set(self.__controller.get_listing())
+        self.__listing_options = tk.OptionMenu(
+            self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
+        self.__listing_options.place(x=100, y=150)
+        self.__remove_listing_btn = tk.Button(
+            self.__app.body_frame, text="remove listing", command=self.__controller.remove_listing).place(x=400, y=150)
 
-        self.__login_button = tk.Button(self.__app.body_frame, text='remove listing', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.remove_listing([int(id.get()) for id in self.__items if id != None]))
-        self.__login_button.place(x=612, y=460)
+        # Shows
+        self.__show_choice = tk.StringVar()
+        self.__show_choice.set(self.__controller.get_show())
+        self.__show_options = tk.OptionMenu(
+            self.__app.body_frame, self.__show_choice, *self.__controller.get_shows(), command=lambda show: self.__controller.set_show(show))
+        self.__show_options.place(x=100, y=200)
+        self.__remove_show_btn = tk.Button(
+            self.__app.body_frame, text="remove show", command=self.__controller.remove_show).place(x=400, y=200)
 
-        self.__city_options_lable.place(x=10, y=30)
-        self.__city_options.place(x=100, y=30)
-        self.__cinema_options_label.place(x=300, y=30)
-        self.__cinema_options.place(x=400, y=30)
-        self.__date_label.place(x=10, y=90)
         self.__date_entry.place(x=100, y=90)
-        self.__listings_label.place(x=10, y=150)
-        self.__listings_box.place(x=100, y=150)
 
     def update_listing(self):
         print("Update listing page opened")  # debugging
@@ -803,7 +778,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(
-        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))))
+        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
@@ -811,7 +786,7 @@ class Main_frame(tk.Frame):
         self.__cinema_options_label = tk.Label(
             self.__app.body_frame, text="choose cinema: ")
         self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
 
         # date
         self.__date_label = tk.Label(
@@ -820,7 +795,7 @@ class Main_frame(tk.Frame):
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings_one()))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
         self.__controller.set_date(str(datetime.date.today()))
 
         # listings  (need to change this so they can only pick one)
@@ -828,7 +803,7 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="select date:")
         self.__listing_choice = tk.StringVar()
         self.__listing_choice.set(self.__controller.get_listing())
-        self.__film_options = tk.OptionMenu(
+        self.__listing_options = tk.OptionMenu(
             self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=lambda listing: self.__controller.set_listing(listing))
 
         self.__login_button = tk.Button(self.__app.body_frame, text='select listing', bg='#DD2424', fg='#000000', font=("Arial", 18),
@@ -843,7 +818,7 @@ class Main_frame(tk.Frame):
         self.__date_label.place(x=10, y=90)
         self.__date_entry.place(x=100, y=90)
         self.__listings_label.place(x=10, y=150)
-        self.__film_options.place(x=100, y=150)
+        self.__listing_options.place(x=100, y=150)
 
     # after they have selected a listing in (update listing) this lets them actually change the listings details
 
@@ -867,9 +842,9 @@ class Main_frame(tk.Frame):
         # select film
         self.__film_choice = tk.StringVar()
         self.__film_choice.set(self.__original_film)
-        self.__film_options_label = tk.Label(
+        self.__listing_options_label = tk.Label(
             self.__app.body_frame, text="choose film: ")
-        self.__film_options = tk.OptionMenu(
+        self.__listing_options = tk.OptionMenu(
             self.__app.body_frame, self.__film_choice, *self.__controller.get_films().keys())
 
         # select date
@@ -879,7 +854,7 @@ class Main_frame(tk.Frame):
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings_one()))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
         self.__controller.set_date(str(datetime.date.today()))
 
         # update listing button
@@ -889,8 +864,8 @@ class Main_frame(tk.Frame):
         # place buttons
         self.__login_button.place(x=612, y=460)
 
-        self.__film_options_label.place(x=10, y=30)
-        self.__film_options.place(x=100, y=30)
+        self.__listing_options_label.place(x=10, y=30)
+        self.__listing_options.place(x=100, y=30)
         self.__date_label.place(x=10, y=90)
         self.__date_entry.place(x=100, y=90)
         self.__orignal_listing_label.place(x=500, y=30)
@@ -900,8 +875,8 @@ class Main_frame(tk.Frame):
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Generate report"
 
+    # IF WE DO BIRMIGNAHm
 
-    #IF WE DO BIRMIGNAHm
     def add_new_show(self):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
@@ -913,7 +888,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
-            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
@@ -921,7 +896,7 @@ class Main_frame(tk.Frame):
         self.__cinema_options_label = tk.Label(
             self.__app.body_frame, text="choose cinema: ")
         self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_one()))
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
 
         # date
         self.__date_label = tk.Label(
@@ -930,7 +905,7 @@ class Main_frame(tk.Frame):
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings_one()))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
         self.__controller.set_date(str(datetime.date.today()))
 
         # listings  (need to change this so they can only pick one)
@@ -939,20 +914,20 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="select date:")
         self.__listing_choice = tk.StringVar()
         self.__listing_choice.set(self.__controller.get_listing())
-        self.__film_options = tk.OptionMenu(
+        self.__listing_options = tk.OptionMenu(
             self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=lambda listing: self.__controller.set_listing(listing))
-        self.__film_options.place(x=100, y=150)
+        self.__listing_options.place(x=100, y=150)
 
         self.__time_label = tk.Label(
             self.__app.body_frame, text="select time: ")
         self.__hours_choice = tk.IntVar()
         self.__hours_choice.set(8)
-        self.__hours_options = tk.Spinbox(
-            self.__app.body_frame, textvariable=self.__hours_choice, from_=8, to=23, width=5)
+        self.__hours_options = tk.OptionMenu(
+            self.__app.body_frame, self.__hours_choice, *range(8, 24))
         self.__minutes_choice = tk.IntVar()
         self.__minutes_choice.set(0)
-        self.__minutes_options = tk.Spinbox(
-            self.__app.body_frame, textvariable=self.__minutes_choice, from_=0, to=59, width=5)
+        self.__minutes_options = tk.OptionMenu(
+            self.__app.body_frame, self.__minutes_choice, *range(0, 60, 5))
 
         self.__login_button = tk.Button(self.__app.body_frame, text='select listing', bg='#DD2424', fg='#000000', font=("Arial", 18),
                                         command=lambda: self.__controller.add_show(datetime.time(self.__hours_choice.get(), self.__minutes_choice.get(), 0)))
@@ -1036,73 +1011,122 @@ class Main_frame(tk.Frame):
         self.__city_evening_price_lable.place(x=10, y=210)
         self.__city_evening_price.place(x=130, y=210)
 
+    def add_new_user(self):
+        self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1030, y=130)
+        self.__app.page_label["text"] = "Add new user"
+
+        # city
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(self.__controller.get_city())
+        self.__city_options_lable = tk.Label(
+            self.__app.body_frame, text="choose city: ")
+        self.__city_options = tk.OptionMenu(
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: self.__controller.set_cinema(cinema))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+
+        # cinema
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set(self.__controller.get_cinema())
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ")
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: (self.__controller.set_cinema(cinema)))
+
+        types = self.__controller.get_user_types()
+        self.__user_type_choice = tk.StringVar()
+        self.__user_type_choice.set(types[0])
+        self.__user_type_label = tk.Label(
+            self.__app.body_frame, text="user type:")
+        self.__user_type_options = tk.OptionMenu(
+            self.__app.body_frame, self.__user_type_choice, *types)
+
+        self.__user_name_lable = tk.Label(
+            self.__app.body_frame, text="user name: ")
+        self.__user_name = tk.Entry(self.__app.body_frame)
+
+        self.__user_password_lable = tk.Label(
+            self.__app.body_frame, text="user password: ")
+        self.__user_password = tk.Entry(self.__app.body_frame, show="*")
+
+        self.__login_button = tk.Button(self.__app.body_frame, text='Add user', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.add_user(
+            self.__user_name.get(), self.__user_password.get(), self.__user_type_choice.get()))
+        self.__login_button.place(x=612, y=460)
+
+        self.__city_options_lable.place(x=10, y=30)
+        self.__city_options.place(x=100, y=30)
+        self.__cinema_options_label.place(x=300, y=30)
+        self.__cinema_options.place(x=400, y=30)
+        self.__user_type_label.place(x=10, y=90)
+        self.__user_type_options.place(x=130, y=90)
+        self.__user_name_lable.place(x=10, y=150)
+        self.__user_name.place(x=130, y=150)
+        self.__user_password_lable.place(x=10, y=210)
+        self.__user_password.place(x=130, y=210)
+
     def get_id(self, string):
         print(string, type(string))
         return int(re.search(r'\d+', string).group())
 
     def remove_create_stuff(self):
-        self.__controller.set_date(str(self.__selected_date.get()))
         try:
-            self.__film_options.destroy()
+            self.__listing_options.destroy()
             self.__show_options.destroy()
             self.__btn.destroy()
         except:
             pass
 
-    def update_cinemas_add_listing(self, func=None):
-        self.__cinema_choice.set("choose cinema")
-        self.__cinema_options.destroy()
-        self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=func)
-        self.__cinema_options.place(x=400, y=30)
-
-
-    def update_cinemas(self, func=None):
-        try:
-            self.remove_create_stuff()
-        except:
-            pass
-        self.__cinema_choice.set("choose cinema")
-        self.__cinema_options.destroy()
-        self.__cinema_options = tk.OptionMenu(
-            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=func)
-        self.__cinema_options.place(x=400, y=30)
-
-    def update_listings_many(self):
-        self.clear_frame(self.__listings_box)
-        self.__items = []
-        idx = 0
-        for listing in self.__controller.get_listings():
-            self.__items.append(tk.IntVar())
-            tk.Checkbutton(
-                self.__listings_box, variable=self.__items[idx], text=listing, onvalue=listing.get_listing_id(), offvalue=None).pack(sid=tk.BOTTOM)
-            idx += 1
-
-    def update_listings_one(self):
-        self.__controller.set_date(str(self.__selected_date.get()))
+    def update_cinemas(self, func):
         self.remove_create_stuff()
-        # self.clear_frame(self.__listings_box)
-        # self.__item = tk.IntVar()
-        # for listing in self.__controller.get_listings():
-        #     if str(listing.get_date()) != self.__selected_date.get():
-        #         continue
+        self.__cinema_choice.set("choose cinema")
+        self.__cinema_options.destroy()
+        self.__cinema_options = tk.OptionMenu(
+            self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=func)
+        self.__cinema_options.place(x=400, y=30)
 
-        #     tk.Checkbutton(
-        #         self.__listings_box, variable=self.__item, text=listing, onvalue=listing.get_listing_id(), offvalue=None).pack(sid=tk.BOTTOM)
-
-        self.__listings_label = tk.Label(
-            self.__app.body_frame, text="select date:")
+    def update_listings(self, func):
+        self.__listing_options.destroy()
         self.__listing_choice = tk.StringVar()
         self.__listing_choice.set(self.__controller.get_listing())
-        self.__film_options = tk.OptionMenu(
-            self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=lambda listing: self.__controller.set_listing(listing))
-        self.__film_options.place(x=100, y=150)
+        self.__listing_options = tk.OptionMenu(
+            self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=func)
+        self.__listing_options.place(x=100, y=150)
+
+    def update_listings_and_shows_based_on_date(self, btn_text, btn_command):
+        self.remove_create_stuff()
+        try:  # Only got this cus it doesnt work with booking staff causes error crash. KEEP it tho, you can remove comments
+            # Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
+
+            # Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
+            # And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
+            if str(self.__cinema_choice.get()) == "choose cinema":
+                print('error: choose cinema is selected, wont update film')
+                return
+        except:
+            pass
+
+        self.__controller.set_date(str(self.__selected_date.get()))
+        self.__film_choice = tk.StringVar()
+        self.__film_choice.set(self.__controller.get_listing())
+        self.__listing_options = tk.OptionMenu(
+            self.__app.body_frame, self.__film_choice, *self.__controller.get_listings(), command=lambda listing: (self.__controller.set_listing(listing), self.update_shows()))
+
+        # Shows
+        self.__show_choice = tk.StringVar()
+        self.__show_choice.set(self.__controller.get_show())
+        self.__show_options = tk.OptionMenu(
+            self.__app.body_frame, self.__show_choice, *self.__controller.get_shows(), command=lambda show: self.__controller.set_show(show))
+
+        self.__btn = tk.Button(
+            self.__app.body_frame, text=btn_text, command=btn_command)
+
+        self.__listing_options.place(x=100, y=150)
+        self.__show_options.place(x=100, y=200)
+        self.__btn.place(x=50, y=350)
 
     def update_shows(self):
-        self.__controller.set_date(str(self.__selected_date.get()))
+        print("im in")
         self.__show_options.destroy()
         self.__show_choice = tk.StringVar()
-        # Instead of "choose show". If we choose city, cinema, date, film AND show is still equal to "choose show", we can still book which it shouldnt. This prevents this by automatically updating shows to the times instead of it.
         self.__show_choice.set(self.__controller.get_show())
         self.__show_options = tk.OptionMenu(self.__app.body_frame, self.__show_choice,
                                             *self.__controller.get_shows(), command=lambda show: [self.__controller.set_show(show)])
