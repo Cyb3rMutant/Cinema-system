@@ -98,8 +98,8 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="Add new show", borderwidth=5, command=self.add_new_show, font=("Arial", 16))
         add_new_cinema_btn = tk.Button(
             self.__app.body_frame, text="Add New Cinema", borderwidth=5, command=self.add_new_cinema, font=("Arial", 16))
-        add_new_city_btn = tk.Button(
-            self.__app.body_frame, text="Add New city", borderwidth=5, command=self.add_new_city, font=("Arial", 16))
+        add_new_film_btn = tk.Button(
+            self.__app.body_frame, text="Add New film", borderwidth=5, command=self.add_new_film, font=("Arial", 16))
         add_new_user_btn = tk.Button(
             self.__app.body_frame, text="Add New user", borderwidth=5, command=self.add_new_user, font=("Arial", 16))
 
@@ -118,7 +118,7 @@ class Main_frame(tk.Frame):
 
             if (isinstance(self.__user, Manager)):
                 add_new_cinema_btn.place(x=270, y=480, width=240, height=130)
-                add_new_city_btn.place(x=520, y=480, width=240, height=130)
+                add_new_film_btn.place(x=520, y=480, width=240, height=130)
                 add_new_user_btn.place(x=770, y=480, width=240, height=130)
 
     def view_bookings(self):
@@ -957,6 +957,8 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
             self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: self.__controller.set_city(city))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+        self.__add_new_city_btn = tk.Button(
+            self.__app.body_frame, text="Add New city", command=self.add_new_city)
 
         self.__cinema_address_lable = tk.Label(
             self.__app.body_frame, text="Cinema address: ")
@@ -972,6 +974,7 @@ class Main_frame(tk.Frame):
 
         self.__city_options_lable.place(x=10, y=30)
         self.__city_options.place(x=130, y=30)
+        self.__add_new_city_btn.place(x=250, y=30)
         self.__cinema_address_lable.place(x=10, y=90)
         self.__cinema_address.place(x=130, y=90)
         self.__number_of_screens_lable.place(x=10, y=150)
@@ -1010,6 +1013,63 @@ class Main_frame(tk.Frame):
         self.__city_afternoon_price.place(x=130, y=150)
         self.__city_evening_price_lable.place(x=10, y=210)
         self.__city_evening_price.place(x=130, y=210)
+
+    def add_new_film(self):
+        self.clear_frame(self.__app.body_frame)
+        self.__back_to_dashboard.place(x=1030, y=130)
+        self.__app.page_label["text"] = "Add new film"
+
+        self.__film_title_lable = tk.Label(
+            self.__app.body_frame, text="film title: ")
+        self.__film_title = tk.Entry(self.__app.body_frame)
+
+        self.__film_rating_lable = tk.Label(
+            self.__app.body_frame, text="film rating: ")
+        self.__film_rating = tk.Entry(self.__app.body_frame)
+
+        self.__film_genre_lable = tk.Label(
+            self.__app.body_frame, text="film genre: ")
+        self.__film_genre = tk.Entry(self.__app.body_frame)
+
+        self.__film_year_lable = tk.Label(
+            self.__app.body_frame, text="film year: ")
+        self.__film_year = tk.Entry(self.__app.body_frame)
+
+        self.__film_age_rating_lable = tk.Label(
+            self.__app.body_frame, text="film age rating: ")
+        self.__film_age_rating = tk.Entry(self.__app.body_frame)
+
+        self.__film_duration_lable = tk.Label(
+            self.__app.body_frame, text="film duration: ")
+        self.__film_duration = tk.Entry(self.__app.body_frame)
+
+        self.__film_description_lable = tk.Label(
+            self.__app.body_frame, text="film description: ")
+        self.__film_description = tk.Entry(self.__app.body_frame)
+
+        self.__film_cast_lable = tk.Label(
+            self.__app.body_frame, text="film cast: ")
+        self.__film_cast = tk.Entry(self.__app.body_frame)
+        self.__login_button = tk.Button(self.__app.body_frame, text='Add film', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.add_film(self.__film_title.get(
+        ), float(self.__film_rating.get()), self.__film_genre.get(), self.__film_year.get(), self.__film_age_rating.get(), int(self.__film_duration.get()), self.__film_description.get(), self.__film_cast.get()))
+        self.__login_button.place(x=612, y=460)
+
+        self.__film_title_lable.place(x=10, y=30)
+        self.__film_title.place(x=130, y=30)
+        self.__film_rating_lable.place(x=10, y=90)
+        self.__film_rating.place(x=130, y=90)
+        self.__film_genre_lable.place(x=10, y=150)
+        self.__film_genre.place(x=130, y=150)
+        self.__film_year_lable.place(x=10, y=210)
+        self.__film_year.place(x=130, y=210)
+        self.__film_age_rating_lable.place(x=10, y=270)
+        self.__film_age_rating.place(x=130, y=270)
+        self.__film_duration_lable.place(x=10, y=330)
+        self.__film_duration.place(x=130, y=330)
+        self.__film_description_lable.place(x=10, y=390)
+        self.__film_description.place(x=130, y=390)
+        self.__film_cast_lable.place(x=10, y=450)
+        self.__film_cast.place(x=130, y=450)
 
     def add_new_user(self):
         self.clear_frame(self.__app.body_frame)

@@ -17,14 +17,14 @@ class Model():
         self.__films = Films()
         films = conn.select("SELECT * FROM films;")
         for f in films:
-            self.__films[f["FILM_TITLE"]] = (
-                Film(f["FILM_TITLE"], f["FILM_RATING"], f["FILM_GENRE"], f["FILM_YEAR"], f["FILM_AGE_RATING"], f["FILM_DURATION"], f["FILM_DESCRIPTION"], f["FILM_CAST"]))
+            self.__films[f["FILM_TITLE"]] = Film(f["FILM_TITLE"], f["FILM_RATING"], f["FILM_GENRE"],
+                                                 f["FILM_YEAR"], f["FILM_AGE_RATING"], f["FILM_DURATION"], f["FILM_DESCRIPTION"], f["FILM_CAST"])
 
         self.__cities = Cities()
         cities = conn.select("SELECT * FROM cities;")
         for c in cities:
-            self.__cities[c["CITY_NAME"]] = (
-                City(c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"]))
+            self.__cities[c["CITY_NAME"]] = City(
+                c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"])
 
     def validate_login(self, username, password):
         data = conn.select(
@@ -85,22 +85,19 @@ class Model():
         except:
             print("no shows airing for listing")
 
-    def max_shows(self):
-        data = conn.select("SELECT COUNT(s.`SHOW_ID`) as c FROM shows s\
-                                LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                            WHERE l.`CINEMA_ID` = %s\
-                            GROUP BY s.`LISTING_ID` ORDER BY c DESC LIMIT 1", self.__cinema.get_cinema_id())
-        if not data:
-            return 1
-        else:
-            return data[0]["c"]
-
     def add_city(self, city_name, morning_price, afternoon_price, evening_price):
         conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
                     city_name, morning_price, afternoon_price, evening_price,)
 
         self.__cities.add_city(city_name, morning_price,
                                afternoon_price, evening_price)
+
+    def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
+        conn.insert("INSERT INTO films VALUES(%s, %s, %s, %s, %s, %s, %s, %s);", film_title, film_rating,
+                    film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)
+
+        self.__films.add_film(film_title, film_rating, film_genre, film_year,
+                              film_age_rating, film_duration, film_description, film_cast)
 
     def add_cinema(self,  address, number_of_screens):
         conn.insert(

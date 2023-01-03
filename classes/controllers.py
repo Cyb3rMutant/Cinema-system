@@ -32,12 +32,12 @@ class Controller():
     def get_all_bookings_as_list(self):
         return self.__model.get_all_bookings_as_list()
 
-    def max_shows(self):
-        return self.__model.max_shows()
-
     def add_city(self, name, morning_price, afternoon_price, evening_price):
         self.__model.add_city(name, morning_price,
                               afternoon_price, evening_price)
+
+    def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
+        return self.__model.add_film(film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)
 
     def add_cinema(self, address, number_of_screens):
         self.__model.add_cinema(address, number_of_screens)
