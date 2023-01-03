@@ -552,7 +552,7 @@ class Main_frame(tk.Frame):
             self.__tree_view.selection()[0])["values"]
 
         self.__login_button = tk.Button(self.__app.body_frame, text='cancel booking', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: (self.__controller.cancel_booking(str(record[0]), self.__customer_email.get(), self.__name_on_card.get(), self.__card_number.get(), self.__cvv.get(), self.__expiry_date.get()), self.display_bookings_treeview()))
+            "Arial", 18), command=lambda: (self.__controller.cancel_booking(str(record[0]), self.__customer_email.get(), None, self.__card_number.get(), None, None), self.display_bookings_treeview()))
         self.__login_button.place(x=212, y=560)
 
     def cancel_booking(self):
@@ -625,32 +625,16 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, text="customer email: ")
         self.__customer_email = tk.Entry(self.__app.body_frame)
 
-        self.__name_on_card_lable = tk.Label(
-            self.__app.body_frame, text="name on card: ")
-        self.__name_on_card = tk.Entry(self.__app.body_frame)
 
         self.__card_number_lable = tk.Label(
             self.__app.body_frame, text="card number: ")
         self.__card_number = tk.Entry(self.__app.body_frame)
 
-        self.__cvv_lable = tk.Label(
-            self.__app.body_frame, text="cvv: ")
-        self.__cvv = tk.Entry(self.__app.body_frame)
-
-        self.__expiry_date_lable = tk.Label(
-            self.__app.body_frame, text="expiry date: ")
-        self.__expiry_date = tk.Entry(self.__app.body_frame)
-
         self.__customer_email_lable.place(x=450, y=500)
         self.__customer_email.place(x=570, y=500)
-        self.__name_on_card_lable.place(x=730, y=500)
-        self.__name_on_card.place(x=850, y=500)
         self.__card_number_lable.place(x=730, y=600)
         self.__card_number.place(x=850, y=600)
-        self.__cvv_lable.place(x=1010, y=500)
-        self.__cvv.place(x=1130, y=500)
-        self.__expiry_date_lable.place(x=1010, y=600)
-        self.__expiry_date.place(x=1130, y=600)
+
 
         # Placing interactive widgets
         self.__btn.place(x=50, y=350)
