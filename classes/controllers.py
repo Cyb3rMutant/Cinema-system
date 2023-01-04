@@ -94,6 +94,7 @@ class Controller():
         match(self.__model.update_listing(film)):
             case 1:
                 self.__view.show_info("Successfully updated listing")
+                self.__view.dashboard()
 
     def get_films(self):
         return self.__model.get_films()

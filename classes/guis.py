@@ -804,7 +804,7 @@ class Main_frame(tk.Frame):
             self.__app.body_frame, self.__listing_choice, *self.__controller.get_listings(), command=lambda listing: self.__controller.set_listing(listing))
 
         self.__login_button = tk.Button(self.__app.body_frame, text='select listing', bg='#DD2424', fg='#000000', font=("Arial", 18),
-                                        command=lambda: self.update_listing_details(self.get_id(self.__listing_choice.get()), self.__city_choice.get(), self.get_id(self.__cinema_choice.get())))
+                                        command=lambda: self.update_listing_details(self.__listing_choice.get(), self.__city_choice.get(), self.__cinema_choice.get()))
 
         self.__login_button.place(x=612, y=460)
 
@@ -820,6 +820,14 @@ class Main_frame(tk.Frame):
     # after they have selected a listing in (update listing) this lets them actually change the listings details
 
     def update_listing_details(self, listing_id, city, cinema):
+        if cinema == "choose cinema": 
+            self.show_error("Choose a cinema.")
+            return  
+        if listing_id == "no listings":
+            self.show_error("Please select a listing.")
+            return 
+        listing_id = self.get_id(listing_id)
+        cinema = self.get_id(cinema)
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Update listings"
@@ -851,7 +859,7 @@ class Main_frame(tk.Frame):
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get())))
         self.__controller.set_date(str(datetime.date.today()))
 
         # update listing button
