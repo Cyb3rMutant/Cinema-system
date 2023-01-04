@@ -87,31 +87,59 @@ class Model():
             print("no shows airing for listing")
 
     def add_city(self, city_name, morning_price, afternoon_price, evening_price):
-        conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
-                    city_name, morning_price, afternoon_price, evening_price,)
+        try:
+            #needs these
+            morning_price = float(morning_price)
+            afternoon_price = float(afternoon_price)
+            evening_price = float(evening_price)
+            conn.insert("INSERT INTO cities VALUES (%s, %s, %s, %s);",
+                        city_name, morning_price, afternoon_price, evening_price,)
 
-        self.__cities.add_city(city_name, morning_price,
-                               afternoon_price, evening_price)
-
+            self.__cities.add_city(city_name, morning_price,
+                                afternoon_price, evening_price)
+            
+            return 1
+        except:
+            return 0
     def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
-        conn.insert("INSERT INTO films VALUES(%s, %s, %s, %s, %s, %s, %s, %s);", film_title, film_rating,
-                    film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)
+        try:
+            film_rating = float(film_rating)
+            film_year = int(film_year)
+            film_duration = int(film_duration)
+            if film_rating > 10 or film_rating < 1: return -1
+            if film_year > 2023 or film_year < 1800: return -2
+            if film_duration > 400 or film_duration < 20: return -3
 
-        self.__films.add_film(film_title, film_rating, film_genre, film_year,
-                              film_age_rating, film_duration, film_description, film_cast)
+            conn.insert("INSERT INTO films VALUES(%s, %s, %s, %s, %s, %s, %s, %s);", film_title, film_rating,
+                        film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)
 
+            self.__films.add_film(film_title, film_rating, film_genre, film_year,
+                                film_age_rating, film_duration, film_description, film_cast)
+            
+            return 1
+        except:
+            return 0
     def add_cinema(self,  address, number_of_screens):
-        conn.insert(
-            "INSERT INTO cinemas (CINEMA_ADDRESS, CITY_NAME) VALUES (%s, %s);", address, self.__city.get_city_name())
-        cinema_id = conn.select("SELECT MAX(CINEMA_ID) as CINEMA_ID FROM cinemas;")[
-            0]["CINEMA_ID"]
+        try:
+            number_of_screens = int(number_of_screens)
+            if number_of_screens > 6 or number_of_screens < 1:
+                return 0
+            else:
+                pass
 
-        for screen in range(number_of_screens):
-            conn.insert("INSERT INTO screens(SCREEN_NUM_VIP_SEATS,SCREEN_NUM_UPPER_SEATS,SCREEN_NUM_LOWER_SEATS,CINEMA_ID, SCREEN_NUMBER) VALUES (%s, %s, %s, %s, %s);",
-                        10, 74, 36, cinema_id, screen)
+            conn.insert(
+                "INSERT INTO cinemas (CINEMA_ADDRESS, CITY_NAME) VALUES (%s, %s);", address, self.__city.get_city_name())
+            cinema_id = conn.select("SELECT MAX(CINEMA_ID) as CINEMA_ID FROM cinemas;")[
+                0]["CINEMA_ID"]
 
-        self.__city.add_cinema(cinema_id, address)
+            for screen in range(number_of_screens):
+                conn.insert("INSERT INTO screens(SCREEN_NUM_VIP_SEATS,SCREEN_NUM_UPPER_SEATS,SCREEN_NUM_LOWER_SEATS,CINEMA_ID, SCREEN_NUMBER) VALUES (%s, %s, %s, %s, %s);",
+                            10, 74, 36, cinema_id, screen)
 
+            self.__city.add_cinema(cinema_id, address)
+            return 1
+        except:
+            return 0
     def get_films(self):
         return self.__films.get_films()
 
@@ -123,6 +151,9 @@ class Model():
 
         city_price = self.get_city_price()
 
+        if not city_price: 
+            return -2 #-2 is only returned if no show is selected
+
         self.__booking_info = self.__show.add_booking(booking_reference, seat_type, num_of_tickets,
                                                       datetime.date.today(), city_price, None)
         if not self.__booking_info:
@@ -131,35 +162,46 @@ class Model():
         return self.__booking_info
 
     def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
-        self.__booking_info.set_customer(Customer(customer_name, customer_phone, customer_email, Payment(
-            name_on_card, card_number, expiry_date, cvv)))
-        self.__booking_in_progress = False
+        try:
+            self.__booking_info.set_customer(Customer(customer_name, customer_phone, customer_email, Payment(
+                name_on_card, card_number, expiry_date, cvv)))
+            self.__booking_in_progress = False
 
-        conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
-                    customer_email, customer_name, customer_phone, card_number[-4:])
+            conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
+                        customer_email, customer_name, customer_phone, card_number[-4:])
 
-        conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-                    self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
+            conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+                        self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
 
-        self.__booking_info.get_customer().get_payment().pay(
-            self.__booking_info.get_price())
+            self.__booking_info.get_customer().get_payment().pay(
+                self.__booking_info.get_price())
 
-        print("successfully done booking")
-        print("booking info: ")
-        print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
-
+            print("successfully done booking")
+            print("booking info: ")
+            print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
+            return 1
+        except:
+            return 0
+                
     def remove_listing(self):
-        id = self.__listing.get_listing_id()
-        conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
-        conn.delete(
-            "DELETE FROM listings WHERE LISTING_ID=%s;", id)
-        self.__cinema.remove_listing(id)
+        try:
+            id = self.__listing.get_listing_id()
+            conn.delete("DELETE FROM shows WHERE LISTING_ID=%s", id)
+            conn.delete(
+                "DELETE FROM listings WHERE LISTING_ID=%s;", id)
+            self.__cinema.remove_listing(id)
+            return 1
+        except:
+            return 0
 
     def remove_show(self):
-        id = self.__show.get_show_id()
-        conn.delete(
-            "DELETE FROM shows WHERE SHOW_ID=%s;", id)
-        self.__cinema.remove_show(id)
+        try:
+            id = self.__show.get_show_id()
+            conn.delete("DELETE FROM shows WHERE SHOW_ID=%s;", id)
+            self.__listing.remove_show(id)
+            return 1
+        except:
+            return 0
 
     def add_listing(self, film):
         conn.insert("INSERT INTO listings (LISTING_TIME, FILM_TITLE, CINEMA_ID) VALUES (%s, %s, %s);",
@@ -169,6 +211,7 @@ class Model():
             "SELECT MAX(LISTING_ID) as LISTING_ID FROM listings")[0]["LISTING_ID"]
 
         self.__cinema.add_listing(listing_id, self.__date, self.__films[film])
+        return 1
 
     def update_listing(self, film):
         listing_id = self.__listing.get_listing_id()
@@ -177,11 +220,14 @@ class Model():
                     self.__date, film.get_title(), listing_id)
 
         self.__cinema.update_listing(listing_id, self.__date, film)
+        return 1
 
     def get_city_price(self):
-        time = conn.select(
-            "SELECT NAME FROM times_of_day WHERE %s BETWEEN START_TIME AND END_TIME;", self.__show.get_time())[0]["NAME"]
-
+        try:  #Throws an error if no show is selected, returning -1 prevents
+            time = conn.select(
+                "SELECT NAME FROM times_of_day WHERE %s BETWEEN START_TIME AND END_TIME;", self.__show.get_time())[0]["NAME"]
+        except: 
+            return 
         if time == "morning":
             return self.__city.get_morning_price()
         elif time == "afternoon":
@@ -217,52 +263,55 @@ class Model():
         self.__show.cancel_booking(booking_reference)
 
     def add_show(self, time):
+        try:
+            duration = datetime.timedelta(
+                minutes=self.__listing.get_film().get_duration()+30)
 
-        duration = datetime.timedelta(
-            minutes=self.__listing.get_film().get_duration()+30)
-
-        data = conn.select("SELECT `SCREEN_ID` FROM screens WHERE `SCREEN_ID` NOT IN ( (\
-                                        SELECT s2.`SCREEN_ID` FROM screens s2\
-                                            LEFT JOIN shows sh2 ON s2.`SCREEN_ID` = sh2.`SCREEN_ID`\
-                                            LEFT JOIN listings l2 ON sh2.`LISTING_ID` = l2.`LISTING_ID`\
-                                        WHERE s2.`SCREEN_ID` AND s2.`CINEMA_ID` = %s AND l2.`LISTING_TIME` = %s\
-                                        GROUP BY s2.`SCREEN_ID` HAVING COUNT(sh2.`SCREEN_ID`) >= 4\
+            data = conn.select("SELECT `SCREEN_ID` FROM screens WHERE `SCREEN_ID` NOT IN ( (\
+                                            SELECT s2.`SCREEN_ID` FROM screens s2\
+                                                LEFT JOIN shows sh2 ON s2.`SCREEN_ID` = sh2.`SCREEN_ID`\
+                                                LEFT JOIN listings l2 ON sh2.`LISTING_ID` = l2.`LISTING_ID`\
+                                            WHERE s2.`SCREEN_ID` AND s2.`CINEMA_ID` = %s AND l2.`LISTING_TIME` = %s\
+                                            GROUP BY s2.`SCREEN_ID` HAVING COUNT(sh2.`SCREEN_ID`) >= 4\
+                                        )\
+                                        UNION (\
+                                            SELECT s1.`SCREEN_ID` FROM screens s1\
+                                                LEFT JOIN shows sh1 ON s1.`SCREEN_ID` = sh1.`SCREEN_ID`\
+                                                LEFT JOIN listings l1 ON sh1.`LISTING_ID` = l1.`LISTING_ID`\
+                                                LEFT JOIN films f1 ON l1.`FILM_TITLE` = f1.`FILM_TITLE`\
+                                            WHERE s1.`CINEMA_ID` = %s AND l1.`LISTING_TIME` = %s\
+                                                AND (\
+                                                    (ADDTIME(%s, '-00:30:00') BETWEEN `SHOW_TIME` AND ADDTIME(`SHOW_TIME`, SEC_TO_TIME(`FILM_DURATION` * 60)))\
+                                                    OR (`SHOW_TIME` BETWEEN ADDTIME(%s, '-00:30:00') AND ADDTIME(%s, %s))\
+                                                )\
+                                        )\
                                     )\
-                                    UNION (\
-                                        SELECT s1.`SCREEN_ID` FROM screens s1\
-                                            LEFT JOIN shows sh1 ON s1.`SCREEN_ID` = sh1.`SCREEN_ID`\
-                                            LEFT JOIN listings l1 ON sh1.`LISTING_ID` = l1.`LISTING_ID`\
-                                            LEFT JOIN films f1 ON l1.`FILM_TITLE` = f1.`FILM_TITLE`\
-                                        WHERE s1.`CINEMA_ID` = %s AND l1.`LISTING_TIME` = %s\
-                                            AND (\
-                                                (ADDTIME(%s, '-00:30:00') BETWEEN `SHOW_TIME` AND ADDTIME(`SHOW_TIME`, SEC_TO_TIME(`FILM_DURATION` * 60)))\
-                                                OR (`SHOW_TIME` BETWEEN ADDTIME(%s, '-00:30:00') AND ADDTIME(%s, %s))\
-                                            )\
-                                    )\
-                                )\
-                                AND `CINEMA_ID` = %s;\
-    ", self.__cinema.get_cinema_id(), self.__listing.get_date(), self.__cinema.get_cinema_id(), self.__listing.get_date(), time, time, time, duration, self.__cinema.get_cinema_id())
-        print(data)
-        if not data:
-            return 0
+                                    AND `CINEMA_ID` = %s;\
+        ", self.__cinema.get_cinema_id(), self.__listing.get_date(), self.__cinema.get_cinema_id(), self.__listing.get_date(), time, time, time, duration, self.__cinema.get_cinema_id())
+            print(data)
+            if not data:
+                return 0
 
-        screen_id = data[0]["SCREEN_ID"]
-        conn.insert(
-            "INSERT INTO shows(SHOW_TIME, SCREEN_ID, LISTING_ID) VALUES (%s, %s, %s);", time, screen_id, self.__listing.get_listing_id())
+            screen_id = data[0]["SCREEN_ID"]
+            conn.insert(
+                "INSERT INTO shows(SHOW_TIME, SCREEN_ID, LISTING_ID) VALUES (%s, %s, %s);", time, screen_id, self.__listing.get_listing_id())
 
-        show_id = conn.select(
-            "SELECT MAX(SHOW_ID) as SHOW_ID FROM shows")[0]["SHOW_ID"]
-        print(show_id)
-        screen = self.__cinema.get_screens()[screen_id]
+            show_id = conn.select(
+                "SELECT MAX(SHOW_ID) as SHOW_ID FROM shows")[0]["SHOW_ID"]
+            print(show_id)
+            screen = self.__cinema.get_screens()[screen_id]
 
-        self.__listing.add_show(show_id, time, screen)
+            self.__listing.add_show(show_id, time, screen)
 
-        return 1
+            return 1
+        except:
+            return -1
 
     def add_user(self, name, password, user_type):
         password = sha256_crypt.hash(password)
         conn.insert(
             "INSERT INTO users(USER_NAME, USER_PASSWORD_HASH, USER_TYPE, CINEMA_ID) VALUES (%s, %s, %s, %s);", name, password, user_type, self.__cinema.get_cinema_id())
+        return 1
 
     def get_booking(self, booking_ref):
         if (isinstance(self.__user, Admin)):
