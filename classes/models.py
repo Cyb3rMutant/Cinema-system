@@ -4,6 +4,7 @@ from passlib.hash import sha256_crypt
 from user_factory import User_factory
 from city_container import Cities
 from film_container import Films
+from customer_container import Customers
 from city import City
 from film import Film
 import datetime
@@ -20,12 +21,24 @@ class Model():
             self.__films[f["FILM_TITLE"]] = Film(f["FILM_TITLE"], f["FILM_RATING"], f["FILM_GENRE"],
                                                  f["FILM_YEAR"], f["FILM_AGE_RATING"], f["FILM_DURATION"], f["FILM_DESCRIPTION"], f["FILM_CAST"])
 
+        self.__customers = Customers()
+        customers = conn.select("SELECT * FROM customers;")
+        for c in customers:
+            self.__customers[c["CUSTOMER_EMAIL"]] = Customer(
+                c["CUSTOMER_NAME"], c["CUSTOMER_PHONE"], c["CUSTOMER_EMAIL"])
+
         self.__cities = Cities()
         cities = conn.select("SELECT * FROM cities;")
         for c in cities:
             self.__cities[c["CITY_NAME"]] = City(
                 c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"])
-        self.__booking_in_progress = False
+
+        self.__booking_info = None
+        self.__city = None
+        self.__cinema = None
+        self.__listing = None
+        self.__show = None
+        self.__date = None
 
     def validate_login(self, username, password):
         data = conn.select(
@@ -88,7 +101,7 @@ class Model():
 
     def add_city(self, city_name, morning_price, afternoon_price, evening_price):
         try:
-            #needs these
+            # needs these
             morning_price = float(morning_price)
             afternoon_price = float(afternoon_price)
             evening_price = float(evening_price)
@@ -96,29 +109,34 @@ class Model():
                         city_name, morning_price, afternoon_price, evening_price,)
 
             self.__cities.add_city(city_name, morning_price,
-                                afternoon_price, evening_price)
-            
+                                   afternoon_price, evening_price)
+
             return 1
         except:
             return 0
+
     def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
         try:
             film_rating = float(film_rating)
             film_year = int(film_year)
             film_duration = int(film_duration)
-            if film_rating > 10 or film_rating < 1: return -1
-            if film_year > 2023 or film_year < 1800: return -2
-            if film_duration > 400 or film_duration < 20: return -3
+            if film_rating > 10 or film_rating < 1:
+                return -1
+            if film_year > 2023 or film_year < 1800:
+                return -2
+            if film_duration > 400 or film_duration < 20:
+                return -3
 
             conn.insert("INSERT INTO films VALUES(%s, %s, %s, %s, %s, %s, %s, %s);", film_title, film_rating,
                         film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)
 
             self.__films.add_film(film_title, film_rating, film_genre, film_year,
-                                film_age_rating, film_duration, film_description, film_cast)
-            
+                                  film_age_rating, film_duration, film_description, film_cast)
+
             return 1
         except:
             return 0
+
     def add_cinema(self,  address, number_of_screens):
         try:
             number_of_screens = int(number_of_screens)
@@ -140,6 +158,7 @@ class Model():
             return 1
         except:
             return 0
+
     def get_films(self):
         return self.__films.get_films()
 
@@ -151,38 +170,48 @@ class Model():
 
         city_price = self.get_city_price()
 
-        if not city_price: 
-            return -2 #-2 is only returned if no show is selected
+        if not city_price:
+            return -2  # -2 is only returned if no show is selected
 
         self.__booking_info = self.__show.add_booking(booking_reference, seat_type, num_of_tickets,
                                                       datetime.date.today(), city_price, None)
         if not self.__booking_info:
             return 0
-        self.__booking_in_progress = True
+
         return self.__booking_info
 
-    def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
-        try:
-            self.__booking_info.set_customer(Customer(customer_name, customer_phone, customer_email, Payment(
-                name_on_card, card_number, expiry_date, cvv)))
-            self.__booking_in_progress = False
+    def add_booking(self, customer_email, name_on_card, card_number, cvv, expiry_date):
+        customer = self.__customers[customer_email]
+        customer.set_payment(
+            Payment(name_on_card, card_number, expiry_date, cvv))
+        self.__booking_info.set_customer(customer)
 
-            conn.insert("INSERT INTO customers(CUSTOMER_EMAIL, CUSTOMER_NAME, CUSTOMER_PHONE, CARD_ENDING_DIGITS) VALUES (%s, %s, %s, %s);",
-                        customer_email, customer_name, customer_phone, card_number[-4:])
+        conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+                    self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
 
-            conn.insert("INSERT INTO bookings(BOOKING_REFERENCE, BOOKING_SEAT_COUNT, BOOKING_DATE, BOOKING_PRICE, SHOW_ID, SEAT_TYPE, CUSTOMER_EMAIL, USER_ID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
-                        self.__booking_info.get_booking_reference(), self.__booking_info.get_number_of_seats(), self.__booking_info.get_date_of_booking(), self.__booking_info.get_price(), self.__show.get_show_id(), self.__booking_info.get_seat_type(), self.__booking_info.get_customer().get_email(), self.__user.get_id())
+        self.__booking_info.get_customer().get_payment().pay(
+            self.__booking_info.get_price())
+        print("successfully done booking")
+        print("booking info: ")
+        print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
+        self.__booking_info = None
 
-            self.__booking_info.get_customer().get_payment().pay(
-                self.__booking_info.get_price())
+    def check_customer(self, customer_email):
+        return customer_email in self.__customers.get_customers()
 
-            print("successfully done booking")
-            print("booking info: ")
-            print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
-            return 1
-        except:
-            return 0
-                
+    def update_customer(self, customer_name, customer_email, customer_phone, card_number):
+        self.__customers.update_customer(
+            customer_email, customer_name, customer_phone)
+        conn.update("UPDATE customers SET CUSTOMER_NAME=%s, CUSTOMER_PHONE=%s, CARD_ENDING_DIGITS=%s",
+                    customer_name, customer_phone, card_number[-4:])
+
+    def add_customer(self, customer_name, customer_email, customer_phone, card_number):
+        self.__customers.add_customer(
+            customer_email, customer_name, customer_phone)
+
+        conn.insert("INSERT INTO customers VALUES (%s, %s, %s, %s);",
+                    customer_email, customer_name, customer_phone, card_number[-4:])
+
     def remove_listing(self):
         try:
             id = self.__listing.get_listing_id()
@@ -223,11 +252,11 @@ class Model():
         return 1
 
     def get_city_price(self):
-        try:  #Throws an error if no show is selected, returning -1 prevents
+        try:  # Throws an error if no show is selected, returning -1 prevents
             time = conn.select(
                 "SELECT NAME FROM times_of_day WHERE %s BETWEEN START_TIME AND END_TIME;", self.__show.get_time())[0]["NAME"]
-        except: 
-            return 
+        except:
+            return
         if time == "morning":
             return self.__city.get_morning_price()
         elif time == "afternoon":
@@ -314,34 +343,34 @@ class Model():
         return 1
 
     def get_booking(self, booking_ref):
-        if (isinstance(self.__user, Admin)):
-            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
-                                FROM bookings b\
-                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
-                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
-                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
-                                WHERE\
-                                    b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
+        try:
+            if (isinstance(self.__user, Admin)):
+                data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                    FROM bookings b\
+                                        LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                        LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                        LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                        LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                    WHERE\
+                                        b.`BOOKING_REFERENCE` = %s;", booking_ref)[0]
 
-        else:
-
-            data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
-                                FROM bookings b\
-                                    LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
-                                    LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                                    LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
-                                    LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
-                                WHERE\
-                                    b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, self.__user.get_branch().get_cinema_id())[0]
-
+            else:
+                data = conn.select("SELECT b.`BOOKING_REFERENCE`, b.`SHOW_ID`, s.`LISTING_ID`, l.`CINEMA_ID`, c.`CITY_NAME`\
+                                    FROM bookings b\
+                                        LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                                        LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                                        LEFT JOIN cinemas c ON l.`CINEMA_ID` = c.`CINEMA_ID`\
+                                        LEFT JOIN cities ON c.`CITY_NAME` = cities.`CITY_NAME`\
+                                    WHERE\
+                                        b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, self.__user.get_branch().get_cinema_id())[0]
+        except IndexError:
+            return 0
+        self.__city = self.__cities[data["CITY_NAME"]]
+        self.__cinema = self.__city[data["CINEMA_ID"]]
+        self.__listing = self.__cinema.get_listings()[data["LISTING_ID"]]
+        self.__show = self.__listing.get_shows()[data["SHOW_ID"]]
         print(data)
-        return self.__cities[
-            data["CITY_NAME"]][
-                data["CINEMA_ID"]].get_listings()[
-                    data["LISTING_ID"]].get_shows()[
-                        data["SHOW_ID"]].get_bookings()[
-                            data["BOOKING_REFERENCE"]]
+        return self.__show.get_bookings()[data["BOOKING_REFERENCE"]]
 
     def get_user_types(self):
         return [t["USER_TYPE"] for t in conn.select("SELECT USER_TYPE FROM user_types;")]
@@ -417,7 +446,7 @@ class Model():
 
     def clear_data(self):
         print("in clear")
-        if self.__booking_in_progress:
+        if self.__booking_info:
             print("in if")
             self.__show.cancel_booking(
                 self.__booking_info.get_booking_reference())

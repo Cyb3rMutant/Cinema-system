@@ -33,13 +33,13 @@ class Controller():
         return self.__model.get_all_bookings_as_list()
 
     def add_city(self, name, morning_price, afternoon_price, evening_price):
-        match(self.__model.add_city(name, morning_price,afternoon_price, evening_price)):
+        match(self.__model.add_city(name, morning_price, afternoon_price, evening_price)):
             case 1:
                 self.__view.show_info("Successfully added city.")
                 self.__view.dashboard()
             case 0:
-                self.__view.show_error("Enter numerical values for city prices.")
-
+                self.__view.show_error(
+                    "Enter numerical values for city prices.")
 
     def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
         match(self.__model.add_film(film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast)):
@@ -47,13 +47,16 @@ class Controller():
                 self.__view.show_info("Successfully Added Film.")
                 self.__view.dashboard()
             case 0:
-                self.__view.show_error("Please enter valid rating(1-10), year(1800-2023) & duration(20-400).")
+                self.__view.show_error(
+                    "Please enter valid rating(1-10), year(1800-2023) & duration(20-400).")
             case -1:
                 self.__view.show_error("Please enter a rating between 1-10.")
             case -2:
                 self.__view.show_error("Please enter valid year parameters.")
             case -3:
-                self.__view.show_error("Please enter a film duration between 20 & 400 minutes.")
+                self.__view.show_error(
+                    "Please enter a film duration between 20 & 400 minutes.")
+
     def add_cinema(self, address, number_of_screens):
         match(self.__model.add_cinema(address, number_of_screens)):
             case 1:
@@ -61,15 +64,18 @@ class Controller():
                 self.__view.dashboard()
             case 0:
                 self.__view.show_error("Please enter an integer between 1-6.")
-    def remove_listing(self,cinema):
-        if cinema == "choose cinema": self.__view.show_error("Choose a cinema."); return #quickfix for the choose cinema problem. (we do need this or an alternative)
+
+    def remove_listing(self, cinema):
+        if cinema == "choose cinema":
+            self.__view.show_error("Choose a cinema.")
+            # quickfix for the choose cinema problem. (we do need this or an alternative)
+            return
         match(self.__model.remove_listing()):
             case 1:
                 self.__view.show_info("Successfully Removed Listing")
                 self.__view.dashboard()
             case 0:
                 self.__view.show_error("No Listing Selected")
-
 
     def remove_show(self):
         match(self.__model.remove_show()):
@@ -86,8 +92,7 @@ class Controller():
         match(self.__model.add_listing(film)):
             case 1:
                 self.__view.show_info("Successfully Added Listing.")
-                self.__view.dashboard() 
-        
+                self.__view.dashboard()
 
     def update_listing(self, film):
 
@@ -113,12 +118,21 @@ class Controller():
                 ret.as_list(), ret.get_ticket(), ret.get_receipt())
 
     def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
-        match(self.__model.add_booking(customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date)):
-            case 1:
-                self.__view.show_info("Booking Successful.")
-                self.__view.dashboard() #Take to receipt or ticket or smth
-            case 0:
-                self.__view.show_error("Duplicate email.") #Needs to be fixed
+        if self.__model.check_customer(customer_email):
+            self.__view.askquestion(
+                "customer email exists, do you want to update data")
+        else:
+            self.__model.add_customer(
+                customer_name, customer_email, customer_phone, card_number)
+
+        self.__model.add_booking(
+            customer_email, name_on_card, card_number, cvv, expiry_date)
+        self.__view.show_info("Booking Successful.")
+        self.__view.dashboard()  # Take to receipt or ticket or smth
+
+    def update_customer(self, customer_name, customer_email, customer_phone, card_number):
+        self.__model.update_customer(
+            customer_name, customer_email, customer_phone, card_number)
 
     def get_cinema_city(self):
         return self.__model.get_cinema_city()
@@ -148,7 +162,7 @@ class Controller():
             case -1:
                 self.__view.show_error("Select a Listing or Cinema.")
 
-    def add_user(self, name, password, user_type,cinema):
+    def add_user(self, name, password, user_type, cinema):
         if cinema == "choose cinema":
             self.__view.show_error("Choose a cinema.")
             return
@@ -156,7 +170,6 @@ class Controller():
             case 1:
                 self.__view.show_info("Successfully Added User.")
                 self.__view.dashboard()
-
 
     def get_user_types(self):
         return self.__model.get_user_types()
@@ -186,7 +199,12 @@ class Controller():
         return self.__model.get_show(id)
 
     def get_booking(self, booking_ref):
-        return self.__model.get_booking(booking_ref)
+        booking = self.__model.get_booking(booking_ref)
+        if booking:
+            return booking
+        else:
+            self.__view.show_error("booking not found")
+            return []
 
     def clear_data(self):
         return self.__model.clear_data()

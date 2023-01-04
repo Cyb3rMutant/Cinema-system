@@ -1,6 +1,6 @@
 from booking_factory import Booking_factory
 from dbfunc import conn
-from customer import Customer
+from customer_container import Customers
 
 
 class Show(object):
@@ -21,10 +21,8 @@ class Show(object):
         bookings = conn.select(
             "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show_id)
         for b in bookings:
-            c = conn.select(
-                "SELECT * FROM customers WHERE CUSTOMER_EMAIL=%s;", b["CUSTOMER_EMAIL"])[0]
             self.__bookings[b["BOOKING_REFERENCE"]] = Booking_factory.get_booking_seat_hall(b["SEAT_TYPE"])(
-                b["BOOKING_REFERENCE"], self, b["BOOKING_SEAT_COUNT"], b["BOOKING_DATE"], b["BOOKING_PRICE"], Customer(c["CUSTOMER_NAME"], c["CUSTOMER_PHONE"], c["CUSTOMER_EMAIL"]))
+                b["BOOKING_REFERENCE"], self, b["BOOKING_SEAT_COUNT"], b["BOOKING_DATE"], b["BOOKING_PRICE"], Customers.get_customer(b["CUSTOMER_EMAIL"]))
 
         self.__screen = screen
 

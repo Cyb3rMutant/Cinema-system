@@ -25,5 +25,11 @@ class Customer(object):
     def get_payment(self):
         return self.__payment
 
+    def set_name(self, name):
+        self.__name = name
+
+    def set_phone(self, phone):
+        self.__phone = phone
+
     def set_payment(self, payment):
         self.__payment = payment
