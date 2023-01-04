@@ -1,0 +1,2 @@
+Python GUI, PyQT vs TKinter
+https://dev.to/amigosmaker/python-gui-pyqt-vs-tkinter-5hdd 

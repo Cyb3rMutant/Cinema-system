@@ -201,10 +201,6 @@ class Main_frame(tk.Frame):
             pass
         self.clear_frame(self.__tree_frame)
 
-        if str(self.__cinema_choice.get()) == "choose cinema":
-            self.show_error("Select a Cinema.")
-            return
-
         xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
@@ -561,6 +557,9 @@ class Main_frame(tk.Frame):
                 '', tk.END, values=self.__controller.get_booking(booking_ref).as_list())
 
         if search == False:
+            if str(self.__cinema_choice.get()) == "choose cinema":
+                self.show_error("Select a Cinema.")
+                return
             try:
                 for data in self.__controller.get_bookings_as_list():
                     self.__tree_view.insert('', tk.END, values=data)
@@ -884,6 +883,80 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "Generate report"
+
+        self.__city_options_label = tk.Label(
+            self.__app.body_frame, text="choose city: ").place(x=10, y=30)
+        self.__cinema_options_label = tk.Label(
+            self.__app.body_frame, text="choose cinema: ").place(x=300, y=30)
+
+        self.__city_choice = tk.StringVar()
+        self.__city_choice.set(
+            self.__controller.get_city())
+        self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
+                                            command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema)))))
+        self.__city_options.place(x=100, y=30)
+
+        self.__cinema_choice = tk.StringVar()
+        self.__cinema_choice.set("choose cinema")
+        self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice,
+                                              *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(cinema)])
+        self.__cinema_options.place(x=400, y=30)
+
+        self.__start_date_label = tk.Label(
+            self.__app.body_frame, text="start date").place(x=10, y=90)
+        self.__start_date = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
+                                      maxdate=datetime.date.today()).place(x=100, y=90)
+
+        self.__end_date_label = tk.Label(
+            self.__app.body_frame, text="end date").place(x=10, y=150)
+        self.__end_date = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
+                                    maxdate=datetime.date.today()).place(x=100, y=150)
+
+        self.__listing_number_of_bookings = tk.Button(self.__app.body_frame, text='listing number\nof bookings', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: self.__controller.listing_number_of_bookings('2022-01-12', '2023-01-12'))
+        self.__listing_number_of_bookings.place(x=112, y=160+50)
+
+        self.__cinema_revenu = tk.Button(self.__app.body_frame, text='cinema revenu', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: self.__controller.cinema_revenu('2022-01-12', '2023-01-12'))
+        self.__cinema_revenu.place(x=112, y=260+50)
+
+        self.__film_revenu = tk.Button(self.__app.body_frame, text='film revenu', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: self.__controller.film_revenu())
+        self.__film_revenu.place(x=112, y=360+50)
+
+        self.__staff_number_of_bookings = tk.Button(self.__app.body_frame, text='staff number\nof bookings', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: self.__controller.staff_number_of_bookings('2022-01-12', '2023-01-12'))
+        self.__staff_number_of_bookings.place(x=112, y=460)
+
+        self.__tree_frame = tk.Frame(
+            self.__app.body_frame, width=700, height=400, bg='gainsboro')
+        self.__tree_frame.place(x=350, y=200)
+
+    def report_tree(self, data):
+        self.clear_frame(self.__tree_frame)
+
+        xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
+        yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
+
+        self.__tree_view = ttk.Treeview(
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=list(data[0].keys()))
+
+        self.__tree_view.grid(row=0, column=0)
+        xscrollbar.configure(command=self.__tree_view.xview)
+        yscrollbar.configure(command=self.__tree_view.yview)
+
+        xscrollbar.grid(row=1, column=0, sticky=tk.N+tk.S+tk.E+tk.W)
+        yscrollbar.grid(row=0, column=1, sticky=tk.N+tk.S+tk.E+tk.W)
+
+        self.__tree_view.column("#0", width=0,  stretch=tk.NO)
+        for d in data[0].keys():
+            print(d)
+            self.__tree_view.heading(d, text=d, anchor=tk.CENTER)
+            self.__tree_view.column(d, anchor=tk.CENTER, width=140)
+        for d in data:
+            print(d)
+            self.__tree_view.insert('', tk.END, values=list(d.values()))
+
 
     # IF WE DO BIRMIGNAHm
 

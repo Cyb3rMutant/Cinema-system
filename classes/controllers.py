@@ -95,11 +95,24 @@ class Controller():
                 self.__view.dashboard()
 
     def update_listing(self, film):
-
         match(self.__model.update_listing(film)):
             case 1:
                 self.__view.show_info("Successfully updated listing")
                 self.__view.dashboard()
+
+    def listing_number_of_bookings(self, start, end):
+        self.__view.report_tree(
+            self.__model.listing_number_of_bookings(start, end))
+
+    def cinema_revenu(self, start, end):
+        self.__view.report_tree(self.__model.cinema_revenu(start, end))
+
+    def film_revenu(self,):
+        self.__view.report_tree(self.__model.film_revenu())
+
+    def staff_number_of_bookings(self, start, end):
+        self.__view.report_tree(
+            self.__model.staff_number_of_bookings(start, end))
 
     def get_films(self):
         return self.__model.get_films()

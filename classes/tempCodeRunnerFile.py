@@ -1,24 +1,39 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk
+from tkcalendar import Calendar, DateEntry
+
+
+def calendar_view():
+    def print_sel():
+        print(cal.selection_get())
+
+    top = tk.Toplevel(root)
+
+    cal = Calendar(top,
+                   font="Arial 14", selectmode='day',
+                   cursor="hand1", year=2018, month=2, day=5)
+    cal.pack(fill="both", expand=True)
+    ttk.Button(top, text="ok", command=print_sel).pack()
+
+
+def dateentry_view():
+    def print_sel():
+        print(cal.get_date())
+    top = tk.Toplevel(root)
+
+    ttk.Label(top, text='Choose date').pack(padx=10, pady=10)
+    cal = DateEntry(top, width=12, background='darkblue',
+                    foreground='white', borderwidth=2)
+    cal.pack(padx=10, pady=10)
+    ttk.Button(top, text="ok", command=print_sel).pack()
+
 
 root = tk.Tk()
+s = ttk.Style(root)
+s.theme_use('clam')
 
-canvas1 = tk.Canvas(root, width=300, height=300)
-canvas1.pack()
-
-
-def exit_application():
-    msg_box = tk.messagebox.askquestion('Exit Application', 'Are you sure you want to exit the application?',
-                                        icon='error')
-    if msg_box == 'yes':
-        root.destroy()
-    else:
-        tk.messagebox.showinfo(
-            'Return', 'You will now return to the application screen')
-
-
-button1 = tk.Button(root, text='Exit Application',
-                    command=exit_application, bg='brown', fg='white')
-canvas1.create_window(150, 150, window=button1)
+ttk.Button(root, text='Calendar', command=calendar_view).pack(padx=10, pady=10)
+ttk.Button(root, text='DateEntry',
+           command=dateentry_view).pack(padx=10, pady=10)
 
 root.mainloop()

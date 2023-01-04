@@ -251,6 +251,56 @@ class Model():
         self.__cinema.update_listing(listing_id, self.__date, film)
         return 1
 
+    def listing_number_of_bookings(self, start, end):
+        return conn.select("SELECT\
+                        l.`LISTING_ID`, COUNT(`BOOKING_REFERENCE`) as cnt\
+                    FROM listings l\
+                        LEFT JOIN shows s ON l.`LISTING_ID` = s.`LISTING_ID`\
+                        LEFT JOIN bookings b ON s.`SHOW_ID` = b.`SHOW_ID`\
+                    WHERE\
+                        `CINEMA_ID` = %s\
+                        AND ISNULL(b.`REFUND`)\
+                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                    GROUP BY l.`LISTING_ID`\
+                    ORDER BY cnt DESC;", self.__cinema.get_cinema_id(), start, end)
+
+    def cinema_revenu(self, start, end):
+        return conn.select("SELECT\
+                    c.*,\
+                        SUM(b.`BOOKING_PRICE`) as tot\
+                    FROM cinemas c\
+                    LEFT JOIN listings l ON c.`CINEMA_ID` = l.`CINEMA_ID`\
+                        LEFT JOIN shows s ON l.`LISTING_ID` = s.`LISTING_ID`\
+                        LEFT JOIN bookings b ON s.`SHOW_ID` = b.`SHOW_ID`\
+                    WHERE\
+                        ISNULL(b.`REFUND`)\
+                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                    GROUP BY c.`CINEMA_ID`\
+                    ORDER BY tot DESC", start, end)
+
+    def film_revenu(self):
+        return conn.select("SELECT\
+                    f.`FILM_TITLE`,\
+                        SUM(b.`BOOKING_PRICE`) as tot\
+                    FROM films f\
+                    LEFT JOIN listings l ON f.`FILM_TITLE` = l.`FILM_TITLE`\
+                        LEFT JOIN shows s ON l.`LISTING_ID` = s.`LISTING_ID`\
+                        LEFT JOIN bookings b ON s.`SHOW_ID` = b.`SHOW_ID`\
+                    WHERE ISNULL(b.`REFUND`)\
+                    GROUP BY f.`FILM_TITLE`\
+                    ORDER BY tot DESC")
+
+    def staff_number_of_bookings(self, start, end):
+        return conn.select("SELECT u.`USER_ID`, u.`USER_NAME`, COUNT(b.`BOOKING_REFERENCE`) as tot\
+                    FROM users u\
+                    LEFT JOIN bookings b ON u.`USER_ID` = b.`USER_ID`\
+                        LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
+                        LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
+                    WHERE ISNULL(b.`REFUND`)\
+                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                    GROUP BY u.`USER_ID`\
+                    ORDER BY tot DESC", start, end)
+
     def get_city_price(self):
         try:  # Throws an error if no show is selected, returning -1 prevents
             time = conn.select(
