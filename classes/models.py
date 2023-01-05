@@ -44,9 +44,9 @@ class Model():
                 for s in s_data:
                     screens[s["SCREEN_ID"]] = Screen(s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"],
                                                      s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"], s["SCREEN_NUMBER"])
-                print(screens)
+
                 c.add_cinema(ci["CINEMA_ID"], ci["CINEMA_ADDRESS"], screens)
-            print(c.get_cinemas())
+
             self.__cities[c.get_city_name()] = c
 
         self.__booking_info = None
@@ -89,11 +89,13 @@ class Model():
 
     def get_all_bookings_as_list(self):
         bookings = []
-        print(self.__cinema)
-        for l in self.__cinema.get_listings().values():
-            for s in l.get_shows().values():
-                for b in s.get_bookings().values():
-                    bookings.append(b.as_list())
+        data = conn.select("SELECT b.BOOKING_REFERENCE, b.BOOKING_SEAT_COUNT, b.BOOKING_DATE, b.BOOKING_PRICE, b.SHOW_ID, b.SEAT_TYPE FROM bookings b\
+                            LEFT JOIN shows s ON b.`SHOW_ID`=s.`SHOW_ID`\
+                            LEFT JOIN listings l ON s.`LISTING_ID`=l.`LISTING_ID`\
+                            LEFT JOIN cinemas c ON l.`CINEMA_ID`=c.`CINEMA_ID`\
+                        WHERE c.`CINEMA_ID`=%s AND ISNULL(b.`REFUND`);", self.__cinema.get_cinema_id())
+        for b in data:
+            bookings.append(list(b.values()))
         return bookings
 
     def get_cinema_listings_as_list(self):
@@ -109,8 +111,7 @@ class Model():
         try:
             sh_list = []
             for sh in data:
-                sh_list.append(
-                    [sh["SHOW_ID"], sh["SHOW_TIME"], sh["SCREEN_ID"]])
+                sh_list.append(sh.values())
             return sh_list
         except:
             print("no shows airing for listing")
@@ -214,9 +215,6 @@ class Model():
 
         self.__booking_info.get_customer().get_payment().pay(
             self.__booking_info.get_price())
-        print("successfully done booking")
-        print("booking info: ")
-        print(f'booking reference:{self.__booking_info.get_booking_reference()}\nnum_of_seats:{self.__booking_info.get_number_of_seats()}\ndate_today:{self.__booking_info.get_date_of_booking()}\nprice:{self.__booking_info.get_price()}\nshow_id:{self.__show.get_show_id()}\nseat_type:{self.__booking_info.get_seat_type()}\ncust_email:{customer_email}\n')
         self.__booking_info = None
 
     def check_customer(self, customer_email):
@@ -390,7 +388,7 @@ class Model():
                                     )\
                                     AND `CINEMA_ID` = %s;\
         ", self.__cinema.get_cinema_id(), self.__listing.get_date(), self.__cinema.get_cinema_id(), self.__listing.get_date(), time, time, time, duration, self.__cinema.get_cinema_id())
-            print(data)
+
             if not data:
                 return 0
 
@@ -400,7 +398,7 @@ class Model():
 
             show_id = conn.select(
                 "SELECT MAX(SHOW_ID) as SHOW_ID FROM shows")[0]["SHOW_ID"]
-            print(show_id)
+
             screen = self.__cinema.get_screens()[screen_id]
 
             self.__listing.add_show(show_id, time, screen)
@@ -438,11 +436,11 @@ class Model():
                                         b.`BOOKING_REFERENCE` = %s AND c.`CINEMA_ID` = %s;", booking_ref, self.__user.get_branch().get_cinema_id())[0]
         except IndexError:
             return 0
-        self.__city = self.__cities[data["CITY_NAME"]]
-        self.__cinema = self.__city[data["CINEMA_ID"]]
-        self.__listing = self.__cinema.get_listings()[data["LISTING_ID"]]
-        self.__show = self.__listing.get_shows()[data["SHOW_ID"]]
-        print(data)
+        self.set_city(self.__cities[data["CITY_NAME"]])
+        self.set_cinema(self.__city[data["CINEMA_ID"]])
+        self.set_listing(self.__cinema.get_listings()[data["LISTING_ID"]])
+        self.set_show(self.__listing.get_shows()[data["SHOW_ID"]])
+
         return self.__show.get_bookings()[data["BOOKING_REFERENCE"]]
 
     def get_user_types(self):
@@ -460,7 +458,9 @@ class Model():
         return self.__city
 
     def get_cinemas(self):
-        return self.__city.get_cinemas().values()
+        cinemas = list(self.__city.get_cinemas().values())
+        print("cinemas", cinemas)
+        return cinemas if cinemas else ["no cinemas"]
 
     def get_cinema(self, id=None):
         if id:
@@ -471,6 +471,8 @@ class Model():
         return self.__cinema
 
     def get_listings(self):
+        if self.__cinema == "no cinemas":
+            return ["no listings"]
         listings = [l for l in list(
             self.__cinema.get_listings().values()) if l.get_date() == self.__date]
         # for l in list(self.__cinema.get_listings().values()):
@@ -478,6 +480,7 @@ class Model():
         #         listings.append(l)
         if not listings:
             listings.append("no listings")
+        print("listings", listings)
         return listings
 
     def get_listing(self, id=None):
@@ -494,6 +497,7 @@ class Model():
         shows = list(self.__listing.get_shows().values())
         if not shows:
             shows.append("no shows")
+        print("shows", shows)
         return shows
 
     def get_show(self, id=None):
@@ -508,10 +512,13 @@ class Model():
         self.__city = city
 
     def set_cinema(self, cinema):
-        if self.__cinema:
-            self.__cinema.get_listings.clear()
+        if self.__cinema and not isinstance(self.__cinema, str):
+            self.__cinema.get_listings().clear()
 
         self.__cinema = cinema
+
+        if isinstance(cinema, str):
+            return
 
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema.get_cinema_id())
@@ -520,10 +527,13 @@ class Model():
                 l["LISTING_ID"], l["LISTING_TIME"], self.__films[l["FILM_TITLE"]])
 
     def set_listing(self, listing):
-        if self.__listing:
+        if self.__listing and not isinstance(self.__listing, str):
             self.__listing.get_shows().clear()
 
         self.__listing = listing
+
+        if isinstance(listing, str):
+            return
 
         shows = conn.select(
             "SELECT * FROM shows WHERE LISTING_ID=%s", self.__listing.get_listing_id())
@@ -532,10 +542,13 @@ class Model():
                 s["SHOW_ID"], s["SHOW_TIME"], self.__cinema.get_screens()[s["SCREEN_ID"]])
 
     def set_show(self, show):
-        if self.__show:
+        if self.__show and not isinstance(self.__show, str):
             self.__show.get_bookings().clear()
 
         self.__show = show
+
+        if isinstance(show, str):
+            return
 
         bookings = conn.select(
             "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show.get_show_id())
@@ -543,15 +556,11 @@ class Model():
             self.__show.add_booking(b["BOOKING_REFERENCE"], b["SEAT_TYPE"], b["BOOKING_SEAT_COUNT"],
                                     b["BOOKING_DATE"], b["BOOKING_PRICE"], self.__customers[b["CUSTOMER_EMAIL"]])
 
-        print(self.__show.get_bookings())
-
     def set_date(self, date):
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
         self.__date = date.date()
-        print(self.__date, type(self.__date))
 
     def clear_data(self):
-        print("in clear")
         self.__date = None
         self.__booking_info = None
         self.__show = None

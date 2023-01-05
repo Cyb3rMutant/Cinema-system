@@ -156,7 +156,7 @@ class Main_frame(tk.Frame):
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set("choose cinema")
+            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice,
                                                   *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(cinema)])
             self.__cinema_options.place(x=400, y=30)
@@ -269,7 +269,7 @@ class Main_frame(tk.Frame):
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set("choose cinema")
+            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(
                 cinema), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))])
             self.__cinema_options.place(x=400, y=30)
@@ -419,7 +419,7 @@ class Main_frame(tk.Frame):
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set("choose cinema")
+            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice,
                                                   *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(cinema)])
             self.__cinema_options.place(x=400, y=30)
@@ -594,7 +594,7 @@ class Main_frame(tk.Frame):
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set("choose cinema")
+            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=lambda cinema: [
                                                   self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)])
             self.__cinema_options.place(x=400, y=30)
@@ -897,7 +897,7 @@ class Main_frame(tk.Frame):
         self.__city_options.place(x=100, y=30)
 
         self.__cinema_choice = tk.StringVar()
-        self.__cinema_choice.set("choose cinema")
+        self.__cinema_choice.set(self.__controller.get_cinema())
         self.__cinema_options = tk.OptionMenu(self.__app.body_frame, self.__cinema_choice,
                                               *self.__controller.get_cinemas(), command=lambda cinema: [self.__controller.set_cinema(cinema)])
         self.__cinema_options.place(x=400, y=30)
@@ -956,7 +956,6 @@ class Main_frame(tk.Frame):
         for d in data:
             print(d)
             self.__tree_view.insert('', tk.END, values=list(d.values()))
-
 
     # IF WE DO BIRMIGNAHm
 
@@ -1223,7 +1222,7 @@ class Main_frame(tk.Frame):
             pass
         else:
             self.remove_create_stuff()
-        self.__cinema_choice.set("choose cinema")
+        self.__cinema_choice.set(self.__controller.get_cinema())
         self.__cinema_options.destroy()
         self.__cinema_options = tk.OptionMenu(
             self.__app.body_frame, self.__cinema_choice, *self.__controller.get_cinemas(), command=func)
