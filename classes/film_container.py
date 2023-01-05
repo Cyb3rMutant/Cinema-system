@@ -1,5 +1,4 @@
 import film
-from dbfunc import conn
 
 
 class Films():

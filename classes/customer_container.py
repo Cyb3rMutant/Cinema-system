@@ -1,5 +1,4 @@
 import customer
-from dbfunc import conn
 
 
 class Customers():

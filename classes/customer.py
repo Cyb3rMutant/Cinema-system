@@ -1,7 +1,3 @@
-import payment
-from dbfunc import conn
-
-
 class Customer(object):
     def __init__(self, name, phone, email, payment=None):
 
