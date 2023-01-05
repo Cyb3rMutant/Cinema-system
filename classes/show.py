@@ -1,6 +1,4 @@
 from booking_factory import Booking_factory
-from dbfunc import conn
-from customer_container import Customers
 
 
 class Show(object):
@@ -18,15 +16,15 @@ class Show(object):
 
         self.__bookings = dict()
 
-        bookings = conn.select(
-            "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show_id)
-        for b in bookings:
-            self.__bookings[b["BOOKING_REFERENCE"]] = Booking_factory.get_booking_seat_hall(b["SEAT_TYPE"])(
-                b["BOOKING_REFERENCE"], self, b["BOOKING_SEAT_COUNT"], b["BOOKING_DATE"], b["BOOKING_PRICE"], Customers.get_customer(b["CUSTOMER_EMAIL"]))
-
         self.__screen = screen
 
         self.__listing = listing
+
+    def __getitem__(self, key):
+        return self.__bookings[key]
+
+    def __setitem__(self, key, value):
+        self.__bookings[key] = value
 
     def get_show_id(self):
         return self.__show_id
@@ -54,9 +52,6 @@ class Show(object):
 
     def get_listing(self):
         return self.__listing
-
-    def set_time(self, time):
-        pass
 
     def set_available_vip_seats(self, seats):
         self.__available_vip_seats -= seats

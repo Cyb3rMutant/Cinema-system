@@ -1,10 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
 import cinema
-from dbfunc import conn
-
-# ˄
 
 
 class City(object):
@@ -20,11 +14,11 @@ class City(object):
 
         self.__cinemas = dict()
 
-        cinemas = conn.select(
-            "SELECT * FROM cinemas WHERE CITY_NAME=%s;", self.__city_name)
-        for c in cinemas:
-            self.__cinemas[c["CINEMA_ID"]] = cinema.Cinema(
-                c["CINEMA_ID"], c["CINEMA_ADDRESS"])
+    def __getitem__(self, key):
+        return self.__cinemas[key]
+
+    def __setitem__(self, key, value):
+        self.__cinemas[key] = value
 
     def get_city_name(self):
         return self.__city_name
@@ -41,9 +35,6 @@ class City(object):
     def get_cinemas(self):
         return self.__cinemas
 
-    def __getitem__(self, cinema_id: int):
-        return self.__cinemas[cinema_id]
-
     def set_morning_price(self, morning_prince: int):
         self.__morning_price = morning_prince
 
@@ -53,8 +44,9 @@ class City(object):
     def set_evening_price(self, evening_price: int):
         self.__evening_price = evening_price
 
-    def add_cinema(self, cinema_id: int, cinema_address: str):
-        self.__cinemas[cinema_id] = cinema.Cinema(cinema_id, cinema_address)
+    def add_cinema(self, cinema_id, cinema_address, screens):
+        self.__cinemas[cinema_id] = cinema.Cinema(
+            cinema_id, cinema_address, screens)
 
     def __str__(self):
         return self.__city_name

@@ -9,7 +9,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("")
         self.geometry("1350x800+0+0")
-        self.resizable(False,False)
+        self.resizable(False, False)
         self.configure(background="gainsboro")
         self.main_frame = tk.Frame(
             self, bd=10, width=1350, height=800, bg='gainsboro', relief=tk.RIDGE)

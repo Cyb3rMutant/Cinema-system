@@ -11,6 +11,8 @@ import datetime
 from customer import Customer
 from payment import Payment
 import random
+from cinema import Cinema
+from screen import Screen
 
 
 class Model():
@@ -30,8 +32,22 @@ class Model():
         self.__cities = Cities()
         cities = conn.select("SELECT * FROM cities;")
         for c in cities:
-            self.__cities[c["CITY_NAME"]] = City(
+            c = City(
                 c["CITY_NAME"], c["CITY_MORNING_PRICE"], c["CITY_AFTERNOON_PRICE"], c["CITY_EVENING_PRICE"])
+
+            cinemas = conn.select(
+                "SELECT * FROM cinemas WHERE CITY_NAME=%s;", c.get_city_name())
+            for ci in cinemas:
+                screens = dict()
+                s_data = conn.select(
+                    "SELECT * FROM screens WHERE CINEMA_ID=%s ORDER BY SCREEN_NUMBER;", ci["CINEMA_ID"])
+                for s in s_data:
+                    screens[s["SCREEN_ID"]] = Screen(s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"],
+                                                     s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"], s["SCREEN_NUMBER"])
+                print(screens)
+                c.add_cinema(ci["CINEMA_ID"], ci["CINEMA_ADDRESS"], screens)
+            print(c.get_cinemas())
+            self.__cities[c.get_city_name()] = c
 
         self.__booking_info = None
         self.__city = None
@@ -150,11 +166,18 @@ class Model():
             cinema_id = conn.select("SELECT MAX(CINEMA_ID) as CINEMA_ID FROM cinemas;")[
                 0]["CINEMA_ID"]
 
+            screens = dict()
             for screen in range(number_of_screens):
                 conn.insert("INSERT INTO screens(SCREEN_NUM_VIP_SEATS,SCREEN_NUM_UPPER_SEATS,SCREEN_NUM_LOWER_SEATS,CINEMA_ID, SCREEN_NUMBER) VALUES (%s, %s, %s, %s, %s);",
                             10, 74, 36, cinema_id, screen)
 
-            self.__city.add_cinema(cinema_id, address)
+                s = conn.select(
+                    "SELECT * FROM screens WHERE CINEMA_ID=%s ORDER BY SCREEN_NUMBER;", cinema_id)[0]
+
+                screens[s["SCREEN_ID"]] = Screen(s["SCREEN_ID"], s["SCREEN_NUM_VIP_SEATS"],
+                                                 s["SCREEN_NUM_UPPER_SEATS"], s["SCREEN_NUM_LOWER_SEATS"], s["SCREEN_NUMBER"])
+
+            self.__city.add_cinema(cinema_id, address, screens)
             return 1
         except:
             return 0
@@ -430,9 +453,10 @@ class Model():
 
     def get_city(self, name=None):
         if name:
-            self.__city = self.__cities[name]
+            city = self.__cities[name]
         else:
-            self.__city = list(self.__cities.get_cities().values())[0]
+            city = list(self.__cities.get_cities().values())[0]
+        self.set_city(city)
         return self.__city
 
     def get_cinemas(self):
@@ -440,26 +464,28 @@ class Model():
 
     def get_cinema(self, id=None):
         if id:
-            self.__cinema = self.__city[id]
+            cinema = self.__city[id]
         else:
-            self.__cinema = list(self.__city.get_cinemas().values())[0]
+            cinema = list(self.__city.get_cinemas().values())[0]
+        self.set_cinema(cinema)
         return self.__cinema
 
     def get_listings(self):
-        listings = []
-        for l in list(self.__cinema.get_listings().values()):
-            if l.get_date() == self.__date:
-                listings.append(l)
+        listings = [l for l in list(
+            self.__cinema.get_listings().values()) if l.get_date() == self.__date]
+        # for l in list(self.__cinema.get_listings().values()):
+        #     if l.get_date() == self.__date:
+        #         listings.append(l)
         if not listings:
             listings.append("no listings")
         return listings
 
     def get_listing(self, id=None):
-        if id != None:
-            self.__listing = self.__cinema.get_listings()[id]
-            return self.__listing
+        if id:
+            listing = self.__cinema.get_listings()[id]
         else:
-            self.__listing = self.get_listings()[0]
+            listing = self.get_listings()[0]
+        self.set_listing(listing)
         return self.__listing
 
     def get_shows(self):
@@ -472,22 +498,52 @@ class Model():
 
     def get_show(self, id=None):
         if id:
-            self.__show = self.__listing.get_shows()[id]
+            show = self.__listing.get_shows()[id]
         else:
-            self.__show = self.get_shows()[0]
+            show = self.get_shows()[0]
+        self.set_show(show)
         return self.__show
 
     def set_city(self, city):
         self.__city = city
 
     def set_cinema(self, cinema):
+        if self.__cinema:
+            self.__cinema.get_listings.clear()
+
         self.__cinema = cinema
 
+        listings = conn.select(
+            "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema.get_cinema_id())
+        for l in listings:
+            self.__cinema.add_listing(
+                l["LISTING_ID"], l["LISTING_TIME"], self.__films[l["FILM_TITLE"]])
+
     def set_listing(self, listing):
+        if self.__listing:
+            self.__listing.get_shows().clear()
+
         self.__listing = listing
 
+        shows = conn.select(
+            "SELECT * FROM shows WHERE LISTING_ID=%s", self.__listing.get_listing_id())
+        for s in shows:
+            self.__listing.add_show(
+                s["SHOW_ID"], s["SHOW_TIME"], self.__cinema.get_screens()[s["SCREEN_ID"]])
+
     def set_show(self, show):
+        if self.__show:
+            self.__show.get_bookings().clear()
+
         self.__show = show
+
+        bookings = conn.select(
+            "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show.get_show_id())
+        for b in bookings:
+            self.__show.add_booking(b["BOOKING_REFERENCE"], b["SEAT_TYPE"], b["BOOKING_SEAT_COUNT"],
+                                    b["BOOKING_DATE"], b["BOOKING_PRICE"], self.__customers[b["CUSTOMER_EMAIL"]])
+
+        print(self.__show.get_bookings())
 
     def set_date(self, date):
         date = datetime.datetime.strptime(date, '%Y-%m-%d')
@@ -496,13 +552,9 @@ class Model():
 
     def clear_data(self):
         print("in clear")
-        if self.__booking_info:
-            print("in if")
-            self.__show.cancel_booking(
-                self.__booking_info.get_booking_reference())
-            self.__booking_info = None
-        self.__city = None
-        self.__cinema = None
-        self.__listing = None
-        self.__show = None
         self.__date = None
+        self.__booking_info = None
+        self.__show = None
+        self.__listing = None
+        self.__cinema = None
+        self.__city = None

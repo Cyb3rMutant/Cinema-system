@@ -1,11 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# ˅
-import film
 import show
-from dbfunc import conn
-
-# ˄
 
 
 class Listing(object):
@@ -20,11 +13,11 @@ class Listing(object):
 
         self.__shows = dict()
 
-        shows = conn.select("SELECT * FROM shows WHERE LISTING_ID=%s",
-                            self.__listing_id)
-        for s in shows:
-            self.__shows[s["SHOW_ID"]] = show.Show(
-                s["SHOW_ID"], s["SHOW_TIME"], cinema.get_screens()[s["SCREEN_ID"]], self)
+    def __getitem__(self, key):
+        return self.__shows[key]
+
+    def __setitem__(self, key, value):
+        self.__shows[key] = value
 
     def get_listing_id(self):
         return self.__listing_id

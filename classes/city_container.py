@@ -1,5 +1,4 @@
 import city
-from dbfunc import conn
 
 
 class Cities():
