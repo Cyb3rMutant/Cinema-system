@@ -816,7 +816,7 @@ class Main_frame(tk.Frame):
 
         # listings  (need to change this so they can only pick one)
         self.__listings_label = tk.Label(
-            self.__app.body_frame, text="select date:")
+            self.__app.body_frame, text="select listing:")
         self.__listing_choice = tk.StringVar()
         self.__listing_choice.set(self.__controller.get_listing())
         self.__listing_options = tk.OptionMenu(
@@ -933,13 +933,13 @@ class Main_frame(tk.Frame):
             "Arial", 18), command=lambda: self.__controller.listing_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__listing_number_of_bookings.place(x=112, y=160+50)
 
-        self.__cinema_revenu = tk.Button(self.__app.body_frame, text='cinema revenu', bg='#DD2424', fg='#000000', font=(
+        self.__cinema_revenue = tk.Button(self.__app.body_frame, text='cinema revenue', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: self.__controller.cinema_revenue(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
-        self.__cinema_revenu.place(x=112, y=260+50)
+        self.__cinema_revenue.place(x=112, y=260+50)
 
-        self.__film_revenu = tk.Button(self.__app.body_frame, text='film revenu', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.film_revenu())
-        self.__film_revenu.place(x=112, y=360+50)
+        self.__film_revenue = tk.Button(self.__app.body_frame, text='film revenue', bg='#DD2424', fg='#000000', font=(
+            "Arial", 18), command=lambda: self.__controller.film_revenue())
+        self.__film_revenue.place(x=112, y=360+50)
 
         self.__staff_number_of_bookings = tk.Button(self.__app.body_frame, text='staff number\nof bookings', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: self.__controller.staff_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
@@ -1234,8 +1234,18 @@ class Main_frame(tk.Frame):
     def remove_create_stuff(self):
         try:
             self.__listing_options.destroy()
+        except:
+            pass
+        try:
             self.__show_options.destroy()
+        except:
+            pass
+        try:
             self.__btn.destroy()
+        except:
+            pass
+        try:
+            self.clear_frame(self.__tree_frame)
         except:
             pass
 

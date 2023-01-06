@@ -290,7 +290,7 @@ class Model():
                     GROUP BY l.`LISTING_ID`\
                     ORDER BY cnt DESC;", self.__cinema.get_cinema_id(), start, end)
 
-    def cinema_revenu(self, start, end):
+    def cinema_revenue(self, start, end):
         return conn.select("SELECT\
                     c.*,\
                         SUM(b.`BOOKING_PRICE`) as tot\
@@ -304,7 +304,7 @@ class Model():
                     GROUP BY c.`CINEMA_ID`\
                     ORDER BY tot DESC", start, end)
 
-    def film_revenu(self):
+    def film_revenue(self):
         return conn.select("SELECT\
                     f.`FILM_TITLE`,\
                         SUM(b.`BOOKING_PRICE`) as tot\
@@ -464,14 +464,13 @@ class Model():
 
     def get_cinemas(self):
         cinemas = list(self.__city.get_cinemas().values())
-        print("cinemas", cinemas)
         return cinemas if cinemas else ["no cinemas"]
 
     def get_cinema(self, id=None):
         if id:
             cinema = self.__city[id]
         else:
-            cinema = list(self.__city.get_cinemas().values())[0]
+            cinema = self.get_cinemas()[0]
         self.set_cinema(cinema)
         return self.__cinema
 
@@ -485,7 +484,6 @@ class Model():
         #         listings.append(l)
         if not listings:
             listings.append("no listings")
-        print("listings", listings)
         return listings
 
     def get_listing(self, id=None):
@@ -502,7 +500,6 @@ class Model():
         shows = list(self.__listing.get_shows().values())
         if not shows:
             shows.append("no shows")
-        print("shows", shows)
         return shows
 
     def get_show(self, id=None):
@@ -543,6 +540,7 @@ class Model():
         shows = conn.select(
             "SELECT * FROM shows WHERE LISTING_ID=%s", self.__listing.get_listing_id())
         for s in shows:
+            print(self.__cinema, self.__cinema.get_screens())
             self.__listing.add_show(
                 s["SHOW_ID"], s["SHOW_TIME"], self.__cinema.get_screens()[s["SCREEN_ID"]])
 
