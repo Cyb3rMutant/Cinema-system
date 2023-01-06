@@ -113,7 +113,7 @@ class Model():
         try:
             sh_list = []
             for sh in data:
-                sh_list.append(sh.values())
+                sh_list.append(list(sh.values()))
             return sh_list
         except:
             print("no shows airing for listing")
