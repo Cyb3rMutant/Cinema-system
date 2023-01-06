@@ -562,8 +562,12 @@ class Model():
                                     b["BOOKING_DATE"], b["BOOKING_PRICE"], self.__customers[b["CUSTOMER_EMAIL"]])
 
     def set_date(self, date):
-        date = datetime.datetime.strptime(date, '%Y-%m-%d')
-        self.__date = date.date()
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d')
+            self.__date = date.date()
+        except:
+            pass
+        print(self.__date)
 
     def clear_data(self):
         self.__date = None

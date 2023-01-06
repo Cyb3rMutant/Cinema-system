@@ -165,10 +165,11 @@ class Main_frame(tk.Frame):
         else:
             self.__city_choice = tk.StringVar()
             self.__controller.set_cinema(self.__user.get_branch())
-            self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__city_choice.set(
                 self.__controller.get_cinema_city())
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set(self.__controller.get_cinema(
+                self.__user.get_branch().get_cinema_id()))
             self.__view_btn = tk.Button(
                 self.__app.body_frame, text='reset', command=lambda: self.view_bookings_treeview())
             self.__view_btn.place(x=10, y=90)
@@ -266,7 +267,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))))))
+                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get()))))), self.update_listings_and_shows_based_on_date("Book now", lambda: self.__controller.validate_booking(str(self.__seat_type_btn.get()), int(self.__num_of_ticket_choice.get())))))
 
             self.__city_options.place(x=100, y=30)
 
@@ -279,10 +280,11 @@ class Main_frame(tk.Frame):
         else:
             self.__city_choice = tk.StringVar()
             self.__controller.set_cinema(self.__user.get_branch())
-            self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__city_choice.set(
                 self.__controller.get_cinema_city())
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set(self.__controller.get_cinema(
+                self.__user.get_branch().get_cinema_id()))
 
         # Standard labels
         self.__date_label = tk.Label(
@@ -435,10 +437,11 @@ class Main_frame(tk.Frame):
         else:
             self.__city_choice = tk.StringVar()
             self.__controller.set_cinema(self.__user.get_branch())
-            self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__city_choice.set(
                 self.__controller.get_cinema_city())
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set(self.__controller.get_cinema(
+                self.__user.get_branch().get_cinema_id()))
 
             self.view_film_listings_treeview()
 
@@ -599,7 +602,7 @@ class Main_frame(tk.Frame):
             self.__city_choice.set(
                 self.__controller.get_city())
             self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(),
-                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)))))
+                                                command=lambda city: (self.__controller.set_city(city), self.remove_create_stuff(),  self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview))), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)))
             self.__city_options.place(x=100, y=30)
 
             self.__cinema_choice = tk.StringVar()
@@ -611,10 +614,11 @@ class Main_frame(tk.Frame):
         else:
             self.__city_choice = tk.StringVar()
             self.__controller.set_cinema(self.__user.get_branch())
-            self.__cinema_choice = tk.StringVar()
-            self.__cinema_choice.set(self.__controller.get_cinema())
             self.__city_choice.set(
                 self.__controller.get_cinema_city())
+            self.__cinema_choice = tk.StringVar()
+            self.__cinema_choice.set(self.__controller.get_cinema(
+                self.__user.get_branch().get_cinema_id()))
 
         self.search_entry = tk.Entry(self.__app.body_frame)
         self.search_entry.place(x=100, y=450)
@@ -632,7 +636,7 @@ class Main_frame(tk.Frame):
         self.__date_entry = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
                                       mindate=datetime.date.today(), textvariable=self.__selected_date)
         self.__selected_date.trace(
-            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()),self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)))
+            'w', lambda *unused: (self.__controller.set_date(self.__selected_date.get()), self.update_listings_and_shows_based_on_date("refresh", self.display_bookings_treeview)))
         self.__controller.set_date(str(datetime.date.today()))
 
         self.__date_entry.place(x=100, y=90)
