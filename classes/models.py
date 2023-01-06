@@ -291,6 +291,7 @@ class Model():
                     ORDER BY cnt DESC;", self.__cinema.get_cinema_id(), start, end)
 
     def cinema_revenue(self, start, end):
+        print(self.__city)
         return conn.select("SELECT\
                     c.*,\
                         SUM(b.`BOOKING_PRICE`) as tot\
@@ -511,7 +512,9 @@ class Model():
         return self.__show
 
     def set_city(self, city):
+        print(self.__city)
         self.__city = city
+        print(self.__city)
 
     def set_cinema(self, cinema):
         if self.__cinema and not isinstance(self.__cinema, str):

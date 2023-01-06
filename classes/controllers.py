@@ -66,10 +66,6 @@ class Controller():
                 self.__view.show_error("Please enter an integer between 1-6.")
 
     def remove_listing(self, cinema):
-        if cinema == "choose cinema":
-            self.__view.show_error("Choose a cinema.")
-            # quickfix for the choose cinema problem. (we do need this or an alternative)
-            return
         match(self.__model.remove_listing()):
             case 1:
                 self.__view.show_info("Successfully Removed Listing")
@@ -86,9 +82,6 @@ class Controller():
                 self.__view.show_error("No Show Selected.")
 
     def add_listing(self, film, cinema):
-        if cinema == "choose cinema":
-            self.__view.show_error("Choose a cinema.")
-            return
         match(self.__model.add_listing(film)):
             case 1:
                 self.__view.show_info("Successfully Added Listing.")
@@ -172,9 +165,6 @@ class Controller():
                 self.__view.dashboard()
 
     def add_show(self, time, cinema):
-        if cinema == "choose cinema":
-            self.__view.show_error("Choose a cinema.")
-            return
         match(self.__model.add_show(time)):
             case 1:
                 self.__view.show_info("Successfully Added Show.")
@@ -185,8 +175,11 @@ class Controller():
                 self.__view.show_error("Select a Listing or Cinema.")
 
     def add_user(self, name, password, user_type, cinema):
-        if cinema == "choose cinema":
-            self.__view.show_error("Choose a cinema.")
+        if len(password) < 5:
+            self.__view.show_error("Password must be atleast 5 characters long")
+            return
+        if len(name) < 5:
+            self.__view.show_error("Username must be atleast 5 characters long")
             return
         match(self.__model.add_user(name, password, user_type)):
             case 1:

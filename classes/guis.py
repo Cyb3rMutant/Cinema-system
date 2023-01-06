@@ -794,7 +794,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(
-        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))))
+        ), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing))))), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
@@ -933,17 +933,17 @@ class Main_frame(tk.Frame):
             "Arial", 18), command=lambda: self.__controller.listing_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__listing_number_of_bookings.place(x=112, y=160+50)
 
-        self.__cinema_revenue = tk.Button(self.__app.body_frame, text='cinema revenue', bg='#DD2424', fg='#000000', font=(
+        self.__cinema_revenue = tk.Button(self.__app.body_frame, text='cinema revenue\n(only dates required)', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: self.__controller.cinema_revenue(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__cinema_revenue.place(x=112, y=260+50)
 
-        self.__film_revenue = tk.Button(self.__app.body_frame, text='film revenue', bg='#DD2424', fg='#000000', font=(
+        self.__film_revenue = tk.Button(self.__app.body_frame, text='film revenue\n(no data required)', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: self.__controller.film_revenue())
         self.__film_revenue.place(x=112, y=360+50)
 
         self.__staff_number_of_bookings = tk.Button(self.__app.body_frame, text='staff number\nof bookings', bg='#DD2424', fg='#000000', font=(
             "Arial", 18), command=lambda: self.__controller.staff_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
-        self.__staff_number_of_bookings.place(x=112, y=460)
+        self.__staff_number_of_bookings.place(x=112, y=460+50)
 
         self.__tree_frame = tk.Frame(
             self.__app.body_frame, width=700, height=400, bg='gainsboro')
@@ -987,7 +987,7 @@ class Main_frame(tk.Frame):
         self.__city_options_lable = tk.Label(
             self.__app.body_frame, text="choose city: ")
         self.__city_options = tk.OptionMenu(
-            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
+            self.__app.body_frame, self.__city_choice, *self.__controller.get_cities(), command=lambda city: (self.__controller.set_city(city), self.update_cinemas(lambda cinema: (self.__controller.set_cinema(cinema), self.update_listings(lambda listing: (self.__controller.set_listing(listing))))), self.update_listings(lambda listing: (self.__controller.set_listing(listing)))))  # , command=self.__controller.set_cinema(self.__city_choice.get()))
 
         # cinema
         self.__cinema_choice = tk.StringVar()
