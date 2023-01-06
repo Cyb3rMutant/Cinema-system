@@ -9,13 +9,13 @@ class Controller():
     def set_view(self, view):
         self.__view = view
 
-    def login(self, username, password):
-        user = self.__model.validate_login(username, password)
+    def login(self, user_id, password):
+        user = self.__model.validate_login(user_id, password)
         if (user == -1):
             self.__view.show_error("User doesnt exist.")
 
         elif (user == 0):
-            self.__view.show_error("Incorrect username or password.")
+            self.__view.show_error("Incorrect user_id or password.")
 
         else:
             self.__view.show_info("You have successfully logged in.")
@@ -127,8 +127,7 @@ class Controller():
             self.__view.show_error("No available seats.")
         else:
             self.__view.show_info("Seats available.")
-            self.__view.book_now(
-                ret.as_list(), ret.get_ticket(), ret.get_receipt())
+            self.__view.book_now(ret)
 
     def add_booking(self, customer_name, customer_email, customer_phone, name_on_card, card_number, cvv, expiry_date):
         if self.__model.check_customer(customer_email):

@@ -13,6 +13,8 @@ from payment import Payment
 import random
 from cinema import Cinema
 from screen import Screen
+from receipt_generator import Receipt_generator
+from ticket_generator import Ticket_generator
 
 
 class Model():
@@ -56,11 +58,11 @@ class Model():
         self.__show = None
         self.__date = None
 
-    def validate_login(self, username, password):
+    def validate_login(self, user_id, password):
         data = conn.select(
             "SELECT * FROM users u \
                 LEFT JOIN cinemas c ON c.CINEMA_ID=u.CINEMA_ID \
-                    WHERE USER_NAME=%s", username)
+                    WHERE USER_ID=%s", user_id)
 
         if (data):
             data = data[0]
@@ -202,7 +204,7 @@ class Model():
         if not self.__booking_info:
             return 0
 
-        return self.__booking_info
+        return Ticket_generator.gen_ticket(self.__booking_info, self.__cinema)
 
     def add_booking(self, customer_email, name_on_card, card_number, cvv, expiry_date):
         customer = self.__customers[customer_email]
@@ -215,6 +217,9 @@ class Model():
 
         self.__booking_info.get_customer().get_payment().pay(
             self.__booking_info.get_price())
+
+        print(Receipt_generator.gen_receipt(self.__booking_info, self.__user))
+        print(Ticket_generator.gen_ticket(self.__booking_info, self.__cinema))
         self.__booking_info = None
 
     def check_customer(self, customer_email):
@@ -336,7 +341,7 @@ class Model():
             return self.__city.get_evening_price()
 
     def get_cinema_city(self):
-        city_name = conn.select("SELECT CITY_NAME FROM CINEMAS WHERE CINEMA_ID = %s;",
+        city_name = conn.select("SELECT CITY_NAME FROM cinemas WHERE CINEMA_ID = %s;",
                                 self.__cinema.get_cinema_id())[0]["CITY_NAME"]
         self.__city = self.__cities[city_name]
         return self.__city

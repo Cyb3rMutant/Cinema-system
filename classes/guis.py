@@ -40,12 +40,12 @@ class Main_frame(tk.Frame):
         self.clear_frame(self.__app.body_frame)
         # Create widgets
         self.__app.page_label["text"] = "Login"
-        self.__username_label = tk.Label(
-            self.__app.body_frame, text='Username', font=("Arial", 32))
-        self.__username_label.place(x=562, y=60)
-        self.__username_entry = tk.Entry(
+        self.__user_id_label = tk.Label(
+            self.__app.body_frame, text='User_id', font=("Arial", 32))
+        self.__user_id_label.place(x=562, y=60)
+        self.__user_id_entry = tk.Entry(
             self.__app.body_frame, font=("Arial", 32))
-        self.__username_entry.place(x=412, y=130)
+        self.__user_id_entry.place(x=412, y=130)
         self.__password_label = tk.Label(
             self.__app.body_frame, text='Password', font=("Arial", 32))
         self.__password_label.place(x=562, y=260)
@@ -54,7 +54,7 @@ class Main_frame(tk.Frame):
         self.__password_entry.place(x=412, y=330)
         self.__login_button = tk.Button(
             self.__app.body_frame, text='Login', bg='#DD2424', fg='#000000', font=("Arial", 18), command=lambda: self.__controller.login(
-                self.__username_entry.get(), self.__password_entry.get()))
+                self.__user_id_entry.get(), self.__password_entry.get()))
         self.__login_button.place(x=612, y=460)
 
     def show_info(self, message):
@@ -75,7 +75,7 @@ class Main_frame(tk.Frame):
         # Page Title
         self.__log_out.place(x=0, y=0)
         self.__user = user
-        self.__app.name_label["text"] = f"{self.__user.get_id()}: {self.__user.get_name()}[{self.__user.__class__.__name__}]"
+        self.__app.name_label["text"] = self.__user
         self.__app.branch_label["text"] = self.__user.get_branch().get_address()
 
         self.dashboard()
@@ -340,10 +340,13 @@ class Main_frame(tk.Frame):
         # Placing interactive widgets
         self.__listing_options.place(x=100, y=150)
         self.__show_options.place(x=100, y=200)
-        self.__btn.place(x=50, y=350)
+        self.__btn.place(x=50, y=380)
 
-    def book_now(self, info, ticket, receipt):
+    def book_now(self, info):
         self.clear_frame(self.__app.body_frame)
+
+        self.__booking_info = tk.Label(
+            self.__app.body_frame, text=info).place(x=500, y=50)
 
         self.__customer_name_lable = tk.Label(
             self.__app.body_frame, text="customer name: ")
@@ -606,7 +609,7 @@ class Main_frame(tk.Frame):
                 self.__controller.get_cinema_city())
 
         self.search_entry = tk.Entry(self.__app.body_frame)
-        self.search_entry.place(x=100, y=550)
+        self.search_entry.place(x=100, y=450)
 
         # Standard labels
         self.__date_label = tk.Label(
@@ -635,7 +638,7 @@ class Main_frame(tk.Frame):
         self.search_btn = tk.Button(self.__app.body_frame, text='Search',
                                     command=lambda: self.validate_search(self.search_entry.get(), "cancel"))
 
-        self.search_btn.place(x=300, y=550)
+        self.search_btn.place(x=300, y=450)
 
         # Ticket type & Number of tickets entry
         self.__btn = tk.Button(
@@ -655,7 +658,7 @@ class Main_frame(tk.Frame):
         self.__card_number.place(x=850, y=600)
 
         # Placing interactive widgets
-        self.__btn.place(x=50, y=350)
+        self.__btn.place(x=50, y=380)
 
     def add_listing(self):
         self.clear_frame(self.__app.body_frame)
@@ -904,20 +907,22 @@ class Main_frame(tk.Frame):
 
         self.__start_date_label = tk.Label(
             self.__app.body_frame, text="start date").place(x=10, y=90)
+        self.__selected_start_date = tk.StringVar()
         self.__start_date = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
-                                      maxdate=datetime.date.today()).place(x=100, y=90)
+                                      maxdate=datetime.date.today(), textvariable=self.__selected_start_date).place(x=100, y=90)
 
         self.__end_date_label = tk.Label(
             self.__app.body_frame, text="end date").place(x=10, y=150)
+        self.__selected_end_date = tk.StringVar()
         self.__end_date = DateEntry(self.__app.body_frame, date_pattern='y-mm-dd',
-                                    maxdate=datetime.date.today()).place(x=100, y=150)
+                                    maxdate=datetime.date.today(), textvariable=self.__selected_end_date).place(x=100, y=150)
 
         self.__listing_number_of_bookings = tk.Button(self.__app.body_frame, text='listing number\nof bookings', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.listing_number_of_bookings('2022-01-12', '2023-01-12'))
+            "Arial", 18), command=lambda: self.__controller.listing_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__listing_number_of_bookings.place(x=112, y=160+50)
 
         self.__cinema_revenu = tk.Button(self.__app.body_frame, text='cinema revenu', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.cinema_revenu('2022-01-12', '2023-01-12'))
+            "Arial", 18), command=lambda: self.__controller.cinema_revenu(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__cinema_revenu.place(x=112, y=260+50)
 
         self.__film_revenu = tk.Button(self.__app.body_frame, text='film revenu', bg='#DD2424', fg='#000000', font=(
@@ -925,7 +930,7 @@ class Main_frame(tk.Frame):
         self.__film_revenu.place(x=112, y=360+50)
 
         self.__staff_number_of_bookings = tk.Button(self.__app.body_frame, text='staff number\nof bookings', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.staff_number_of_bookings('2022-01-12', '2023-01-12'))
+            "Arial", 18), command=lambda: self.__controller.staff_number_of_bookings(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__staff_number_of_bookings.place(x=112, y=460)
 
         self.__tree_frame = tk.Frame(
@@ -1205,6 +1210,11 @@ class Main_frame(tk.Frame):
         self.__user_password_lable.place(x=10, y=210)
         self.__user_password.place(x=130, y=210)
 
+    def print_film(self, film):
+        film = film.__dict__
+        self.__film_label = tk.Label(self.__app.body_frame, text="\n".join(
+            [f"{x.replace('_', ' ')}: {y}" for x, y in film.items()])).place(x=50, y=400)
+
     def get_id(self, string):
         print(string, type(string))
         return int(re.search(r'\d+', string).group())
@@ -1273,7 +1283,7 @@ class Main_frame(tk.Frame):
 
         self.__listing_options.place(x=100, y=150)
         self.__show_options.place(x=100, y=200)
-        self.__btn.place(x=50, y=350)
+        self.__btn.place(x=50, y=380)
 
     def update_shows(self):
         print("im in")

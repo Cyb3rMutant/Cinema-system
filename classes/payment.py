@@ -13,17 +13,8 @@ class Payment(object):
 
         self.__cvv = cvv
 
-    def get_name_on_card(self):
-        return self._name_on_card
-
     def get_card_number(self):
-        return self._card_number
-
-    def get_expiry_date(self):
-        return self._expiry_date
-
-    def get_cvv(self):
-        return self._cvv
+        return "*****"+self.__card_number[-4:]
 
     def pay(self, amount):
         print(f"payment of {amount} complete")

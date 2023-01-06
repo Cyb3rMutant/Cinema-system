@@ -18,3 +18,6 @@ class User():
 
     def get_branch(self):
         return self._branch
+
+    def __str__(self):
+        return f"{self.get_id()}: {self.get_name()}[{self.__class__.__name__}]"

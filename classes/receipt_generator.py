@@ -1,7 +1,19 @@
 class Receipt_generator():
-    def __init__(self, booking):
+    def gen_receipt(booking, user):
+        customer = booking.get_customer()
+        payment = customer.get_payment()
 
-        self.__booking = booking
+        return f"""
+  Horizon Cinemas
+{user.get_branch().get_address()}
+**booking receipt**
 
-    def gen_receipt(self):
-        pass
+{booking.get_seat_type()} hall ticket     x{booking.get_number_of_seats()}\t{booking.get_price()}
+
+
+payed with card {payment.get_card_number()}
+
+date: {booking.get_date_of_booking()}
+user: {user}
+Thank you!
+"""

@@ -27,4 +27,4 @@ class Screen(object):
         return self.__screen_number
 
     def __str__(self):
-        return "Screen number %d" % self.__screen_id
+        return "Screen number %d" % self.__screen_number
