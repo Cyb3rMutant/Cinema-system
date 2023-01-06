@@ -101,19 +101,26 @@ class Controller():
                 self.__view.dashboard()
 
     def listing_number_of_bookings(self, start, end):
-        self.__view.report_tree(
-            self.__model.listing_number_of_bookings(start, end))
-
+        if start < end:
+            self.__view.report_tree(
+                self.__model.listing_number_of_bookings(start, end))
+        else:
+            self.__view.show_error("Start-date has to be before end-date!")
     def cinema_revenu(self, start, end):
-        self.__view.report_tree(self.__model.cinema_revenu(start, end))
-
+        if start<end:
+            self.__view.report_tree(self.__model.cinema_revenu(start, end))
+        else:
+            self.__view.show_error("Start-date has to be before end-date!")
     def film_revenu(self,):
+
         self.__view.report_tree(self.__model.film_revenu())
-
+      
     def staff_number_of_bookings(self, start, end):
-        self.__view.report_tree(
-            self.__model.staff_number_of_bookings(start, end))
-
+        if start<end:
+            self.__view.report_tree(
+                self.__model.staff_number_of_bookings(start, end))
+        else:
+            self.__view.show_error("Start-date has to be before end-date!")
     def get_films(self):
         return self.__model.get_films()
 

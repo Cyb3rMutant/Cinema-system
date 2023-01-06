@@ -10,8 +10,10 @@ class Receipt_generator():
 
 {booking.get_seat_type()} hall ticket     x{booking.get_number_of_seats()}\t{booking.get_price()}
 
+booking reference : {booking.get_booking_reference()}
 
-payed with card {payment.get_card_number()}
+
+paid with card {payment.get_card_number()}
 
 date: {booking.get_date_of_booking()}
 user: {user}

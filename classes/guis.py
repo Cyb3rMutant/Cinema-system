@@ -934,7 +934,7 @@ class Main_frame(tk.Frame):
         self.__listing_number_of_bookings.place(x=112, y=160+50)
 
         self.__cinema_revenu = tk.Button(self.__app.body_frame, text='cinema revenu', bg='#DD2424', fg='#000000', font=(
-            "Arial", 18), command=lambda: self.__controller.cinema_revenu(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
+            "Arial", 18), command=lambda: self.__controller.cinema_revenue(datetime.datetime.strptime(self.__selected_start_date.get(), '%Y-%m-%d').date(), datetime.datetime.strptime(self.__selected_end_date.get(), '%Y-%m-%d').date()))
         self.__cinema_revenu.place(x=112, y=260+50)
 
         self.__film_revenu = tk.Button(self.__app.body_frame, text='film revenu', bg='#DD2424', fg='#000000', font=(

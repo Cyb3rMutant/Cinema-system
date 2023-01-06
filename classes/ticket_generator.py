@@ -17,7 +17,7 @@ cinema: {cinema.get_address()}
 
 price: {booking.get_price()}
 seat type: {booking.get_seat_type()}
-
+booking reference : {booking.get_booking_reference()}
 date booked: {booking.get_date_of_booking()}
 
 
