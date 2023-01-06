@@ -262,7 +262,7 @@ class Model():
         return 1
 
     def add_listing(self, film):
-        conn.insert("INSERT INTO listings (LISTING_TIME, FILM_TITLE, CINEMA_ID) VALUES (%s, %s, %s);",
+        conn.insert("INSERT INTO listings (LISTING_DATE, FILM_TITLE, CINEMA_ID) VALUES (%s, %s, %s);",
                     self.__date, film, self.__cinema.get_cinema_id())
         # now get the listing id from database
         listing_id = conn.select(
@@ -274,7 +274,7 @@ class Model():
     def update_listing(self, film):
         listing_id = self.__listing.get_listing_id()
         film = self.__films[film]
-        conn.update("UPDATE listings SET LISTING_TIME=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
+        conn.update("UPDATE listings SET LISTING_DATE=%s, FILM_TITLE=%s WHERE LISTING_ID=%s;",
                     self.__date, film.get_title(), listing_id)
 
         self.__cinema.update_listing(listing_id, self.__date, film)
@@ -289,7 +289,7 @@ class Model():
                     WHERE\
                         `CINEMA_ID` = %s\
                         AND ISNULL(b.`REFUND`)\
-                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                        AND l.`LISTING_DATE` BETWEEN %s AND %s\
                     GROUP BY l.`LISTING_ID`\
                     ORDER BY cnt DESC;", self.__cinema.get_cinema_id(), start, end)
 
@@ -304,7 +304,7 @@ class Model():
                         LEFT JOIN bookings b ON s.`SHOW_ID` = b.`SHOW_ID`\
                     WHERE\
                         ISNULL(b.`REFUND`)\
-                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                        AND l.`LISTING_DATE` BETWEEN %s AND %s\
                     GROUP BY c.`CINEMA_ID`\
                     ORDER BY tot DESC", start, end)
 
@@ -327,7 +327,7 @@ class Model():
                         LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
                         LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
                     WHERE ISNULL(b.`REFUND`)\
-                        AND l.`LISTING_TIME` BETWEEN %s AND %s\
+                        AND l.`LISTING_DATE` BETWEEN %s AND %s\
                     GROUP BY u.`USER_ID`\
                     ORDER BY tot DESC", start, end)
 
@@ -380,7 +380,7 @@ class Model():
                                             SELECT s2.`SCREEN_ID` FROM screens s2\
                                                 LEFT JOIN shows sh2 ON s2.`SCREEN_ID` = sh2.`SCREEN_ID`\
                                                 LEFT JOIN listings l2 ON sh2.`LISTING_ID` = l2.`LISTING_ID`\
-                                            WHERE s2.`SCREEN_ID` AND s2.`CINEMA_ID` = %s AND l2.`LISTING_TIME` = %s\
+                                            WHERE s2.`SCREEN_ID` AND s2.`CINEMA_ID` = %s AND l2.`LISTING_DATE` = %s\
                                             GROUP BY s2.`SCREEN_ID` HAVING COUNT(sh2.`SCREEN_ID`) >= 4\
                                         )\
                                         UNION (\
@@ -388,7 +388,7 @@ class Model():
                                                 LEFT JOIN shows sh1 ON s1.`SCREEN_ID` = sh1.`SCREEN_ID`\
                                                 LEFT JOIN listings l1 ON sh1.`LISTING_ID` = l1.`LISTING_ID`\
                                                 LEFT JOIN films f1 ON l1.`FILM_TITLE` = f1.`FILM_TITLE`\
-                                            WHERE s1.`CINEMA_ID` = %s AND l1.`LISTING_TIME` = %s\
+                                            WHERE s1.`CINEMA_ID` = %s AND l1.`LISTING_DATE` = %s\
                                                 AND (\
                                                     (ADDTIME(%s, '-00:30:00') BETWEEN `SHOW_TIME` AND ADDTIME(`SHOW_TIME`, SEC_TO_TIME(`FILM_DURATION` * 60)))\
                                                     OR (`SHOW_TIME` BETWEEN ADDTIME(%s, '-00:30:00') AND ADDTIME(%s, %s))\
@@ -532,7 +532,7 @@ class Model():
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema.get_cinema_id())
         for l in listings:
             self.__cinema.add_listing(
-                l["LISTING_ID"], l["LISTING_TIME"], self.__films[l["FILM_TITLE"]])
+                l["LISTING_ID"], l["LISTING_DATE"], self.__films[l["FILM_TITLE"]])
 
     def set_listing(self, listing):
         if self.__listing and not isinstance(self.__listing, str):

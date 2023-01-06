@@ -456,7 +456,7 @@ class Main_frame(tk.Frame):
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
         self.__tree_view = ttk.Treeview(
-            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("listing_id", "listing_time", "film_title"))
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("listing_id", "listing_date", "film_title"))
         self.__tree_view.grid(row=0, column=0)
         xscrollbar.configure(command=self.__tree_view.xview)
         yscrollbar.configure(command=self.__tree_view.yview)
@@ -468,14 +468,14 @@ class Main_frame(tk.Frame):
         self.__tree_view.heading(
             "listing_id", text="listing_id", anchor=tk.CENTER)
         self.__tree_view.heading(
-            "listing_time", text="listing_time", anchor=tk.CENTER)
+            "listing_date", text="listing_date", anchor=tk.CENTER)
         self.__tree_view.heading(
             "film_title", text="film_title", anchor=tk.CENTER)
 
         # Null column to prevent overflow of large size column (disablet o test)
         self.__tree_view.column("#0", width=0,  stretch=tk.NO)
         self.__tree_view.column("listing_id", anchor=tk.CENTER, width=310)
-        self.__tree_view.column("listing_time", anchor=tk.CENTER, width=310)
+        self.__tree_view.column("listing_date", anchor=tk.CENTER, width=310)
         self.__tree_view.column("film_title", anchor=tk.CENTER, width=310)
 
         self.__tree_view.bind('<<TreeviewSelect>>',
