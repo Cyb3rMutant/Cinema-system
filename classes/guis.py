@@ -290,7 +290,7 @@ class Main_frame(tk.Frame):
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date").place(x=10, y=90)
         self.__select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film").place(x=10, y=150)
+            self.__app.body_frame, text="Select listing").place(x=10, y=150)
         self.__select_show_label = tk.Label(
             self.__app.body_frame, text="Select Show").place(x=10, y=210)
         self.__select_seat_type = tk.Label(
@@ -452,15 +452,11 @@ class Main_frame(tk.Frame):
             pass
         self.clear_frame(self.__tree_frame)
 
-        if str(self.__cinema_choice.get()) == "choose cinema":
-            self.show_error("Select a Cinema.")
-            return
-
         xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
 
         self.__tree_view = ttk.Treeview(
-            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("listing_id", "listing_time", "film_title"))
+            self.__tree_frame, yscrollcommand=yscrollbar.set, xscrollcommand=xscrollbar.set, selectmode="extended", columns=("listing_id", "listing_date", "film_title"))
         self.__tree_view.grid(row=0, column=0)
         xscrollbar.configure(command=self.__tree_view.xview)
         yscrollbar.configure(command=self.__tree_view.yview)
@@ -472,14 +468,14 @@ class Main_frame(tk.Frame):
         self.__tree_view.heading(
             "listing_id", text="listing_id", anchor=tk.CENTER)
         self.__tree_view.heading(
-            "listing_time", text="listing_time", anchor=tk.CENTER)
+            "listing_date", text="listing_date", anchor=tk.CENTER)
         self.__tree_view.heading(
             "film_title", text="film_title", anchor=tk.CENTER)
 
         # Null column to prevent overflow of large size column (disablet o test)
         self.__tree_view.column("#0", width=0,  stretch=tk.NO)
         self.__tree_view.column("listing_id", anchor=tk.CENTER, width=310)
-        self.__tree_view.column("listing_time", anchor=tk.CENTER, width=310)
+        self.__tree_view.column("listing_date", anchor=tk.CENTER, width=310)
         self.__tree_view.column("film_title", anchor=tk.CENTER, width=310)
 
         self.__tree_view.bind('<<TreeviewSelect>>',
@@ -525,9 +521,6 @@ class Main_frame(tk.Frame):
         except:
             pass
         self.clear_frame(self.__tree_frame)
-        if str(self.__cinema_choice.get()) == "choose cinema":
-            self.show_error("Select a Cinema.")
-            return
 
         xscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.HORIZONTAL)
         yscrollbar = tk.Scrollbar(self.__tree_frame, orient=tk.VERTICAL)
@@ -569,9 +562,6 @@ class Main_frame(tk.Frame):
                 '', tk.END, values=self.__controller.get_booking(booking_ref).as_list())
 
         if search == False:
-            if str(self.__cinema_choice.get()) == "choose cinema":
-                self.show_error("Select a Cinema.")
-                return
             try:
                 for data in self.__controller.get_bookings_as_list():
                     self.__tree_view.insert('', tk.END, values=data)
@@ -627,7 +617,7 @@ class Main_frame(tk.Frame):
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date").place(x=10, y=90)
         self.__select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film").place(x=10, y=150)
+            self.__app.body_frame, text="Select listing").place(x=10, y=150)
         self.__select_show_label = tk.Label(
             self.__app.body_frame, text="Select Show").place(x=10, y=210)
 
@@ -751,7 +741,7 @@ class Main_frame(tk.Frame):
         self.__date_label = tk.Label(
             self.__app.body_frame, text="Select Date").place(x=10, y=90)
         self.__select_film_label = tk.Label(
-            self.__app.body_frame, text="Select Film").place(x=10, y=150)
+            self.__app.body_frame, text="Select listing").place(x=10, y=150)
         self.__select_show_label = tk.Label(
             self.__app.body_frame, text="Select Show").place(x=10, y=210)
 
@@ -839,9 +829,6 @@ class Main_frame(tk.Frame):
     # after they have selected a listing in (update listing) this lets them actually change the listings details
 
     def update_listing_details(self, listing_id, city, cinema):
-        if cinema == "choose cinema":
-            self.show_error("Choose a cinema.")
-            return
         if listing_id == "no listings":
             self.show_error("Please select a listing.")
             return
@@ -863,7 +850,7 @@ class Main_frame(tk.Frame):
         self.__orignal_listing_label = tk.Label(
             self.__app.body_frame, text=f'Original Listing Details:\n City: {city}\n Cinema ID: {cinema}\n Film: {self.__original_film}\n Date: {self.__original_date}', font=("Arial", 12))
 
-        # select film
+        # select listing
         self.__film_choice = tk.StringVar()
         self.__film_choice.set(self.__original_film)
         self.__listing_options_label = tk.Label(
@@ -1010,7 +997,7 @@ class Main_frame(tk.Frame):
         # listings  (need to change this so they can only pick one)
 
         self.__listings_label = tk.Label(
-            self.__app.body_frame, text="select date:")
+            self.__app.body_frame, text="select listing:")
         self.__listing_choice = tk.StringVar()
         self.__listing_choice.set(self.__controller.get_listing())
         self.__listing_options = tk.OptionMenu(
@@ -1261,9 +1248,6 @@ class Main_frame(tk.Frame):
         self.__cinema_options.place(x=400, y=30)
 
     def update_listings(self, func, remove_listing=0):
-        if str(self.__cinema_choice.get()) == "choose cinema":
-            print('error: choose cinema is selected, wont update film')
-            return
         # added in commit 124, get rid of if doesnt work
         self.__controller.set_date(str(self.__selected_date.get()))
         self.__listing_options.destroy()
@@ -1277,16 +1261,6 @@ class Main_frame(tk.Frame):
 
     def update_listings_and_shows_based_on_date(self, btn_text, btn_command):
         self.remove_create_stuff()
-        try:  # Only got this cus it doesnt work with booking staff causes error crash. KEEP it tho, you can remove comments
-            # Debug -> Change city to anything but birmingham and date only. U will see it prints birminghams address when it shouldnt be. the if statement prevents this
-
-            # Added this because when we load create_booking -> change city to Bristol -> change date to any date -> the above debug will print birminghams cinema info -> change date to birmingham listing date -> film and show options will update with birminghams and not bristols
-            # And cinema_choice will still be "choose cinema" whilst it prints birminghams listings in city_choice bristol
-            if str(self.__cinema_choice.get()) == "choose cinema":
-                print('error: choose cinema is selected, wont update film')
-                return
-        except:
-            pass
 
         self.__controller.set_date(str(self.__selected_date.get()))
         self.__film_choice = tk.StringVar()
