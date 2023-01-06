@@ -1,5 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `HC` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
-USE `HC`;
+CREATE DATABASE  IF NOT EXISTS `HC4` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE `HC4`;
 -- MariaDB dump 10.19  Distrib 10.9.4-MariaDB, for Linux (x86_64)
 --
 -- Host: 127.0.0.1    Database: HC
