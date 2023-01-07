@@ -136,6 +136,9 @@ class Model():
 
     def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
         try:
+            if film_title in self.__films.get_films():
+                return -4
+
             film_rating = float(film_rating)
             film_year = int(film_year)
             film_duration = int(film_duration)
@@ -326,10 +329,10 @@ class Model():
                     LEFT JOIN bookings b ON u.`USER_ID` = b.`USER_ID`\
                         LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
                         LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                    WHERE ISNULL(b.`REFUND`)\
+                    WHERE u.`CINEMA_ID` = %s AND ISNULL(b.`REFUND`)\
                         AND l.`LISTING_DATE` BETWEEN %s AND %s\
                     GROUP BY u.`USER_ID`\
-                    ORDER BY tot DESC", start, end)
+                    ORDER BY tot DESC", self.__cinema.get_cinema_id(), start, end)
 
     def get_city_price(self):
         try:  # Throws an error if no show is selected, returning -1 prevents

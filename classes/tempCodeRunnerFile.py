@@ -1,5 +1,13 @@
+def wrap_by_word(s, n):
+    '''returns a string where \\n is inserted between every n words'''
+    a = s.split()
+    ret = ''
+    for i in range(0, len(a), n):
+        ret += ' '.join(a[i:i+n]) + '\n'
 
-    def print_film(self, film):
-        film = film.__dict__
-        self.__film_label = tk.Label(self.__app.body_frame, text="\n".join(
-            [f"{x.replace('_', ' ')}: {y}" for x, y in film.items()])).place(x=50, y=400)
+    return ret
+
+
+x = wrap_by_word(
+    'There is a dog and fox fighting in the park and there is an apple falling down.', 4)
+print(x)

@@ -402,18 +402,19 @@ class Main_frame(tk.Frame):
         self.__expiry_date.place(x=130, y=390)
 
     def view_film_listings(self):
-
         self.clear_frame(self.__app.body_frame)
         self.__back_to_dashboard.place(x=1030, y=130)
         self.__app.page_label["text"] = "View film listings"
 
+        self.__film_label = tk.Label(
+            self.__app.body_frame, text="")
+        self.__film_label.place(x=200, y=400)
         self.__view_btn = tk.Button(
             self.__app.body_frame, text='view', command=lambda: self.view_film_listings_treeview())
 
         self.__tree_frame = tk.Frame(
             self.__app.body_frame, width=700, height=400, bg='gainsboro')
         self.__tree_frame.place(x=150, y=150)
-
         if (isinstance(self.__user, Admin)):  # if manager or admin
             self.__city_options_label = tk.Label(
                 self.__app.body_frame, text="choose city: ").place(x=10, y=30)
@@ -479,7 +480,7 @@ class Main_frame(tk.Frame):
         self.__tree_view.column("film_title", anchor=tk.CENTER, width=310)
 
         self.__tree_view.bind('<<TreeviewSelect>>',
-                              lambda unused: self.item_selected_listings())
+                              lambda unused: (self.item_selected_listings(), self.print_film()))
 
         # Going to insert view listings data here
         for data in self.__controller.get_cinema_listings_as_list():
@@ -1209,10 +1210,19 @@ class Main_frame(tk.Frame):
         self.__user_password_lable.place(x=10, y=210)
         self.__user_password.place(x=130, y=210)
 
-    def print_film(self, film):
-        film = film.__dict__
-        self.__film_label = tk.Label(self.__app.body_frame, text="\n".join(
-            [f"{x.replace('_', ' ')}: {y}" for x, y in film.items()])).place(x=50, y=400)
+    def print_film(self):
+        record = self.__tree_view.item(self.__tree_view.selection()[0])[
+            "values"][2]
+        film = self.__controller.get_films()[str(record)].__dict__
+        a = film["_Film__description"].split()
+        print(a)
+        film["_Film__description"] = ''
+        print(film["_Film__description"])
+        for i in range(0, len(a), 15):
+            film["_Film__description"] += ' '.join(a[i:i+10]) + '\n'
+
+        self.__film_label["text"] = "\n".join(
+            [f"{x.replace('_', ' ')}: {y}" for x, y in film.items()])
 
     def get_id(self, string):
         print(string, type(string))

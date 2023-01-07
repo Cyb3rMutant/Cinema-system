@@ -56,6 +56,8 @@ class Controller():
             case -3:
                 self.__view.show_error(
                     "Please enter a film duration between 20 & 400 minutes.")
+            case -4:
+                self.__view.show_error("This film already_exists")
 
     def add_cinema(self, address, number_of_screens):
         match(self.__model.add_cinema(address, number_of_screens)):
@@ -94,28 +96,39 @@ class Controller():
                 self.__view.dashboard()
 
     def listing_number_of_bookings(self, start, end):
-        if start < end:
-            self.__view.report_tree(
-                self.__model.listing_number_of_bookings(start, end))
-        else:
-            self.__view.show_error("Start-date has to be before end-date!")
+        try:
+            if start < end:
+                self.__view.report_tree(
+                    self.__model.listing_number_of_bookings(start, end))
+            else:
+                self.__view.show_error("Start-date has to be before end-date!")
+        except IndexError:
+            self.__view.show_error("no bookings")
 
     def cinema_revenue(self, start, end):
-        if start < end:
-            self.__view.report_tree(self.__model.cinema_revenue(start, end))
-        else:
-            self.__view.show_error("Start-date has to be before end-date!")
+        try:
+            if start < end:
+                self.__view.report_tree(self.__model.cinema_revenue(start, end))
+            else:
+                self.__view.show_error("Start-date has to be before end-date!")
+        except IndexError:
+            self.__view.show_error("no bookings")
 
     def film_revenue(self,):
-
-        self.__view.report_tree(self.__model.film_revenue())
+        try:
+            self.__view.report_tree(self.__model.film_revenue())
+        except IndexError:
+            self.__view.show_error("no films")
 
     def staff_number_of_bookings(self, start, end):
-        if start < end:
-            self.__view.report_tree(
-                self.__model.staff_number_of_bookings(start, end))
-        else:
-            self.__view.show_error("Start-date has to be before end-date!")
+        try:
+            if start < end:
+                self.__view.report_tree(
+                    self.__model.staff_number_of_bookings(start, end))
+            else:
+                self.__view.show_error("Start-date has to be before end-date!")
+        except IndexError:
+            self.__view.show_error("no staff members")
 
     def get_films(self):
         return self.__model.get_films()
