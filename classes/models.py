@@ -533,6 +533,7 @@ class Model():
 
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema.get_cinema_id())
+        print(listings)
         for l in listings:
             self.__cinema.add_listing(
                 l["LISTING_ID"], l["LISTING_DATE"], self.__films[l["FILM_TITLE"]])
@@ -548,6 +549,7 @@ class Model():
 
         shows = conn.select(
             "SELECT * FROM shows WHERE LISTING_ID=%s", self.__listing.get_listing_id())
+        print(shows)
         for s in shows:
             print(self.__cinema, self.__cinema.get_screens())
             self.__listing.add_show(
@@ -564,6 +566,7 @@ class Model():
 
         bookings = conn.select(
             "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show.get_show_id())
+        print(bookings)
         for b in bookings:
             self.__show.add_booking(b["BOOKING_REFERENCE"], b["SEAT_TYPE"], b["BOOKING_SEAT_COUNT"],
                                     b["BOOKING_DATE"], b["BOOKING_PRICE"], self.__customers[b["CUSTOMER_EMAIL"]])
