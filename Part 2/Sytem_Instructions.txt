@@ -1,0 +1,76 @@
+Python Modules Required:
+- tkinter
+- tkcalendar
+- mysql.connector
+- datetime
+- random
+- passlib
+
+Also the python version needs to be 3.10 or later
+
+
+How to run the system:
+- Run the database dump to create the database
+- Alter dbfunc to reflect your own MySQL credentials for the database
+- Run app.py file
+
+
+
+
+Login details:
+
+Bristol Staff:
+ - booking staff:
+   - user_id = 5
+   - password = bb123
+
+ - admin:
+   - user_id = 6
+   - password = ba123
+
+ - manager:
+   - user_id = 7
+   - password = bm123
+
+
+
+Birmingham Staff:
+ - booking staff:
+   - user_id = 8
+   - password = bb123
+
+ - admin:
+   - user_id = 9
+   - password = ba123
+
+ - manager:
+   - user_id = 11
+   - password = bm123
+
+
+Cardiff Staff:
+ - booking staff:
+   - user_id = 12
+   - password = cb123
+
+ - admin:
+   - user_id = 10
+   - password = ca123
+
+ - manager:
+   - user_id = 13
+   - password = cm123
+
+
+London Staff:
+ - booking staff:
+   - user_id = 15
+   - password = lb123
+
+ - admin:
+   - user_id = 14
+   - password = la123
+
+ - manager:
+   - user_id = 16
+   - password = lm123
