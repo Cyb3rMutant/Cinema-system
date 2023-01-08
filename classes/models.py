@@ -144,6 +144,9 @@ class Model():
 
     def add_film(self, film_title, film_rating, film_genre, film_year, film_age_rating, film_duration, film_description, film_cast):
         try:
+            if film_title in self.__films.get_films():
+                return -4
+
             film_rating = float(film_rating)
             film_year = int(film_year)
             film_duration = int(film_duration)
@@ -334,10 +337,10 @@ class Model():
                     LEFT JOIN bookings b ON u.`USER_ID` = b.`USER_ID`\
                         LEFT JOIN shows s ON b.`SHOW_ID` = s.`SHOW_ID`\
                         LEFT JOIN listings l ON s.`LISTING_ID` = l.`LISTING_ID`\
-                    WHERE ISNULL(b.`REFUND`)\
+                    WHERE u.`CINEMA_ID` = %s AND ISNULL(b.`REFUND`)\
                         AND l.`LISTING_DATE` BETWEEN %s AND %s\
                     GROUP BY u.`USER_ID`\
-                    ORDER BY tot DESC", start, end)
+                    ORDER BY tot DESC", self.__cinema.get_cinema_id(), start, end)
 
     def get_city_price(self):
         try:  # Throws an error if no show is selected, returning -1 prevents
@@ -538,6 +541,7 @@ class Model():
 
         listings = conn.select(
             "SELECT * FROM listings WHERE CINEMA_ID=%s", self.__cinema.get_cinema_id())
+        print(listings)
         for l in listings:
             self.__cinema.add_listing(
                 l["LISTING_ID"], l["LISTING_DATE"], self.__films[l["FILM_TITLE"]])
@@ -553,6 +557,7 @@ class Model():
 
         shows = conn.select(
             "SELECT * FROM shows WHERE LISTING_ID=%s", self.__listing.get_listing_id())
+        print(shows)
         for s in shows:
             print(self.__cinema, self.__cinema.get_screens())
             self.__listing.add_show(
@@ -569,6 +574,7 @@ class Model():
 
         bookings = conn.select(
             "SELECT * FROM bookings WHERE SHOW_ID=%s AND ISNULL(REFUND)", self.__show.get_show_id())
+        print(bookings)
         for b in bookings:
             self.__show.add_booking(b["BOOKING_REFERENCE"], b["SEAT_TYPE"], b["BOOKING_SEAT_COUNT"],
                                     b["BOOKING_DATE"], b["BOOKING_PRICE"], self.__customers[b["CUSTOMER_EMAIL"]])

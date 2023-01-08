@@ -27,23 +27,34 @@ class Conn():
         return conn
 
     def select(self, query: str, *args):
+        self.__conn = self.__getConnection()
+        self.__dbcursor = self.__conn.cursor(dictionary=True)
         self.__dbcursor.execute(query, (*args,))
         data = self.__dbcursor.fetchall()
-
+        self.close()
         return data
 
     def insert(self, query: str, *args):
+        self.__conn = self.__getConnection()
+        self.__dbcursor = self.__conn.cursor(dictionary=True)
         self.__dbcursor.execute(query, args)
         self.__conn.commit()
-
+        self.close()
 # want to create update method (ben)
+
     def update(self, query: str, *args):
+        self.__conn = self.__getConnection()
+        self.__dbcursor = self.__conn.cursor(dictionary=True)
         self.__dbcursor.execute(query, args)
         self.__conn.commit()
+        self.close()
 
     def delete(self, query: str, *args):
+        self.__conn = self.__getConnection()
+        self.__dbcursor = self.__conn.cursor(dictionary=True)
         self.__dbcursor.execute(query, args)
         self.__conn.commit()
+        self.close()
 
     def close(self):
         self.__dbcursor.close()
