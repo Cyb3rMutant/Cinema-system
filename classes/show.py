@@ -1,3 +1,11 @@
+"""
+Authors:
+    Rohaan Aslam (21017718)
+    Benjamin Hussey (21022768)
+    Yazeed Abu-Hummous (21014295)
+Date: 08/01/2023
+Module: Advanced Software Development 22/23
+"""
 from booking_factory import Booking_factory
 
 

@@ -1,4 +1,11 @@
-from textwrap import wrap
+"""
+Authors:
+    Rohaan Aslam (21017718)
+    Benjamin Hussey (21022768)
+    Yazeed Abu-Hummous (21014295)
+Date: 08/01/2023
+Module: Advanced Software Development 22/23
+"""
 import tkinter as tk
 import tkinter.messagebox
 from tkcalendar import DateEntry
@@ -8,8 +15,7 @@ from manager import Manager
 from tkinter import ttk
 from tkinter.messagebox import showinfo
 import re
-# Started using inheritence for windows. In the testing stage atm of it
-# Started create booking GUI, working on validation
+
 
 
 class Main_frame(tk.Frame):

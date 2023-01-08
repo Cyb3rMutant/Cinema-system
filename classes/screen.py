@@ -1,3 +1,11 @@
+"""
+Authors:
+    Rohaan Aslam (21017718)
+    Benjamin Hussey (21022768)
+    Yazeed Abu-Hummous (21014295)
+Date: 08/01/2023
+Module: Advanced Software Development 22/23
+"""
 class Screen(object):
     def __init__(self, screen_id, num_vip_seats, num_upper_seats, num_lower_seats, screen_number):
 
