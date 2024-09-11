@@ -1,0 +1,5 @@
+babel==2.16.0
+mysql-connector==2.2.9
+mysql-connector-python==9.0.0
+passlib==1.7.4
+tkcalendar==1.6.1

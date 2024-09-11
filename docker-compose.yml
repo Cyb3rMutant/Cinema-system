@@ -1,0 +1,34 @@
+services:
+  cinema:
+    image: cinema
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix # Share the X11 socket for GUI
+    environment:
+      - DISPLAY=$DISPLAY # Pass the host display
+    depends_on:
+      - db
+    entrypoint: ["./entrypoint.sh"]
+  # "db" service
+  db:
+    # Name of the image to be pulled from Docker Hub.
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: p
+      MYSQL_DATABASE: HC # Automatically create the 'HC' database
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./ASD.sql:/docker-entrypoint-initdb.d/db.sql # Load db.sql on initialization
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  db_data:
